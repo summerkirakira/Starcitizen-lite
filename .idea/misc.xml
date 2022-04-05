@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="app/src/main/res/drawable/bottom_button_ripple.xml" value="0.1875" />
+        <entry key="app/src/main/res/drawable/ic_broken_image.xml" value="0.1875" />
+        <entry key="app/src/main/res/drawable/ic_stock_ok.xml" value="0.1875" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.3333333333333333" />
+        <entry key="app/src/main/res/layout/activity_web_login.xml" value="0.17135416666666667" />
+        <entry key="app/src/main/res/layout/home_fragment.xml" value="0.17135416666666667" />
+        <entry key="app/src/main/res/layout/main_fragment.xml" value="0.17135416666666667" />
+        <entry key="app/src/main/res/layout/shopping_catalog_list_item.xml" value="0.45" />
+        <entry key="app/src/main/res/layout/shopping_fragment.xml" value="0.17135416666666667" />
+        <entry key="app/src/main/res/menu/hanger_menu_bar.xml" value="0.1859375" />
+      </map>
+    </option>
+  </component>
+  <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="web" url="file://$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="jbr-11" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Starcitizen lite</string>
+    <string name="all_hanger">总览</string>
+    <string name="hanger">机库</string>
+    <string name="buyback">回购</string>
+    <string name="dollar">$</string>
+</resources>

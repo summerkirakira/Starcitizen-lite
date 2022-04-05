@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable name="property" type="vip.kirakira.starcitizenlite.database.ShopItem"/>
+    </data>
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginStart="2dp"
+                  android:orientation="vertical"
+                  android:background="?selectableItemBackground"
+    >
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+        >
+                <ImageView
+                        android:id="@+id/ship_image"
+                        tools:layout_width="177dp"
+                        android:layout_height="100dp"
+                        tools:layout_height="100dp"
+                        android:layout_width="177dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:adjustViewBounds="true"
+                        android:scaleType="fitXY"
+                        android:elevation="20dp"
+                        android:background="@color/white"
+                        android:imageUrl="@{property.slideshow}"
+                        android:src="@drawable/ic_launcher_background" />
+                <TextView android:layout_width="0dp"
+                          app:layout_constraintHorizontal_weight="1"
+                          app:layout_constraintEnd_toEndOf="parent"
+                          android:layout_height="wrap_content"
+                          android:layout_marginTop="5dp"
+                          android:id="@+id/ship_name"
+                          android:layout_marginStart="16dp"
+                          android:ellipsize="end"
+                          android:singleLine="false"
+                          android:maxLines="2"
+                          tools:text="HAMMERHEAD - STORMBRINGER PAINT "
+                          android:text="@{property.title}"
+                          android:textSize="16sp"
+                          android:textStyle="bold"
+                          app:layout_constraintStart_toEndOf="@+id/ship_image"
+                          app:layout_constraintTop_toTopOf="@+id/ship_image" />
+                <TextView android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:id="@+id/series_name"
+                          app:layout_constraintTop_toBottomOf="@id/ship_name"
+                          app:layout_constraintStart_toStartOf="@id/ship_name"
+                          android:layout_marginTop="8dp"
+                          tools:text="Paints"
+                          android:textStyle="bold"
+                          android:text="@{property.subtitle}"
+                />
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:id="@+id/currency_icon"
+                      app:layout_constraintStart_toStartOf="@id/ship_name"
+                      app:layout_constraintBottom_toBottomOf="parent"
+                      app:layout_constraintBaseline_toBaselineOf="@id/price"
+                      android:textSize="16sp"
+                      android:text="@string/dollar" android:fontFamily="serif"/>
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:id="@+id/price"
+                      app:layout_constraintStart_toEndOf="@id/currency_icon"
+                      app:layout_constraintBottom_toBottomOf="parent"
+                      android:textSize="23sp"
+                      android:layout_marginStart="2dp"
+                      tools:text="100"
+                      android:textStyle="bold"
+                      android:text="@{String.valueOf(Float.valueOf(property.nativePrice) / 100.0f)}"
+                      android:fontFamily="serif"/>
+            <ImageView android:layout_width="20dp"
+                       android:layout_height="20dp"
+                       android:id="@+id/can_buy"
+                       android:layout_marginEnd="5dp"
+                       app:tint="#FFD54F"
+                       android:src="@drawable/ic_double_check"
+                       app:layout_constraintEnd_toEndOf="parent"
+                       app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+<!--        <View-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="1dp"-->
+<!--                android:layout_marginTop="4dp"-->
+<!--                android:layout_marginBottom="4dp"-->
+<!--                android:layout_marginStart="4dp"-->
+<!--                android:layout_marginEnd="4dp"-->
+<!--                android:background="#2FCAC7C7"-->
+<!--        />-->
+    </LinearLayout>
+</layout>

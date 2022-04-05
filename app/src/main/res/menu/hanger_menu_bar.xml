@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+            android:id="@+id/home"
+            android:title="@string/all_hanger"
+            android:icon="@drawable/ic_stock_ok_small"
+            app:exb_color="#FF8888" />
+
+    <item
+            android:id="@+id/settings"
+            android:title="@string/hanger"
+            android:icon="@drawable/ic_stock_ok_small"
+            app:exb_color="#4DD0E1" />
+
+    <item
+            android:id="@+id/bookmarks"
+            android:title="@string/buyback"
+            android:icon="@drawable/ic_stock_ok_small"
+            app:exb_color="#fa2" />
+</menu>
