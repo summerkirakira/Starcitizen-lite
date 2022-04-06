@@ -3,21 +3,17 @@ package vip.kirakira.viewpagertest.ui.shopping
 import android.animation.ObjectAnimator
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.os.Handler
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.databinding.ShoppingFragmentBinding
+import java.util.*
+import kotlin.concurrent.schedule
 
 class ShoppingFragment : Fragment() {
 
@@ -62,6 +58,14 @@ class ShoppingFragment : Fragment() {
                 binding.fab.visibility = View.INVISIBLE
             }
         })
+
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.getCatalog()
+            Timer("StopRefreshing", false).schedule(1000) {
+                binding.swipeRefreshLayout.isRefreshing = false
+            }
+        }
+
         return binding.root
     }
 

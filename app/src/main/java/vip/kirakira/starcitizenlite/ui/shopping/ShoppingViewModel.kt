@@ -16,6 +16,8 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
     private var itemsAfterFilter = dataResource
 
+    var needRefresh = MutableLiveData<Boolean>(false)
+
     private var _popUpItem: MutableLiveData<ShopItem> = MutableLiveData()
     val popUpItem: LiveData<ShopItem>
         get() = _popUpItem
@@ -23,9 +25,9 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     var catalog = itemsAfterFilter
 
     init {
-//        getCatalog()
+        getCatalog()
         sortByPriceDesc()
-//        filterBySubtitle("Standand", false)
+        filterBySubtitle("Standalone Ship", true)
     }
 
     private fun isNew(item: ShopItem): Boolean = System.currentTimeMillis() - item.insert_time < 1000 * 60 * 60
@@ -68,7 +70,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    private fun getCatalog() {
+    fun getCatalog() {
         viewModelScope.launch {
             try{
                shopItemsRepository.refreshItems()

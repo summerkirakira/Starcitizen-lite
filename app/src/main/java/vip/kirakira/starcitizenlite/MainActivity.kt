@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity() {
 
     val shoppingViewModel: ShoppingViewModel by viewModels()
     lateinit var popupLayout: View
+    lateinit var searchButton: ImageView
 
     enum class FragmentType(val value: Int) {
         SHOPPING(0),
@@ -44,6 +45,16 @@ class MainActivity : AppCompatActivity() {
         bottomShopIcon = findViewById(R.id.bottom_shop_icon)
         bottomHangerIcon = findViewById(R.id.bottom_hanger_icon)
         bottomMainIcon = findViewById(R.id.bottom_main_icon)
+        searchButton = findViewById(R.id.search_icon)
+
+
+        searchButton.setOnClickListener(View.OnClickListener {
+            val searchFragment = SearchFragment.newInstance()
+            searchFragment.show(supportFragmentManager, "search")
+            searchFragment.setOnSearchClickListener {
+                keyword -> Toast.makeText(this, keyword, Toast.LENGTH_SHORT).show()
+            }
+        })
 
 
 
