@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
-    <FrameLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+>
+    <androidx.constraintlayout.widget.ConstraintLayout
+            tools:context=".ui.shopping.ShoppingFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context=".ui.shopping.ShoppingFragment">
+            android:layout_height="match_parent">
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout android:layout_width="match_parent"
                                                                android:layout_height="match_parent">
             <androidx.recyclerview.widget.RecyclerView
@@ -15,4 +19,68 @@
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     </FrameLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@+id/popupLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:src="@drawable/ic_stock_ok"
+            android:layout_margin="16dp" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:id="@+id/popupLayout"
+            android:visibility="invisible"
+            android:clickable="true"
+            android:elevation="10dp"
+            tools:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="@color/white"
+            android:layout_height="wrap_content">
+        <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
+                                                           android:layout_height="wrap_content"
+                                                           android:padding="10dp"
+                                                           android:background="@color/white"
+                                                           app:layout_constraintTop_toTopOf="parent"
+                                                           android:elevation="15dp" >
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      tools:text="AURORA MR STARTER PACK"
+                      app:layout_constraintStart_toStartOf="parent"
+                      app:layout_constraintTop_toTopOf="parent"
+                      android:id="@+id/text_view_shop_item_detail_title"
+                      android:textSize="24sp" />
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      tools:text="Aurora MR Starter Pack"
+                      android:textColor="#9E9B9B"
+                      app:layout_constraintStart_toStartOf="parent"
+                      app:layout_constraintTop_toBottomOf="@+id/text_view_shop_item_detail_title"
+                      android:id="@+id/text_view_shop_item_detail_subtitle"
+                      android:textSize="16sp" />
+            <View android:layout_width="60dp"
+                  android:layout_height="1dp"
+                  android:layout_marginTop="5dp"
+                  android:layout_marginBottom="5dp"
+                  android:background="#8BAEABAB"
+                  app:layout_constraintStart_toStartOf="parent"
+                  app:layout_constraintTop_toBottomOf="@+id/text_view_shop_item_detail_subtitle"
+                  android:id="@+id/view_shop_item_detail_divider" />
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      tools:text="The Prospector has long been the preferred ship for solo miners and surveyors throughout the universe. Featuring MISC’s sleek design sensibility, a bevy of high-tech mining tools, and dedicated storage pods for extracted resources, this utilitarian powerhouse perfectly balances form and functionality."
+                      app:layout_constraintStart_toStartOf="parent"
+                      app:layout_constraintTop_toBottomOf="@+id/view_shop_item_detail_divider"
+                      android:id="@+id/text_view_shop_item_detail_description"
+                      android:textSize="16sp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

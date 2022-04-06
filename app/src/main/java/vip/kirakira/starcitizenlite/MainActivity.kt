@@ -80,10 +80,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        shoppingViewModel.popUpItem.observe(this, androidx.lifecycle.Observer {
-            System.out.println("item changed")
-        })
-
     }
 
 }
