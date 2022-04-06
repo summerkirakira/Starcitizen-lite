@@ -1,9 +1,11 @@
 package vip.kirakira.starcitizenlite
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
@@ -12,6 +14,7 @@ import vip.kirakira.starcitizenlite.ui.ScreenSlidePagerAdapter
 import vip.kirakira.starcitizenlite.ui.home.HomeFragment
 import vip.kirakira.starcitizenlite.ui.main.MainFragment
 import vip.kirakira.viewpagertest.ui.shopping.ShoppingFragment
+import vip.kirakira.viewpagertest.ui.shopping.ShoppingViewModel
 
 
 var  PAGE_NUM = 3;
@@ -23,6 +26,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottomHangerIcon: ImageView
     private lateinit var bottomMainIcon: ImageView
     private var  density: Float = 0f
+
+    val shoppingViewModel: ShoppingViewModel by viewModels()
+    lateinit var popupLayout: View
 
     enum class FragmentType(val value: Int) {
         SHOPPING(0),
@@ -39,11 +45,14 @@ class MainActivity : AppCompatActivity() {
         bottomHangerIcon = findViewById(R.id.bottom_hanger_icon)
         bottomMainIcon = findViewById(R.id.bottom_main_icon)
 
-        var searchFragment: SearchFragment = SearchFragment.newInstance()
+
+
+
+        val searchFragment: SearchFragment = SearchFragment.newInstance()
         searchFragment.setOnSearchClickListener { keyword ->
             Toast.makeText(this, keyword, Toast.LENGTH_SHORT).show()
         }
-        searchFragment.showFragment(supportFragmentManager,SearchFragment.TAG);
+//        searchFragment.showFragment(supportFragmentManager,SearchFragment.TAG);
 
         bottomMainIcon.setOnClickListener {
             mPager.currentItem = FragmentType.MAIN.value
@@ -70,6 +79,11 @@ class MainActivity : AppCompatActivity() {
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels)
             }
         })
+
+        shoppingViewModel.popUpItem.observe(this, androidx.lifecycle.Observer {
+            System.out.println("item changed")
+        })
+
     }
 
 }

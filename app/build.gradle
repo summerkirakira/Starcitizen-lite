@@ -74,4 +74,6 @@ dependencies {
     implementation "com.github.st235:expandablebottombar:1.4.0"
 
     implementation 'com.wenwenwen888:searchbox:1.0.1'
+
+    implementation "com.sothree.slidinguppanel:library:3.4.0"
 }

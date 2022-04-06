@@ -23,6 +23,7 @@
             android:layout_width="240dp"
             android:layout_marginTop="3dp"
             android:layout_height="50dp"
+            android:visibility="gone"
             app:exb_backgroundCornerRadius="10dp"
             app:exb_backgroundColor="#2e2e2e"
             app:exb_itemInactiveColor="#fff"

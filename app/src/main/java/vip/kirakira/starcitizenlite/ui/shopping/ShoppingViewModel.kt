@@ -16,10 +16,14 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
     private var itemsAfterFilter = dataResource
 
+    private var _popUpItem: MutableLiveData<ShopItem> = MutableLiveData()
+    val popUpItem: LiveData<ShopItem>
+        get() = _popUpItem
+
     var catalog = itemsAfterFilter
 
     init {
-        getCatalog()
+//        getCatalog()
         sortByName()
         filterBySubtitle("Paints", true)
     }
@@ -64,8 +68,6 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-
-
     private fun getCatalog() {
         viewModelScope.launch {
             try{
@@ -74,5 +76,9 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                 e.printStackTrace()
             }
         }
+    }
+
+    fun popUpItemDetail(item: ShopItem) {
+        _popUpItem.value = item
     }
 }
