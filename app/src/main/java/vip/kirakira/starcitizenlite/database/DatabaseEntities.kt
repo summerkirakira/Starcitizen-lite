@@ -1,8 +1,11 @@
 package vip.kirakira.starcitizenlite.database
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 import vip.kirakira.starcitizenlite.network.shop.CatalogProperty
+import java.sql.Date
 
 @Entity(tableName = "users")
 data class User constructor(
@@ -50,6 +53,45 @@ data class ShopItem constructor(
     val price: Int,
     val type: String,
     val insert_time: Long
+)
+
+
+@Entity(tableName = "hanger_items")
+data class HangerItem constructor(
+    @PrimaryKey val id: String,
+    val image: String,
+    val package_id: Int,
+    val title: String,
+    val kind: String,
+    val subtitle: String,
+    val insert_time: Long
+)
+
+
+@Entity(tableName = "hanger_packages")
+data class HangerPackage constructor(
+    @PrimaryKey val id: Int,
+    val title: String,
+    val image: String,
+    val value: Int,
+    val status: String,
+    val is_upgrade: Boolean,
+    val upgrade_info: String,
+    val date: String,
+    val contains: String,
+    val also_contains: String,
+    val can_gift: Boolean,
+    val exchangeable: Boolean,
+    val insert_time: Long
+)
+
+data class HangerPackageWithItems constructor(
+    @Embedded var hangerPackage: HangerPackage,
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "package_id"
+    )
+    val hangerItems: List<HangerItem>
 )
 
 fun List<ShopItem>.toCatalogProperty(): List<CatalogProperty> {

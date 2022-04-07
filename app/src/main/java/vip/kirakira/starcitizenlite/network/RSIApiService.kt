@@ -5,6 +5,9 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.HeaderMap
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import vip.kirakira.starcitizenlite.network.shop.CatalogResponse
@@ -28,9 +31,13 @@ interface RSIApiService {
     @Headers("Accept: */*" )
     @POST("graphql")
     suspend fun getCatalog(@Body body: BaseGraphQLBody): CatalogResponse
+
+    @GET("account/pledges")
+    suspend fun getHanger(@HeaderMap headers: Map<String, String>): String
 }
 
 object RSIApi {
     val retrofitService : RSIApiService by lazy {
         retrofit.create(RSIApiService::class.java) }
 }
+
