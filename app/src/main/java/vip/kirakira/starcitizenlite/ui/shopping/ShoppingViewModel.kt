@@ -27,7 +27,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     init {
         getCatalog()
         sortByPriceDesc()
-        filterBySubtitle("Standalone Ship", true)
+        filterBySubtitle("Standalone Ship", false)
     }
 
     private fun isNew(item: ShopItem): Boolean = System.currentTimeMillis() - item.insert_time < 1000 * 60 * 60

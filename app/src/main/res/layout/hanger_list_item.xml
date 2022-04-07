@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <data>
+        <variable name="hangerItemProperty"
+                  type="vip.kirakira.starcitizenlite.ui.home.HangerItemProperty"/>
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                       android:layout_width="match_parent"
+                                                       android:layout_height="wrap_content"
+                                                       android:padding="5dp"
+                                                       android:background="?selectableItemBackground"
+                                                       xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                       xmlns:tools="http://schemas.android.com/tools">
+        <ImageView android:layout_width="100dp" android:layout_height="100dp"
+                   android:id="@+id/hanger_item_image"
+                   app:layout_constraintStart_toStartOf="parent"
+                   app:layout_constraintTop_toTopOf="parent"
+                   android:imageUrl="@{hangerItemProperty.image}"
+                   tools:src="@drawable/ic_launcher_background" />
+        <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/insurance_item_button"
+                app:layout_constraintStart_toStartOf="@+id/hanger_item_image"
+                app:layout_constraintTop_toTopOf="@+id/hanger_item_image"
+                app:qmui_backgroundColor="#FF8A65"
+                android:visibility="gone"
+                tools:visibility="visible"
+                tools:text="LTI"
+                android:text="@{hangerItemProperty.insurance}"
+                android:padding="2dp"
+                android:textColor="@color/white"
+                app:qmui_borderColor="#FF8A65"
+                app:qmui_radiusTopLeft="2dp"
+                app:qmui_radiusTopRight="4dp"
+                app:qmui_radiusBottomLeft="4dp"
+                app:qmui_radiusBottomRight="4dp"
+                 />
+        <TextView android:layout_width="30dp" android:layout_height="30dp"
+                  android:id="@+id/hanger_item_number"
+                  android:elevation="10dp"
+                  android:gravity="center"
+                  app:layout_constraintEnd_toEndOf="@+id/hanger_item_image"
+                  app:layout_constraintBottom_toBottomOf="@+id/hanger_item_image"
+                  android:layout_margin="2dp"
+                  android:textColor="@color/white"
+                  android:text="@{String.valueOf(hangerItemProperty.number)}"
+                  android:background="@drawable/number_shape"
+                  tools:text="+1"
+                   />
+        <TextView android:layout_width="0dp"
+                  android:layout_height="wrap_content"
+                  android:ellipsize="end"
+                  android:singleLine="false"
+                  android:maxLines="2"
+                  android:layout_marginEnd="0dp"
+                  android:id="@+id/hanger_item_title"
+                  app:layout_constraintEnd_toEndOf="parent"
+                  app:layout_constraintStart_toEndOf="@+id/hanger_item_image"
+                  app:layout_constraintTop_toTopOf="parent"
+                  tools:text="XENOTHREAT 3.14.1 - CDF VETERAN XENOTHREAT 3.14.1 - CDF VETERAN"
+                  android:text="@{hangerItemProperty.name}"
+                  android:layout_marginStart="5dp"
+                  android:textStyle="bold"
+                  android:textSize="16sp" />
+        <com.qmuiteam.qmui.widget.QMUIFloatLayout
+            app:layout_constraintStart_toStartOf="@+id/hanger_item_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/hanger_item_title"
+            android:layout_marginTop="5dp"
+            app:qmui_childHorizontalSpacing="5dp"
+            app:qmui_childVerticalSpacing="5dp"
+            android:id="@+id/tag_container">
+            <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
+                style="@style/hanger_tag"
+                android:text="@{hangerItemProperty.status}"
+                android:id="@+id/hanger_item_status"
+                tools:text="Distributed"
+                android:visibility="visible"
+                app:qmui_borderColor="#AED581"
+                android:textColor="#AED581"
+                app:qmui_radius="6dp" />
+            <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
+                    style="@style/hanger_tag"
+                    android:id="@+id/can_reclaim"
+                    tools:visibility="visible"
+                    app:qmui_radius="6dp"
+                    android:text="@string/can_reclaim"
+                    android:textColor="@color/text_grey"
+                    app:qmui_borderColor="@color/text_grey" />
+
+            <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
+                    android:id="@+id/can_upgrade"
+                    android:text="@string/can_upgrade"
+                    app:qmui_radius="6dp"
+                    tools:visibility="visible"
+                    style="@style/hanger_tag"/>
+            <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
+                    style="@style/hanger_tag"
+                    android:text="@string/can_gift"
+                    android:id="@+id/can_gift"
+                    tools:visibility="visible"
+                    app:qmui_radius="6dp"
+                    app:qmui_borderColor="#F89BAC"
+                    android:textColor="#F89BAC" />
+        </com.qmuiteam.qmui.widget.QMUIFloatLayout>
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:id="@+id/time_text"
+                  tools:text="2022-12-12"
+                  android:text="@{hangerItemProperty.date}"
+                  app:layout_constraintEnd_toEndOf="parent"
+                  app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:id="@+id/dollar_icon"
+                  android:textSize="20sp"
+                  app:layout_constraintStart_toStartOf="@+id/hanger_item_title"
+                  app:layout_constraintBottom_toBottomOf="parent"
+                  android:text="@string/dollar"/>
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  app:layout_constraintStart_toEndOf="@+id/dollar_icon"
+                  app:layout_constraintBaseline_toBaselineOf="@+id/dollar_icon"
+                  tools:text="40"
+                  android:textSize="24sp"
+                  android:text="@{String.valueOf(Float.valueOf(hangerItemProperty.price) / 100.0f)}"
+                  android:layout_marginStart="2dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

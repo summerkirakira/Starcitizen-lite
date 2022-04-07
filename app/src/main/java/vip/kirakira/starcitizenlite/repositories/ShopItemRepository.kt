@@ -31,7 +31,7 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
                     break
                 }
                 database.shopItemDao.insertAll(data.toShopItem())
-                System.out.println("Crawling page: $page")
+                println("Crawling page: $page")
                 page++
             }
         }

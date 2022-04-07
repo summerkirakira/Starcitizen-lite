@@ -20,7 +20,7 @@ class HangerProcess {
             for(pledge in pledgeList) {
                 val pledgeId = pledge.select(".js-pledge-id").attr("value").toInt()
                 val pledgeValue = (pledge.select(".js-pledge-value").attr("value").replace("$", "").replace(" USD", "").toFloat() * 100).toInt()
-                val pledgeImage = pledge.select("div.image").attr("style")
+                val pledgeImage = pledge.select("div.image").attr("style").replace("background-image:url('", "").replace("');", "")
                 val pledgeTitle = pledge.select(".title-col")[0].text()
                 val pledgeStatus = pledge.select(".availability").text()
                 val pledgeDate = pledge.select(".date-col").text().replace("Created: ", "")
@@ -34,7 +34,7 @@ class HangerProcess {
                 val itemList = pledge.select(".with-images").select(".item").mapIndexed { position, item ->
                     val id = "$pledgeId#$position"
                     val title = item.select(".title").text()
-                    val image = item.select(".image").attr("style")
+                    val image = item.select(".image").attr("style").replace("background-image:url('", "").replace("');", "")
                     val kind = item.select(".kind").text()
                     val subtitle = item.select(".liner").text()
                     HangerItem(id, image, pledgeId, title, kind, subtitle, System.currentTimeMillis())

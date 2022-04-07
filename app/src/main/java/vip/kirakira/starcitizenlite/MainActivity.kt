@@ -1,8 +1,10 @@
 package vip.kirakira.starcitizenlite
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -40,14 +42,24 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        mMovingBar = findViewById(R.id.bottom_moving_bar)
-        mPager = findViewById(R.id.pager)
-        bottomShopIcon = findViewById(R.id.bottom_shop_icon)
-        bottomHangerIcon = findViewById(R.id.bottom_hanger_icon)
-        bottomMainIcon = findViewById(R.id.bottom_main_icon)
-        searchButton = findViewById(R.id.search_icon)
 
+        supportActionBar?.hide() //隐藏标题栏
 
+        window.apply {
+            clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            statusBarColor = Color.TRANSPARENT
+        } //设置状态栏透明
+
+        mMovingBar = findViewById(R.id.bottom_moving_bar) //底部滑动条
+        mPager = findViewById(R.id.pager) //ViewPager
+        bottomShopIcon = findViewById(R.id.bottom_shop_icon) //底部购物车图标
+        bottomHangerIcon = findViewById(R.id.bottom_hanger_icon) //底部挂件图标
+        bottomMainIcon = findViewById(R.id.bottom_main_icon) //底部主页图标
+        searchButton = findViewById(R.id.search_icon) //搜索按钮
+
+        //设置底部图标的点击事件
         searchButton.setOnClickListener(View.OnClickListener {
             val searchFragment = SearchFragment.newInstance()
             searchFragment.show(supportFragmentManager, "search")

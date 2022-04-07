@@ -78,4 +78,6 @@ dependencies {
     implementation "com.sothree.slidinguppanel:library:3.4.0"
 
     implementation "org.jsoup:jsoup:1.13.1"
+
+    implementation 'com.qmuiteam:qmui:2.0.0-alpha10'
 }

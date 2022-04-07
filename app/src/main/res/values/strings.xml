@@ -4,4 +4,7 @@
     <string name="hanger">机库</string>
     <string name="buyback">回购</string>
     <string name="dollar">$</string>
+    <string name="can_upgrade">可升级</string>
+    <string name="can_reclaim">可融解</string>
+    <string name="can_gift">可礼物</string>
 </resources>
