@@ -85,6 +85,17 @@ data class HangerPackage constructor(
     val insert_time: Long
 )
 
+@Entity(tableName = "buyback")
+data class BuybackItem constructor(
+    @PrimaryKey val id: Int,
+    val title: String,
+    val image: String,
+    val date: String,
+    val contains: String,
+    val also_contains: String,
+    val insert_time: Long
+)
+
 data class HangerPackageWithItems constructor(
     @Embedded var hangerPackage: HangerPackage,
     @Relation(

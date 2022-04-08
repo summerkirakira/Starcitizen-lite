@@ -7,4 +7,6 @@
     <string name="can_upgrade">可升级</string>
     <string name="can_reclaim">可融解</string>
     <string name="can_gift">可礼物</string>
+    <string name="items">Items</string>
+    <string name="also_contains">Also Contains</string>
 </resources>

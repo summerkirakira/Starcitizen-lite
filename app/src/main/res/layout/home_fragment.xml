@@ -1,22 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:tools="http://schemas.android.com/tools" xmlns:app="http://schemas.android.com/apk/res-auto"
         tools:context=".ui.home.HomeFragment">
     <data>
 
     </data>
-<FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
+                                                       android:layout_height="match_parent">
+        <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        <androidx.recyclerview.widget.RecyclerView android:layout_width="match_parent"
-                                                   android:layout_height="match_parent"
-                                                   android:id="@+id/hangerRecyclerView"/>
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                    android:id="@+id/swipeRefreshLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                <androidx.recyclerview.widget.RecyclerView android:layout_width="match_parent"
+                                                           android:layout_height="match_parent"
+                                                           android:id="@+id/hangerRecyclerView"/>
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-</FrameLayout>
+        </FrameLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:clickable="true"
+                android:id="@+id/popupLayout"
+                android:background="@color/white"
+                android:visibility="gone"
+                android:elevation="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <ScrollView android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:id="@+id/popupScrollView"
+                            android:maxHeight="100dp"
+                            android:padding="10dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/contentContainer"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/itemsTitle"
+                            android:text="@string/items"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:gravity="start"
+                            android:padding="10dp"/>
+<!--                        <View-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="2dp"-->
+<!--                            android:background="@color/black" />-->
+                        <LinearLayout android:layout_width="match_parent"
+                                      android:layout_height="wrap_content"
+                                      android:id="@+id/itemsLinearLayout"
+                                      android:orientation="vertical" />
+                        <TextView android:layout_width="match_parent"
+                                  android:layout_height="wrap_content"
+                                  android:id="@+id/alsoContainsTitle"
+                                  android:text="@string/also_contains"
+                                  android:textSize="20sp"
+                                  android:textStyle="bold"
+                                  android:gravity="start"
+                                  android:padding="10dp"/>
+                        <LinearLayout android:layout_width="match_parent"
+                                      android:layout_height="wrap_content"
+                                      android:id="@+id/alsoContainsLinearLayout"
+                                      android:orientation="vertical" />
+
+
+                    </LinearLayout>
+
+                </ScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

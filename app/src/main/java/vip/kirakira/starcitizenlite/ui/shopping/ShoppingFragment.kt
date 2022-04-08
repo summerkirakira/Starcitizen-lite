@@ -40,6 +40,10 @@ class ShoppingFragment : Fragment() {
             adapter.submitList(it)
         }
 
+        viewModel.isRefreshing.observe(viewLifecycleOwner) {
+            binding.swipeRefreshLayout.isRefreshing = it
+        }
+
         binding.lifecycleOwner = this
 
         viewModel.popUpItem.observe(this, androidx.lifecycle.Observer {
@@ -61,9 +65,6 @@ class ShoppingFragment : Fragment() {
 
         binding.swipeRefreshLayout.setOnRefreshListener {
             viewModel.getCatalog()
-            Timer("StopRefreshing", false).schedule(1000) {
-                binding.swipeRefreshLayout.isRefreshing = false
-            }
         }
 
         return binding.root

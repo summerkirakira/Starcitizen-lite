@@ -2,6 +2,7 @@ package vip.kirakira.starcitizenlite.network.hanger
 
 import okhttp3.Request
 import org.jsoup.Jsoup
+import vip.kirakira.starcitizenlite.database.BuybackItem
 import vip.kirakira.starcitizenlite.database.HangerItem
 import vip.kirakira.starcitizenlite.database.HangerPackage
 import java.net.URL
@@ -44,4 +45,24 @@ class HangerProcess {
             }
             return PackageWithItem(hangerPackages, hangerItems)
         }
+
+    fun parseBuybackItem(page: String): List<BuybackItem> {
+        val doc = Jsoup.parse(page)
+        val buybackItems: MutableList<BuybackItem> = mutableListOf()
+        for (pledge in doc.select("article.pledge")) {
+            val image = pledge.select("img").attr("src")
+            val title = pledge.select(".information").select("h1").text()
+            val time = pledge.select("dl").select("dd")[0].text()
+            val contains = pledge.select("dl").select("dd")[2].text()
+            var pledgeId = 0
+            try {
+                pledgeId = pledge.select(".holosmallbtn").attr("href").split("/").last().toInt()
+            }
+            catch (e: Exception) {
+                pledgeId = pledge.select(".holosmallbtn").attr("data-pledgeid").toInt()
+            }
+            buybackItems.add(BuybackItem(pledgeId, title, image, time, contains, "回购此物品将会消耗一次回购机会", System.currentTimeMillis()))
+        }
+        return buybackItems
+    }
 }

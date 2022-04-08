@@ -1,5 +1,6 @@
 package vip.kirakira.starcitizenlite.ui.home
 
+import vip.kirakira.starcitizenlite.database.BuybackItem
 import vip.kirakira.starcitizenlite.database.HangerItem
 import vip.kirakira.starcitizenlite.database.HangerPackageWithItems
 import vip.kirakira.starcitizenlite.network.hanger.HangerProcess
@@ -16,12 +17,38 @@ data class HangerItemProperty(
     val contains: String,
     val price: Int,
     val insurance: String,
+    val alsoContains: String,
     val items: List<HangerItem>
 ) {
     data class Tag(
         val name: String,
         val color: String
     )
+}
+
+fun List<BuybackItem>.toItemProperty(): List<HangerItemProperty> {
+    val map = mutableMapOf<String, HangerItemProperty>()
+    for (item in this) {
+        if(map[item.title] == null){
+            map[item.title] = HangerItemProperty(
+                id = item.id,
+                name = item.title,
+                image = item.image,
+                number = 1,
+                status = "回购中",
+                tags = listOf(),
+                date = item.date,
+                contains = item.contains,
+                price = -1,
+                insurance = "",
+                alsoContains = item.contains,
+                items = listOf()
+            )
+        } else {
+            map[item.title]!!.number++
+        }
+    }
+    return map.values.toList()
 }
 
 fun List<HangerPackageWithItems>.toItemPropertyList(): List<HangerItemProperty> {
@@ -81,6 +108,7 @@ fun List<HangerPackageWithItems>.toItemPropertyList(): List<HangerItemProperty> 
                 packageWithItems.hangerPackage.contains,
                 packageWithItems.hangerPackage.value,
                 insuranceString,
+                packageWithItems.hangerPackage.also_contains,
                 packageWithItems.hangerItems
             )
         } else {

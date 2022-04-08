@@ -51,6 +51,14 @@ object RSIApi {
         val response = client.newCall(request).execute()
         return response.body()!!.string()
     }
+
+    fun getBuybackPage(page: Int, page_size: Int=250, headers: Map<String, String>) : String {
+        val request = Request.Builder().url(URL("https://robertsspaceindustries.com/account/buy-back-pledges?page=$page&pagesize=$page_size"))
+            .addHeader("cookie", headers["cookie"]!!)
+            .build()
+        val response = client.newCall(request).execute()
+        return response.body()!!.string()
+    }
 }
 
 

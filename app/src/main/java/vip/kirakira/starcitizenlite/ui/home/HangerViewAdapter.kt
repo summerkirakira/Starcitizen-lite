@@ -28,6 +28,13 @@ class HangerViewAdapter(private val onClickListener: HangerViewAdapter.OnClickLi
 
     class ViewHolder private constructor(val binding: HangerListItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: HangerItemProperty) {
+            if(item.price == -1){
+                binding.dollarIcon.visibility = View.GONE
+                binding.priceText.visibility = View.GONE
+            } else {
+                binding.dollarIcon.visibility = View.VISIBLE
+                binding.priceText.visibility = View.VISIBLE
+            }
             binding.hangerItemProperty = item
             binding.canUpgrade.visibility = View.GONE
             binding.canReclaim.visibility = View.GONE

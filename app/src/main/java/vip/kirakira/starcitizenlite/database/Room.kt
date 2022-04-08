@@ -51,10 +51,23 @@ interface HangerItemDao {
 
 }
 
-@Database(entities = [ShopItem::class, HangerItem::class, HangerPackage::class], version = 1)
+@Dao
+interface BuybackItemDao {
+    @Query("SELECT * FROM buyback")
+    fun getAll(): LiveData<List<BuybackItem>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(buybackItems: List<BuybackItem>)
+
+    @Query("Delete FROM buyback where insert_time < :time")
+    fun deleteAllOldItems(time: Long)
+}
+
+@Database(entities = [ShopItem::class, HangerItem::class, HangerPackage::class, BuybackItem::class], version = 1)
 abstract class ShopItemDatabase: RoomDatabase() {
     abstract val shopItemDao: ShopItemDao
     abstract val hangerItemDao: HangerItemDao
+    abstract val buybackItemDao: BuybackItemDao
 }
 
 private lateinit var INSTANCE: ShopItemDatabase

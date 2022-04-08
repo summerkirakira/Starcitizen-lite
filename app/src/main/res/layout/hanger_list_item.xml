@@ -122,6 +122,7 @@
                   android:text="@string/dollar"/>
         <TextView android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
+                  android:id="@+id/price_text"
                   app:layout_constraintStart_toEndOf="@+id/dollar_icon"
                   app:layout_constraintBaseline_toBaselineOf="@+id/dollar_icon"
                   tools:text="40"

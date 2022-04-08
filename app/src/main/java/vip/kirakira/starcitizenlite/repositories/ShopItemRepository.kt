@@ -1,6 +1,7 @@
 package vip.kirakira.viewpagertest.repositories
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.map
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +16,7 @@ import vip.kirakira.viewpagertest.network.graphql.UpdateCatalogMutation
 class ShopItemRepository(private val database: ShopItemDatabase) {
 
     val allItems: LiveData<List<ShopItem>> = database.shopItemDao.getAll()
+    var isRefreshing: MutableLiveData<Boolean> = MutableLiveData(false)
 
     suspend fun getAll() = database.shopItemDao.getAll()
     suspend fun getShopItem(id: Int) = database.shopItemDao.getById(id)
@@ -23,6 +25,7 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
     suspend fun refreshItems() {
         withContext(Dispatchers.IO) {
             var page = 1;
+            isRefreshing.postValue(true)
             while (true) {
                 val data = RSIApi.retrofitService.getCatalog(
                     UpdateCatalogMutation().getRequestBody(page)
@@ -34,6 +37,7 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
                 println("Crawling page: $page")
                 page++
             }
+            isRefreshing.postValue(false)
         }
     }
 

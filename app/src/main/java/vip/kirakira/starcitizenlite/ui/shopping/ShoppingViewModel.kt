@@ -12,6 +12,8 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
     private val shopItemsRepository = ShopItemRepository(getDatabase(application))
 
+    var isRefreshing = shopItemsRepository.isRefreshing
+
     private val dataResource = shopItemsRepository.allItems
 
     private var itemsAfterFilter = dataResource
