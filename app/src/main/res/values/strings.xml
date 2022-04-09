@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Starcitizen lite</string>
+    <string name="preference_file_key">vip.kirakira.starcitizenlite.kirakira</string>
+    <string name="primary_user_key">PRIMARY_USER</string>
     <string name="all_hanger">总览</string>
     <string name="hanger">机库</string>
     <string name="buyback">回购</string>

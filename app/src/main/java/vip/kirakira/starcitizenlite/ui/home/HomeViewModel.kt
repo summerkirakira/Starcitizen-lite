@@ -23,7 +23,8 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
     val hangerItems = hangerItemRepository.allPackagesAndItems
 
     init {
-        refreshBuybackItems()
+//        refreshBuybackItems()
+        refresh()
     }
 
     fun refresh() {

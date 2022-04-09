@@ -84,12 +84,12 @@ class HomeFragment : Fragment() {
 
         binding.hangerRecyclerView.adapter = adapter
         binding.hangerRecyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
-//        viewModel.hangerItems.observe(viewLifecycleOwner) {
-//            adapter.submitList(it.toItemPropertyList())
-//        }
-        viewModel.buybackItems.observe(viewLifecycleOwner) {
-            adapter.submitList(it.toItemProperty())
+        viewModel.hangerItems.observe(viewLifecycleOwner) {
+            adapter.submitList(it.toItemPropertyList())
         }
+//        viewModel.buybackItems.observe(viewLifecycleOwner) {
+//            adapter.submitList(it.toItemProperty())
+//        }
 
         viewModel.isRefreshing.observe(viewLifecycleOwner) {
             binding.swipeRefreshLayout.isRefreshing = it

@@ -7,9 +7,9 @@ import androidx.room.Relation
 import vip.kirakira.starcitizenlite.network.shop.CatalogProperty
 import java.sql.Date
 
-@Entity(tableName = "users")
+@Entity(tableName = "user")
 data class User constructor(
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     val id: Int,
     val name: String,
 
@@ -24,6 +24,8 @@ data class User constructor(
     val language: String,
     val country: String,
     val region: String,
+    val referral_code: String,
+    val referral_count: Int,
 
     val store: Int,
     val uec: Int,

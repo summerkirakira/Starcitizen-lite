@@ -1,5 +1,6 @@
 package vip.kirakira.starcitizenlite
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
@@ -11,7 +12,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper
 import com.wyt.searchbox.SearchFragment
+import vip.kirakira.starcitizenlite.activities.WebLoginActivity
 import vip.kirakira.starcitizenlite.ui.ScreenSlidePagerAdapter
 import vip.kirakira.starcitizenlite.ui.home.HomeFragment
 import vip.kirakira.starcitizenlite.ui.main.MainFragment
@@ -45,12 +48,16 @@ class MainActivity : AppCompatActivity() {
 
         supportActionBar?.hide() //隐藏标题栏
 
-        window.apply {
-            clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            statusBarColor = Color.TRANSPARENT
-        } //设置状态栏透明
+        val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
+
+        var primaryUserId = sharedPreferences.getInt(getString(R.string.primary_user_key), 0)
+
+
+
+        QMUIStatusBarHelper.translucent(this)
+        QMUIStatusBarHelper.setStatusBarLightMode(this)
+        QMUIStatusBarHelper.getStatusbarHeight(this)
+         //设置状态栏透明
 
         mMovingBar = findViewById(R.id.bottom_moving_bar) //底部滑动条
         mPager = findViewById(R.id.pager) //ViewPager
@@ -102,6 +109,9 @@ class MainActivity : AppCompatActivity() {
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels)
             }
         })
+
+        val intent = Intent(this, WebLoginActivity::class.java)
+        startActivity(intent)
 
     }
 
