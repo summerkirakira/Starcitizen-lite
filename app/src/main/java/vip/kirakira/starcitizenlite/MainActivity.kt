@@ -3,6 +3,7 @@ package vip.kirakira.starcitizenlite
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
@@ -11,10 +12,15 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.viewpager2.widget.ViewPager2
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper
+import com.qmuiteam.qmui.widget.QMUIEmptyView
 import com.wyt.searchbox.SearchFragment
 import vip.kirakira.starcitizenlite.activities.WebLoginActivity
+import vip.kirakira.starcitizenlite.database.User
+import vip.kirakira.starcitizenlite.database.getDatabase
+import vip.kirakira.starcitizenlite.network.setRSICookie
 import vip.kirakira.starcitizenlite.ui.ScreenSlidePagerAdapter
 import vip.kirakira.starcitizenlite.ui.home.HomeFragment
 import vip.kirakira.starcitizenlite.ui.main.MainFragment
@@ -30,6 +36,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottomShopIcon: ImageView
     private lateinit var bottomHangerIcon: ImageView
     private lateinit var bottomMainIcon: ImageView
+    private lateinit var errorBox: QMUIEmptyView
     private var  density: Float = 0f
 
     val shoppingViewModel: ShoppingViewModel by viewModels()
@@ -50,9 +57,11 @@ class MainActivity : AppCompatActivity() {
 
         val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
 
-        var primaryUserId = sharedPreferences.getInt(getString(R.string.primary_user_key), 0)
+        val primaryUserId = sharedPreferences.getInt(getString(R.string.primary_user_key), 0)
 
+        val database = getDatabase(application)
 
+        val currentUser: LiveData<User> = database.userDao.getById(primaryUserId)
 
         QMUIStatusBarHelper.translucent(this)
         QMUIStatusBarHelper.setStatusBarLightMode(this)
@@ -65,6 +74,10 @@ class MainActivity : AppCompatActivity() {
         bottomHangerIcon = findViewById(R.id.bottom_hanger_icon) //底部挂件图标
         bottomMainIcon = findViewById(R.id.bottom_main_icon) //底部主页图标
         searchButton = findViewById(R.id.search_icon) //搜索按钮
+
+        currentUser.observe(this) {
+            setRSICookie(it.rsi_token, it.rsi_device)
+        }
 
         //设置底部图标的点击事件
         searchButton.setOnClickListener(View.OnClickListener {
@@ -109,9 +122,6 @@ class MainActivity : AppCompatActivity() {
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels)
             }
         })
-
-        val intent = Intent(this, WebLoginActivity::class.java)
-        startActivity(intent)
 
     }
 

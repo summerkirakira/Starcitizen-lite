@@ -78,10 +78,10 @@ interface UserDao {
     fun delete(id: Int)
 
     @Query("SELECT * FROM user where id = :id")
-    fun getById(id: Int): User
+    fun getById(id: Int): LiveData<User>
 
     @Query("SELECT * FROM user where handle = :handle")
-    fun getByHandle(handle: String): User
+    fun getByHandle(handle: String): LiveData<User>
 }
 
 @Database(entities = [ShopItem::class, HangerItem::class, HangerPackage::class, BuybackItem::class, User::class], version = 1)

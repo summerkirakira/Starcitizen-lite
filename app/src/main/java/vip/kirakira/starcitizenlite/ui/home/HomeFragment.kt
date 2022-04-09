@@ -1,5 +1,8 @@
 package vip.kirakira.starcitizenlite.ui.home
 
+import android.content.ClipData.newIntent
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +14,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import vip.kirakira.starcitizenlite.R
+import vip.kirakira.starcitizenlite.activities.WebLoginActivity
 import vip.kirakira.starcitizenlite.databinding.HomeFragmentBinding
 import vip.kirakira.starcitizenlite.ui.loadImage
 
@@ -26,6 +30,7 @@ class HomeFragment : Fragment() {
     private lateinit var viewModel: HomeViewModel
 
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,6 +42,25 @@ class HomeFragment : Fragment() {
         binding.contentContainer.setOnClickListener(View.OnClickListener {
             binding.popupLayout.visibility = View.GONE
         })
+
+        viewModel.currentUser.observe(viewLifecycleOwner) {
+            if (it == null) {
+                binding.swipeRefreshLayout.visibility = View.GONE
+                binding.errorBox.setTitleText(getString(R.string.not_login_error_box_title))
+                binding.errorBox.setDetailText(getString(R.string.not_login_error_box_detail))
+                binding.errorBox.setButton(
+                    "点击登陆"
+                ) {
+                    val intent = Intent(context, WebLoginActivity::class.java)
+                    startActivity(intent)
+                }
+                binding.errorBox.show()
+            } else {
+                binding.swipeRefreshLayout.visibility = View.VISIBLE
+                binding.errorBox.hide()
+            }
+        }
+
         val adapter = HangerViewAdapter(
             HangerViewAdapter.OnClickListener {
                 if(binding.popupLayout.visibility == View.VISIBLE) {

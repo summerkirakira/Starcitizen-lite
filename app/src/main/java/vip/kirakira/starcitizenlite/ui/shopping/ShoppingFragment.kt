@@ -42,6 +42,9 @@ class ShoppingFragment : Fragment() {
 
         viewModel.isRefreshing.observe(viewLifecycleOwner) {
             binding.swipeRefreshLayout.isRefreshing = it
+            if(!it) {
+                binding.catalogRecyclerView.scrollToPosition(0)
+            }
         }
 
         binding.lifecycleOwner = this

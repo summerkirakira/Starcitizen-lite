@@ -7,6 +7,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.webkit.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -14,10 +20,12 @@ import okhttp3.RequestBody
 import org.jsoup.Jsoup
 import vip.kirakira.starcitizenlite.MainActivity
 import vip.kirakira.starcitizenlite.R
+import vip.kirakira.starcitizenlite.database.ShopItemDatabase
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.network.DEFAULT_USER_AGENT
 import vip.kirakira.starcitizenlite.network.RSI_COOKIE_CONSTENT
+import vip.kirakira.starcitizenlite.repositories.UserRepository
 import vip.kirakira.viewpagertest.network.graphql.SignInMutation
 
 class WebLoginActivity : AppCompatActivity() {
@@ -41,14 +49,41 @@ XMLHttpRequest.prototype.send = function(body) {
     lateinit var temp_device_id: String
     var password: String? = null
     var email: String? = null
+    var needMultiStep = MutableLiveData<Boolean>(false)
+    var isLogin = MutableLiveData<User>(null)
+
+    val scope = CoroutineScope(Job() + Dispatchers.Main)
+
+    lateinit var database: ShopItemDatabase
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_web_login)
         supportActionBar?.hide()
+
+        val userRepository = UserRepository(getDatabase(application))
+
         loginWebView = findViewById(R.id.login_webview)
         loginWebView.evaluateJavascript(INTERCEPT_JS, null)
+        database = getDatabase(application)
+        isLogin.observe(this, androidx.lifecycle.Observer {
+            if (it != null) {
+                val pref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+                with(pref.edit()) {
+                    putInt(getString(R.string.primary_user_key), it.id)
+                    putBoolean(getString(R.string.is_log_in), true)
+                    apply()
+                }
+                scope.launch {
+                    userRepository.insertUser(it)
+                }
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+        })
+
         loginWebView.webViewClient = object : LoginWebViewClient() {
 
             override fun onPageStarted(
@@ -106,7 +141,8 @@ XMLHttpRequest.prototype.send = function(body) {
                         Log.i("WebLoginActivity", responseBody!!)
                         if("RsiAuthenticatedAccount" in responseBody!!){
                             val successLoginInfo = SignInMutation().parseLoginSuccess(responseBody)
-                            saveUserData(successLoginInfo.data.account_multistep.id, temp_device_id, temp_rsi_token, email!!, password!!)
+                            val newUser = saveUserData(successLoginInfo.data.account_multistep.id, temp_device_id, temp_rsi_token, email!!, password!!)
+                            isLogin.postValue(newUser)
 //                            Log.i("WebLoginActivity", "-----------Success-----------")
                         }
                     }
@@ -144,7 +180,6 @@ XMLHttpRequest.prototype.send = function(body) {
 
     fun saveUserData(uid: Int, rsi_device: String, rsi_token: String, email: String, password: String): User {
         val cookie = "CookieConsent=$RSI_COOKIE_CONSTENT;Rsi-Token=$rsi_token; _rsi_device=$rsi_device"
-        val pref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
         val builder = Request.Builder()
         val req = builder.url("https://robertsspaceindustries.com/account/referral-program")
             .addHeader("cookie", cookie)
@@ -176,10 +211,6 @@ XMLHttpRequest.prototype.send = function(body) {
         val billingDoc = Jsoup.parse(refResponseBody)
         val totalSpent = (billingDoc.select(".spent-line").last().select("em").text().replace("\$","").replace(" ", "").replace("USD", "").replace(",", "").toFloat()*100).toInt()
         val newUser = User(uid, userName, "", email, password, rsi_token, rsi_device, userHandle, userImage, "", "", "", refCode, refNumber, userCredits, userUEC, userREC, 0, totalSpent, isConcierge, isSubscribed, fleet, fleetImage)
-        val database = getDatabase(application)
-        println(newUser)
-        database.userDao.insert(newUser)
-        val intent = Intent(this, MainActivity::class.java)
         return newUser
     }
 

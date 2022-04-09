@@ -2,6 +2,7 @@
     <string name="app_name">Starcitizen lite</string>
     <string name="preference_file_key">vip.kirakira.starcitizenlite.kirakira</string>
     <string name="primary_user_key">PRIMARY_USER</string>
+    <string name="is_log_in">IS_USER_LOG_IN</string>
     <string name="all_hanger">总览</string>
     <string name="hanger">机库</string>
     <string name="buyback">回购</string>
@@ -11,4 +12,6 @@
     <string name="can_gift">可礼物</string>
     <string name="items">Items</string>
     <string name="also_contains">Also Contains</string>
+    <string name="not_login_error_box_title">登陆后才能查看机库哦</string>
+    <string name="not_login_error_box_detail">如频繁显示此消息，请确认登陆授权时间</string>
 </resources>
