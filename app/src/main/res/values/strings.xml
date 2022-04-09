@@ -14,4 +14,9 @@
     <string name="also_contains">Also Contains</string>
     <string name="not_login_error_box_title">登陆后才能查看机库哦</string>
     <string name="not_login_error_box_detail">如频繁显示此消息，请确认登陆授权时间</string>
+    <string name="credits">信用点</string>
+    <string name="uec">UEC</string>
+    <string name="rec">REC</string>
+    <string name="hanger_value">机库价值</string>
+    <string name="option">设置</string>
 </resources>

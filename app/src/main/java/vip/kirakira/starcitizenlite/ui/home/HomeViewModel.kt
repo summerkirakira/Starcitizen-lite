@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import vip.kirakira.starcitizenlite.R
+import vip.kirakira.starcitizenlite.database.HangerPackageWithItems
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.repositories.BuyBackItemRepository
@@ -43,6 +44,11 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
     fun refresh() {
         viewModelScope.launch {
             hangerItemRepository.refreshItems()
+            if(currentUser.value != null) {
+                val newUser = currentUser.value
+                newUser?.hanger_value = hangerItemRepository.getTotalValue()
+                userRepository.insertUser(newUser!!)
+            }
         }
     }
 
@@ -51,4 +57,5 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
             buybackItemRepository.refreshItems()
         }
     }
+
 }

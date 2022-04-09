@@ -24,3 +24,19 @@ fun loadImage(imgView: ImageView, url: String?) {
         )
         .into(imgView)
 }
+
+fun loadUserAvatar(imgView: ImageView, url: String?) {
+    var imageUrl = url
+    if (url!!.startsWith("/")) {
+        imageUrl = "https://robertsspaceindustries.com" + url
+    }
+    Glide.with(imgView.context)
+        .load(imageUrl).apply(
+            RequestOptions()
+                .placeholder(R.drawable.loading_animation)
+                .error(R.drawable.ic_broken_image)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .transform(RoundedCorners(1000))
+        )
+        .into(imgView)
+}

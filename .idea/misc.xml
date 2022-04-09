@@ -7,8 +7,10 @@
         <entry key="app/src/main/res/drawable/ic_broken_image.xml" value="0.1875" />
         <entry key="app/src/main/res/drawable/ic_search.xml" value="0.1875" />
         <entry key="app/src/main/res/drawable/ic_stock_ok.xml" value="0.1875" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.2388888888888889" />
+        <entry key="app/src/main/res/drawable/top_toolbar_button_ripple.xml" value="0.14429967426710097" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_web_login.xml" value="0.17135416666666667" />
+        <entry key="app/src/main/res/layout/drawer_content.xml" value="0.2614942528735632" />
         <entry key="app/src/main/res/layout/hanger_detail_item.xml" value="0.1" />
         <entry key="app/src/main/res/layout/hanger_list_item.xml" value="0.2770083102493075" />
         <entry key="app/src/main/res/layout/home_fragment.xml" value="0.29720853858784896" />

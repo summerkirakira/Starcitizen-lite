@@ -30,7 +30,7 @@ data class User constructor(
     val store: Int,
     val uec: Int,
     val rec: Int,
-    val hanger_value: Int,
+    var hanger_value: Int,
     val total_spent: Int,
 
     val is_concierge: Boolean,

@@ -80,4 +80,6 @@ dependencies {
     implementation "org.jsoup:jsoup:1.13.1"
 
     implementation 'com.qmuiteam:qmui:2.0.0-alpha10'
+
+    implementation "com.mikepenz:materialdrawer:9.0.0-rc01"
 }

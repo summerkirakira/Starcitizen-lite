@@ -13,6 +13,7 @@ import vip.kirakira.starcitizenlite.network.hanger.HangerService
 class HangerItemRepository(private val database: ShopItemDatabase) {
     val allItems: LiveData<List<HangerItem>> = database.hangerItemDao.getAllItems()
     val allPackagesAndItems: LiveData<List<HangerPackageWithItems>> = database.hangerItemDao.getAll()
+    var hangerValue: Int = 0
 
     var isRefreshing = MutableLiveData<Boolean>(false)
 
@@ -31,6 +32,23 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
             }
             isRefreshing.postValue(false)
         }
+    }
+    init {
+        allPackagesAndItems.observeForever(){
+            hangerValue = getHangerValue(it)
+        }
+    }
+
+    fun getHangerValue(hangerPackageWithItems: List<HangerPackageWithItems>): Int {
+        var value = 0
+        for (item in hangerPackageWithItems) {
+            value += item.hangerPackage.value
+        }
+        return value
+    }
+
+    fun getTotalValue(): Int {
+        return hangerValue
     }
 
 }
