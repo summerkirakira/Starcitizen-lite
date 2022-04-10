@@ -14,7 +14,7 @@ import retrofit2.http.HeaderMap
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Query
-import vip.kirakira.starcitizenlite.network.shop.CatalogResponse
+import vip.kirakira.starcitizenlite.network.shop.*
 import vip.kirakira.viewpagertest.network.graphql.BaseGraphQLBody
 import java.net.URL
 
@@ -31,7 +31,11 @@ val client: OkHttpClient = OkHttpClient
     .addInterceptor { chain ->
         val request = chain.request()
         if(request.url().toString() == "https://robertsspaceindustries.com/graphql"){
-            val newRequest = request.newBuilder().addHeader("cookie", rsi_cookie).build()
+            val newRequest = request.newBuilder()
+                .addHeader("cookie", rsi_cookie)
+                .addHeader("referer", "https://robertsspaceindustries.com/")
+                .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
+                .build()
             return@addInterceptor chain.proceed(newRequest)
         }
         return@addInterceptor chain.proceed(request)
@@ -48,12 +52,37 @@ private val retrofit = Retrofit.Builder()
 
 interface RSIApiService {
 
-    @Headers("Accept: */*", "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36")
     @POST("graphql")
     suspend fun getCatalog(@Body body: BaseGraphQLBody): CatalogResponse
 
-}
+    @POST("graphql")
+    suspend fun getCart(@Body body: BaseGraphQLBody): CartSummaryProperty
 
+    @POST("graphql")
+    suspend fun addToCart(@Body body: BaseGraphQLBody): AddCartItemProperty
+
+    @POST("graphql")
+    suspend fun step1Query(@Body body: BaseGraphQLBody): Step1QueryProperty
+
+    @POST("graphql")
+    suspend fun addCredit(@Body body: BaseGraphQLBody): AddCreditProperty
+
+    @POST("graphql")
+    suspend fun nextStep(@Body body: BaseGraphQLBody): NextStepProperty
+
+    @POST("graphql")
+    suspend fun clearCart(@Body body: BaseGraphQLBody): ClearCartProperty
+
+    @POST("graphql")
+    suspend fun cartValidation(@Body body: BaseGraphQLBody): CartValidationProperty
+
+    @POST("graphql")
+    suspend fun cartAddressAssign(@Body body: BaseGraphQLBody): CartAddressAssignProperty
+
+    @POST("graphql")
+    suspend fun cartAddressQuery(@Body body: BaseGraphQLBody): CartAddressProperty
+
+}
 
 
 object RSIApi {

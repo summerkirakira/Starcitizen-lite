@@ -5,6 +5,7 @@ import org.jsoup.Jsoup
 import vip.kirakira.starcitizenlite.database.BuybackItem
 import vip.kirakira.starcitizenlite.database.HangerItem
 import vip.kirakira.starcitizenlite.database.HangerPackage
+import vip.kirakira.starcitizenlite.network.convertDateToLong
 import java.net.URL
 
 
@@ -24,7 +25,7 @@ class HangerProcess {
                 val pledgeImage = pledge.select("div.image").attr("style").replace("background-image:url('", "").replace("');", "")
                 val pledgeTitle = pledge.select(".title-col")[0].text()
                 val pledgeStatus = pledge.select(".availability").text()
-                val pledgeDate = pledge.select(".date-col").text().replace("Created: ", "")
+                val pledgeDate = convertDateToLong( pledge.select(".date-col").text().replace("Created: ", ""))
                 val pledgeContains = pledge.select(".items-col").text().replace("Contains:", "")
                 val canGift = pledge.select(".shadow-button.js-gift").isNotEmpty()
                 val canExchange = pledge.select(".shadow-button.js-reclaim").isNotEmpty()

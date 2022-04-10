@@ -31,7 +31,7 @@ interface ShopItemDao {
 @Dao
 interface HangerItemDao {
     @Transaction
-    @Query("SELECT * FROM hanger_packages")
+    @Query("SELECT * FROM hanger_packages ORDER BY date DESC")
     fun getAll(): LiveData<List<HangerPackageWithItems>>
 
     @Query("Delete FROM hanger_packages where insert_time < :time")

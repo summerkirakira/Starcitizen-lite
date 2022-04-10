@@ -3,6 +3,7 @@ package vip.kirakira.starcitizenlite.ui.home
 import vip.kirakira.starcitizenlite.database.BuybackItem
 import vip.kirakira.starcitizenlite.database.HangerItem
 import vip.kirakira.starcitizenlite.database.HangerPackageWithItems
+import vip.kirakira.starcitizenlite.network.convertLongToDate
 import vip.kirakira.starcitizenlite.network.hanger.HangerProcess
 
 
@@ -104,7 +105,7 @@ fun List<HangerPackageWithItems>.toItemPropertyList(): List<HangerItemProperty> 
                 1,
                 packageWithItems.hangerPackage.status,
                 tagList,
-                packageWithItems.hangerPackage.date,
+                convertLongToDate(packageWithItems.hangerPackage.date),
                 packageWithItems.hangerPackage.contains,
                 packageWithItems.hangerPackage.value,
                 insuranceString,

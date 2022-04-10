@@ -11,7 +11,7 @@ import vip.kirakira.starcitizenlite.database.ShopItemDatabase
 import vip.kirakira.starcitizenlite.network.hanger.HangerService
 
 class HangerItemRepository(private val database: ShopItemDatabase) {
-    val allItems: LiveData<List<HangerItem>> = database.hangerItemDao.getAllItems()
+//    val allItems: LiveData<List<HangerItem>> = database.hangerItemDao.getAllItems()
     val allPackagesAndItems: LiveData<List<HangerPackageWithItems>> = database.hangerItemDao.getAll()
     var hangerValue: Int = 0
 
@@ -21,6 +21,7 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
         withContext(Dispatchers.IO) {
             var page = 1
             isRefreshing.postValue(true)
+            var getTime = System.currentTimeMillis()
             while (true) {
                 val data = HangerService().getHangerInfo(page)
                 if (data.hangerPackages.isEmpty()) {
@@ -30,7 +31,9 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
                 database.hangerItemDao.insertAllPackages(data.hangerPackages)
                 page++
             }
+            database.hangerItemDao.deleteAllOldPackage(getTime)
             isRefreshing.postValue(false)
+
         }
     }
     init {

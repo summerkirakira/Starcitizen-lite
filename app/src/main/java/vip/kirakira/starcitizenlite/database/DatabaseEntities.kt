@@ -79,7 +79,7 @@ data class HangerPackage constructor(
     val status: String,
     val is_upgrade: Boolean,
     val upgrade_info: String,
-    val date: String,
+    val date: Long,
     val contains: String,
     val also_contains: String,
     val can_gift: Boolean,

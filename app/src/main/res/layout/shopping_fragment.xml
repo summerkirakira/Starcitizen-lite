@@ -9,6 +9,7 @@
             android:layout_height="match_parent">
     <FrameLayout
             android:layout_marginTop="70dp"
+            android:layout_marginBottom="65dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -24,13 +25,17 @@
     </FrameLayout>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
-            android:visibility="invisible"
+            android:clickable="true"
+            app:backgroundTint="@color/shop_fab"
             app:layout_constraintBottom_toTopOf="@+id/popupLayout"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
-            android:src="@drawable/ic_stock_ok"
+            android:elevation="5dp"
+            tools:visibility="visible"
+            android:tint="@color/white"
+            android:src="@drawable/ic_fab_add_long"
             android:layout_margin="16dp" />
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -39,6 +44,7 @@
             android:clickable="true"
             android:elevation="10dp"
             tools:visibility="visible"
+            android:layout_marginBottom="60dp"
             app:layout_constraintBottom_toBottomOf="parent"
             android:background="@color/white"
             android:layout_height="wrap_content">

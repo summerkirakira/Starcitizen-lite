@@ -7,10 +7,15 @@ import vip.kirakira.starcitizenlite.PAGE_NUM
 
 class ScreenSlidePagerAdapter(fm: FragmentActivity) : FragmentStateAdapter(fm) {
 
-    lateinit var fragmentList: List<Fragment>
+    lateinit var fragmentList: MutableList<Fragment>
 
-    fun setList(fragmentList: List<Fragment>) {
+    fun setList(fragmentList: MutableList<Fragment>) {
         this.fragmentList = fragmentList
+    }
+
+    fun updateFragment(index: Int, fragment: Fragment) {
+        fragmentList[index] = fragment
+        notifyItemChanged(index)
     }
 
     override fun getItemCount(): Int = PAGE_NUM

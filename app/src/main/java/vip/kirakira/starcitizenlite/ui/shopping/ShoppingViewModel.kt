@@ -16,7 +16,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
     private val dataResource = shopItemsRepository.allItems
 
-    private var itemsAfterFilter = dataResource
+    var itemsAfterFilter = dataResource
 
     var needRefresh = MutableLiveData<Boolean>(false)
 
@@ -26,21 +26,29 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
     var catalog = itemsAfterFilter
 
+    val filter = MutableLiveData<List<String>>().apply { value = listOf("Standalone Ship") }
+
     init {
         getCatalog()
+        sortByName()
         sortByPriceDesc()
-        filterBySubtitle("Standalone Ship", false)
-    }
+        itemsAfterFilter = Transformations.switchMap(filter) {
+            filterBySubtitle(filter.value!!, false)
+        }
 
+    }
     private fun isNew(item: ShopItem): Boolean = System.currentTimeMillis() - item.insert_time < 1000 * 60 * 60
 
-    private fun filterBySubtitle(subtitle: String, canBuy: Boolean = false) {
-        itemsAfterFilter = Transformations.map(dataResource) {
+    fun setFilter(filter: List<String>) {
+        this.filter.value = filter
+    }
+
+    fun filterBySubtitle(subtitle: List<String>, canBuy: Boolean = false): LiveData<List<ShopItem>> {
+        return Transformations.map(dataResource) {
             it.filter {
-                    item -> item.subtitle.equals(subtitle, true) && (!canBuy || isNew(item))
+                    item -> subtitle.any {value -> value.equals(item.subtitle, true)} && (!canBuy || isNew(item))
             }
         }
-        catalog = itemsAfterFilter
     }
 
     private fun filterBySearch(search: String, canBuy: Boolean = false) {
@@ -50,11 +58,12 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                     item.subtitle.contains(search, true) &&
                     (!canBuy || isNew(item))
             }
+
         }
         catalog = itemsAfterFilter
     }
 
-    private fun sortByName() {
+    fun sortByName() {
         catalog = Transformations.map(itemsAfterFilter) {
             it.sortedBy { it.name }
         }
@@ -85,4 +94,5 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     fun popUpItemDetail(item: ShopItem) {
         _popUpItem.value = item
     }
+
 }

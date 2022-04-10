@@ -10,4 +10,5 @@
     <color name="transparent">#00000000</color>
     <color name="bottom_icon_selected_color">#4DD0E1</color>
     <color name="avatar_left_line">#555454</color>
+    <color name="shop_fab">#4FC3F7</color>
 </resources>

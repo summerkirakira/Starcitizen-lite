@@ -28,9 +28,7 @@ import vip.kirakira.starcitizenlite.network.RSI_COOKIE_CONSTENT
 import vip.kirakira.starcitizenlite.repositories.UserRepository
 import vip.kirakira.viewpagertest.network.graphql.SignInMutation
 
-class WebLoginActivity : AppCompatActivity() {
-    var recorder = PayloadRecorder()
-    val INTERCEPT_JS = """XMLHttpRequest.prototype.origOpen = XMLHttpRequest.prototype.open;
+val INTERCEPT_JS = """XMLHttpRequest.prototype.origOpen = XMLHttpRequest.prototype.open;
 XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
     // these will be the key to retrieve the payload
     this.recordedMethod = method;
@@ -43,13 +41,17 @@ XMLHttpRequest.prototype.send = function(body) {
     if(body) recorder.recordPayload(this.recordedMethod, this.recordedUrl, body);
     this.origSend(body);
 };"""
+
+class WebLoginActivity : AppCompatActivity() {
+    var recorder = PayloadRecorder()
+
     lateinit var loginWebView: WebView
     lateinit var signInVariables: SignInMutation.SignInVariables
     lateinit var temp_rsi_token: String
     lateinit var temp_device_id: String
     var password: String? = null
     var email: String? = null
-    var needMultiStep = MutableLiveData<Boolean>(false)
+//    var needMultiStep = MutableLiveData<Boolean>(false)
     var isLogin = MutableLiveData<User>(null)
 
     val scope = CoroutineScope(Job() + Dispatchers.Main)
@@ -226,6 +228,7 @@ class PayloadRecorder {
         payload: String
     ) {
         payloadMap["$method-$url"] = payload
+        println("$method-$url-$payload")
     }
     fun getPayload(
         method: String,

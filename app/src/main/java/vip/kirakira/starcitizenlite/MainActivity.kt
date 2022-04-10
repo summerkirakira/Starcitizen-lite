@@ -1,5 +1,8 @@
 package vip.kirakira.starcitizenlite
 
+import android.app.Activity
+import android.app.PendingIntent.getActivity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -13,9 +16,11 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.core.view.get
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.slider.Slider
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
@@ -23,6 +28,7 @@ import com.mikepenz.materialdrawer.model.interfaces.nameRes
 import com.mikepenz.materialdrawer.widget.MaterialDrawerSliderView
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper
 import com.qmuiteam.qmui.widget.QMUIEmptyView
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog
 import com.wyt.searchbox.SearchFragment
 import vip.kirakira.starcitizenlite.activities.WebLoginActivity
 import vip.kirakira.starcitizenlite.database.User
@@ -56,10 +62,7 @@ class MainActivity : AppCompatActivity() {
 
     private var  density: Float = 0f
 
-    val shoppingViewModel: ShoppingViewModel by viewModels()
-    lateinit var popupLayout: View
     lateinit var searchButton: ImageView
-    lateinit var slider: MaterialDrawerSliderView
 
     enum class FragmentType(val value: Int) {
         SHOPPING(0),
@@ -67,6 +70,7 @@ class MainActivity : AppCompatActivity() {
         HANGER(1),
         ME(3)
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -168,8 +172,13 @@ class MainActivity : AppCompatActivity() {
 
         density = resources.displayMetrics.density
 
+        val shopFragment = ShoppingFragment.newInstance()
+        val homeFragment = HomeFragment.newInstance()
+        val meFragment = MeFragment.newInstance()
+        val hangerFragment = MainFragment.newInstance()
+
         val pagerAdapter = ScreenSlidePagerAdapter(this)
-        val fragment_list: List<Fragment> = listOf(ShoppingFragment(), HomeFragment(), MainFragment(), MeFragment())
+        val fragment_list: MutableList<Fragment> = mutableListOf(shopFragment, homeFragment, hangerFragment, meFragment)
         pagerAdapter.setList(fragment_list)
         mPager.adapter = pagerAdapter
         mPager.setCurrentItem(2, false)
@@ -207,6 +216,40 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        val filterButton = findViewById<ImageView>(R.id.filter_icon)
+
+        val shoppingViewModel = ViewModelProvider(this).get(ShoppingViewModel::class.java)
+
+        filterButton.setOnClickListener {
+            when(mPager.currentItem) {
+                FragmentType.SHOPPING.value -> {
+                    val itemTypes = listOf("单船", "涂装", "装备", "附加包", "信用点", "UEC", "礼品卡")
+                    val builder = QMUIDialog.MultiCheckableDialogBuilder(this)
+                    builder.setTitle("请选择商品种类")
+                        .setCheckedItems(arrayOf(0).toIntArray())
+                        .addItems(itemTypes.toTypedArray(), null)
+                        .addAction("取消") { dialog, index -> dialog.dismiss() }
+                        .addAction("提交") { dialog, index ->
+                            val filterList = mutableListOf<String>()
+                            builder.checkedItemIndexes.forEach {
+                                when(it) {
+                                    0 -> filterList.add(ShopItemType.SHIP.itemName)
+                                    1 -> filterList.add(ShopItemType.PAINT.itemName)
+                                    2 -> filterList.add(ShopItemType.GEAR.itemName)
+                                    3 -> filterList.add(ShopItemType.PACKS.itemName)
+                                    4 -> filterList.add(ShopItemType.ADDON.itemName)
+                                    5 -> filterList.add(ShopItemType.CREDITS.itemName)
+                                    6 -> filterList.add(ShopItemType.UEC.itemName)
+                                    7 -> filterList.add(ShopItemType.GIFT.itemName)
+                                }
+                                shoppingViewModel.setFilter(filterList)
+                            }
+                            dialog.dismiss()
+                        }
+                        .show()
+                }
+            }
+        }
     }
 
 }
