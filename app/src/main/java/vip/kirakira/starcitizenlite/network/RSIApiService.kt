@@ -6,14 +6,12 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.create
 import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.HeaderMap
-import retrofit2.http.Headers
 import retrofit2.http.POST
-import retrofit2.http.Query
+import vip.kirakira.starcitizenlite.network.hanger.BasicResponseBody
+import vip.kirakira.starcitizenlite.network.hanger.CancelPledgeRequestBody
+import vip.kirakira.starcitizenlite.network.hanger.GiftPledgeRequestBody
+import vip.kirakira.starcitizenlite.network.hanger.ReclaimRequestBody
 import vip.kirakira.starcitizenlite.network.shop.*
 import vip.kirakira.viewpagertest.network.graphql.BaseGraphQLBody
 import java.net.URL
@@ -34,6 +32,14 @@ val client: OkHttpClient = OkHttpClient
             val newRequest = request.newBuilder()
                 .addHeader("cookie", rsi_cookie)
                 .addHeader("referer", "https://robertsspaceindustries.com/")
+                .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
+                .build()
+            return@addInterceptor chain.proceed(newRequest)
+        } else if(request.url().toString().startsWith("https://robertsspaceindustries.com/api/account")) {
+            val newRequest = request.newBuilder()
+                .addHeader("cookie", rsi_cookie)
+                .addHeader("x-rsi-token", rsi_token)
+                .addHeader("referer", "https://robertsspaceindustries.com/account/pledges?page=1&pagesize=10")
                 .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
                 .build()
             return@addInterceptor chain.proceed(newRequest)
@@ -81,6 +87,15 @@ interface RSIApiService {
 
     @POST("graphql")
     suspend fun cartAddressQuery(@Body body: BaseGraphQLBody): CartAddressProperty
+
+    @POST("api/account/reclaimPledge")
+    suspend fun reclaimPledge(@Body body: ReclaimRequestBody): BasicResponseBody
+
+    @POST("api/account/giftPledge")
+    suspend fun giftPledge(@Body body: GiftPledgeRequestBody): BasicResponseBody
+
+    @POST("api/account/cancelGift")
+    suspend fun cancelGift(@Body body: CancelPledgeRequestBody): BasicResponseBody
 
 }
 

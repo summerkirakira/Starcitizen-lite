@@ -4,18 +4,27 @@ import android.content.ClipData.newIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat.getColor
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog
+import com.tapadoo.alerter.Alerter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.activities.WebLoginActivity
 import vip.kirakira.starcitizenlite.databinding.HomeFragmentBinding
+import vip.kirakira.starcitizenlite.network.hanger.HangerService
 import vip.kirakira.starcitizenlite.ui.loadImage
 
 
@@ -28,6 +37,8 @@ class HomeFragment : Fragment() {
     private lateinit var binding: HomeFragmentBinding
 
     private lateinit var viewModel: HomeViewModel
+
+    val scope = CoroutineScope(Job() + Dispatchers.Main)
 
 
 
@@ -103,6 +114,96 @@ class HomeFragment : Fragment() {
                     binding.alsoContainsLinearLayout.addView(alsoContainsView)
                 }
                 binding.popupLayout.visibility = View.VISIBLE
+            },
+            HangerViewAdapter.OnTagClickListener {
+                tag, item ->
+                if(tag == "can_reclaim") {
+                    QMUIDialog.MessageDialogBuilder(activity)
+                        .setTitle(getString(R.string.reclaim_warning))
+                        .setMessage("即将对${item.name}进行回收操作，结束后将会返还${item.price.toFloat() / 100f}信用点\n此操作不可逆！是否继续？")
+                        .addAction(getString(R.string. cancel)) { dialog, _ -> dialog.dismiss() }
+                        .addAction(0, getString(R.string.confirm)) { dialog, _ ->
+                            dialog.dismiss()
+                            scope.launch {
+                                val message = HangerService().reclaimPledge(item.id.toString(), viewModel.currentUser.value!!.password)
+                                if (message.code == "OK") {
+                                    Alerter.create(activity!!)
+                                        .setTitle("回收成功")
+                                        .setText("已返还${item.price.toFloat() / 100f}信用点")
+                                        .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background))
+                                        .show()
+                                    viewModel.refresh()
+                                } else {
+                                    Alerter.create(activity!!)
+                                        .setTitle("回收失败")
+                                        .setText(message.msg)
+                                        .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
+                                        .show()
+                                }
+                            }
+                        }
+                        .show()
+
+                }
+                else if (tag == "can_gift"){
+                    var builder = QMUIDialog.EditTextDialogBuilder(activity)
+                    builder
+                        .setTitle(getString(R.string.gifit_pledge))
+                        .setPlaceholder(getString(R.string.please_input_email))
+                        .setInputType(InputType.TYPE_CLASS_TEXT)
+                        .addAction(getString(R.string.cancel)) { dialog, _ -> dialog.dismiss() }
+                        .addAction(0, getString(R.string.confirm)) { dialog, index ->
+                            dialog.dismiss()
+                            scope.launch {
+                                val message = HangerService().giftPledge(item.id.toString(), viewModel.currentUser.value!!.password, "Powered by Starcitizen lite", builder.getEditText().getText().toString())
+                                if (message.code == "OK") {
+                                    Alerter.create(activity!!)
+                                        .setTitle("赠送成功")
+                                        .setText("已赠送${item.price.toFloat() / 100f}信用点")
+                                        .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background))
+                                        .show()
+                                    viewModel.refresh()
+                                } else {
+                                    Alerter.create(activity!!)
+                                        .setTitle("赠送失败")
+                                        .setText(message.msg)
+                                        .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
+                                        .show()
+                                }
+                            }
+                        }
+                        .show()
+                }
+                else if (tag == "status") {
+                    if (item.status == "已礼物") {
+                        val builder = QMUIDialog.MessageDialogBuilder(activity)
+                        builder
+                            .setTitle(getString(R.string.cancel_gift))
+                            .setMessage("要撤回礼物${item.name}吗？")
+                            .addAction(getString(R.string.cancel)) { dialog, _ -> dialog.dismiss() }
+                            .addAction(getString(R.string.confirm)) { dialog, _ ->
+                                dialog.dismiss()
+                                scope.launch {
+                                    val message = HangerService().cancelPledge(item.id.toString())
+                                    if (message.code == "OK") {
+                                        Alerter.create(activity!!)
+                                            .setTitle("撤回成功")
+                                            .setText("已撤回${item.name}")
+                                            .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background))
+                                            .show()
+                                        viewModel.refresh()
+                                    } else {
+                                        Alerter.create(activity!!)
+                                            .setTitle("撤回失败")
+                                            .setText(message.msg)
+                                            .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
+                                            .show()
+                                    }
+                                }
+                            }
+                            .show()
+                    }
+                }
             }
         )
 

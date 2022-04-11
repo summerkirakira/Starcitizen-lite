@@ -10,9 +10,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
+import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.databinding.HangerListItemBinding
 
-class HangerViewAdapter(private val onClickListener: HangerViewAdapter.OnClickListener): ListAdapter<HangerItemProperty, HangerViewAdapter.ViewHolder>(DiffCallback) {
+class HangerViewAdapter(private val onClickListener: HangerViewAdapter.OnClickListener, private val onTagClickListener: OnTagClickListener): ListAdapter<HangerItemProperty, HangerViewAdapter.ViewHolder>(DiffCallback) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HangerViewAdapter.ViewHolder {
         return ViewHolder.from(parent)
     }
@@ -21,6 +22,15 @@ class HangerViewAdapter(private val onClickListener: HangerViewAdapter.OnClickLi
         val item = getItem(position)
         holder.itemView.setOnClickListener {
             onClickListener.onClick(item)
+        }
+        holder.itemView.findViewById<QMUIRoundButton>(R.id.can_gift).setOnClickListener {
+            onTagClickListener.onClick("can_gift", item)
+        }
+        holder.itemView.findViewById<QMUIRoundButton>(R.id.can_reclaim).setOnClickListener {
+            onTagClickListener.onClick("can_reclaim", item)
+        }
+        holder.itemView.findViewById<QMUIRoundButton>(R.id.hanger_item_status).setOnClickListener {
+            onTagClickListener.onClick("status", item)
         }
         holder.bind(item)
     }
@@ -47,6 +57,10 @@ class HangerViewAdapter(private val onClickListener: HangerViewAdapter.OnClickLi
                 } else if(tag.name == "可升级"){
                     binding.canUpgrade.visibility = View.VISIBLE
                 }
+            }
+            if(item.status == "已礼物"){
+                binding.hangerItemStatus.setStrokeData(4, ColorStateList.valueOf(Color.parseColor("#F89BAC")))
+                binding.hangerItemStatus.setTextColor(Color.parseColor("#F89BAC"))
             }
             if (item.insurance.isNotEmpty()){
                 binding.insuranceItemButton.visibility = View.VISIBLE
@@ -94,6 +108,10 @@ class HangerViewAdapter(private val onClickListener: HangerViewAdapter.OnClickLi
 
     class OnClickListener(val clickListener: (hangerListProperty: HangerItemProperty) -> Unit) {
         fun onClick(hangerListProperty: HangerItemProperty) = clickListener(hangerListProperty)
+    }
+
+    class OnTagClickListener(val clickListener: (tag: String, hangerListProperty: HangerItemProperty) -> Unit) {
+        fun onClick(tag: String, hangerListProperty: HangerItemProperty) = clickListener(tag, hangerListProperty)
     }
 
 

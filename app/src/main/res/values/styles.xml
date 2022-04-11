@@ -5,7 +5,5 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:padding">4dp</item>
         <item name="android:visibility">gone</item>
-        <item name="materialDrawerStyle">@style/Widget.MaterialDrawerStyle</item>
-        <item name="materialDrawerHeaderStyle">@style/Widget.MaterialDrawerHeaderStyle</item>
     </style>
 </resources>

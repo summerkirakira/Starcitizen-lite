@@ -13,4 +13,17 @@ class HangerService {
         val buybackInfo = RSIApi.getBuybackPage(page=page)
         return HangerProcess().parseBuybackItem(buybackInfo)
     }
+
+    suspend fun reclaimPledge(itemId: String, password: String): BasicResponseBody {
+        return RSIApi.retrofitService.reclaimPledge(ReclaimRequestBody(itemId, password))
+    }
+
+    suspend fun giftPledge(itemId: String, password: String, receiver: String="Powered by Starcitizen lite", email: String): BasicResponseBody {
+        println(GiftPledgeRequestBody(itemId, password, email, receiver))
+        return RSIApi.retrofitService.giftPledge(GiftPledgeRequestBody(itemId, password, email, receiver))
+    }
+
+    suspend fun cancelPledge(itemId: String): BasicResponseBody {
+        return RSIApi.retrofitService.cancelGift(CancelPledgeRequestBody(itemId))
+    }
 }

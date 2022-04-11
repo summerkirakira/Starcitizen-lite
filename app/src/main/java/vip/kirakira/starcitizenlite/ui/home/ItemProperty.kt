@@ -55,7 +55,7 @@ fun List<BuybackItem>.toItemProperty(): List<HangerItemProperty> {
 fun List<HangerPackageWithItems>.toItemPropertyList(): List<HangerItemProperty> {
     val map = mutableMapOf<String, HangerItemProperty>()
     for(packageWithItems in this) {
-        if(map[packageWithItems.hangerPackage.title] == null){
+        if(map[packageWithItems.hangerPackage.title + packageWithItems.hangerPackage.status] == null){
             var insuranceTime = 0
             var insuranceString = ""
             packageWithItems.hangerPackage.also_contains.split("#").forEach {
@@ -94,16 +94,16 @@ fun List<HangerPackageWithItems>.toItemPropertyList(): List<HangerItemProperty> 
             }
             var status = "未知"
             if(packageWithItems.hangerPackage.status == "Attributed") {
-                status = "已发放"
+                status = "库存中"
             } else if(packageWithItems.hangerPackage.status == "Gifted") {
-                status = "已赠送"
+                status = "已礼物"
             }
-            map[packageWithItems.hangerPackage.title] = HangerItemProperty(
+            map[packageWithItems.hangerPackage.title + packageWithItems.hangerPackage.status] = HangerItemProperty(
                 packageWithItems.hangerPackage.id,
                 packageWithItems.hangerPackage.title,
                 packageWithItems.hangerPackage.image,
                 1,
-                packageWithItems.hangerPackage.status,
+                status,
                 tagList,
                 convertLongToDate(packageWithItems.hangerPackage.date),
                 packageWithItems.hangerPackage.contains,
@@ -113,7 +113,7 @@ fun List<HangerPackageWithItems>.toItemPropertyList(): List<HangerItemProperty> 
                 packageWithItems.hangerItems
             )
         } else {
-            map[packageWithItems.hangerPackage.title]!!.number++
+            map[packageWithItems.hangerPackage.title + packageWithItems.hangerPackage.status]!!.number++
         }
     }
     return map.values.toList()
