@@ -1,5 +1,7 @@
 package vip.kirakira.starcitizenlite.network
 
+import android.app.Application
+import vip.kirakira.starcitizenlite.repositories.UserRepository
 import java.text.SimpleDateFormat
 
 val DEFAULT_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36"

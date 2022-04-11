@@ -9,6 +9,7 @@ import vip.kirakira.starcitizenlite.database.HangerPackage
 import vip.kirakira.starcitizenlite.database.HangerPackageWithItems
 import vip.kirakira.starcitizenlite.database.ShopItemDatabase
 import vip.kirakira.starcitizenlite.network.hanger.HangerService
+import vip.kirakira.starcitizenlite.network.rsi_cookie
 
 class HangerItemRepository(private val database: ShopItemDatabase) {
 //    val allItems: LiveData<List<HangerItem>> = database.hangerItemDao.getAllItems()
@@ -21,19 +22,20 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
         withContext(Dispatchers.IO) {
             var page = 1
             isRefreshing.postValue(true)
-            var getTime = System.currentTimeMillis()
-            while (true) {
-                val data = HangerService().getHangerInfo(page)
-                if (data.hangerPackages.isEmpty()) {
-                    break
+            if (rsi_cookie.contains("_rsi_device")) {
+                val getTime = System.currentTimeMillis()
+                while (true) {
+                    val data = HangerService().getHangerInfo(page)
+                    if (data.hangerPackages.isEmpty()) {
+                        break
+                    }
+                    database.hangerItemDao.insertAllItems(data.hangerItems)
+                    database.hangerItemDao.insertAllPackages(data.hangerPackages)
+                    page++
                 }
-                database.hangerItemDao.insertAllItems(data.hangerItems)
-                database.hangerItemDao.insertAllPackages(data.hangerPackages)
-                page++
+                database.hangerItemDao.deleteAllOldPackage(getTime)
             }
-            database.hangerItemDao.deleteAllOldPackage(getTime)
             isRefreshing.postValue(false)
-
         }
     }
     init {

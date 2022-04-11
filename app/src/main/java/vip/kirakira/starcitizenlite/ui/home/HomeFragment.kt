@@ -49,7 +49,7 @@ class HomeFragment : Fragment() {
                 binding.errorBox.setTitleText(getString(R.string.not_login_error_box_title))
                 binding.errorBox.setDetailText(getString(R.string.not_login_error_box_detail))
                 binding.errorBox.setButton(
-                    "点击登陆"
+                    getString(R.string.click_to_login)
                 ) {
                     val intent = Intent(context, WebLoginActivity::class.java)
                     startActivity(intent)
@@ -109,19 +109,38 @@ class HomeFragment : Fragment() {
         binding.hangerRecyclerView.adapter = adapter
         binding.hangerRecyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
         viewModel.hangerItems.observe(viewLifecycleOwner) {
-            adapter.submitList(it.toItemPropertyList())
+            if (viewModel.currentMode.value == HomeViewModel.Mode.HANGER) {
+                adapter.submitList(it.toItemPropertyList())
+            } else if (viewModel.currentMode.value == HomeViewModel.Mode.BUYBACK) {
+                adapter.submitList(viewModel.buybackItems.value?.toItemProperty())
+            }
         }
-//        viewModel.buybackItems.observe(viewLifecycleOwner) {
-//            adapter.submitList(it.toItemProperty())
-//        }
+
+        viewModel.buybackItems.observe(viewLifecycleOwner) {
+            if (viewModel.currentMode.value == HomeViewModel.Mode.BUYBACK) {
+                adapter.submitList(it.toItemProperty())
+
+            } else if (viewModel.currentMode.value == HomeViewModel.Mode.HANGER) {
+                adapter.submitList(viewModel.hangerItems.value?.toItemPropertyList())
+            }
+        }
 
         viewModel.isRefreshing.observe(viewLifecycleOwner) {
-            binding.swipeRefreshLayout.isRefreshing = it
+            binding.swipeRefreshLayout.isRefreshing = it || viewModel.isBuybackRefreshing.value!!
+        }
+
+        viewModel.isBuybackRefreshing.observe(viewLifecycleOwner) {
+            binding.swipeRefreshLayout.isRefreshing = it || viewModel.isRefreshing.value!!
         }
 
         binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.refresh()
+            if(viewModel.currentMode.value == HomeViewModel.Mode.BUYBACK) {
+                viewModel.refreshBuybackItems()
+            } else {
+                viewModel.refresh()
+            }
         }
+
 
         return binding.root
     }

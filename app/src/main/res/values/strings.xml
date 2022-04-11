@@ -19,4 +19,5 @@
     <string name="rec">REC</string>
     <string name="hanger_value">机库价值</string>
     <string name="option">设置</string>
+    <string name="click_to_login">点击登陆</string>
 </resources>

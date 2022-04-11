@@ -36,6 +36,7 @@ import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.network.setRSICookie
 import vip.kirakira.starcitizenlite.ui.ScreenSlidePagerAdapter
 import vip.kirakira.starcitizenlite.ui.home.HomeFragment
+import vip.kirakira.starcitizenlite.ui.home.HomeViewModel
 import vip.kirakira.starcitizenlite.ui.loadUserAvatar
 import vip.kirakira.starcitizenlite.ui.main.MainFragment
 import vip.kirakira.starcitizenlite.ui.me.MeFragment
@@ -106,6 +107,7 @@ class MainActivity : AppCompatActivity() {
         drawerUserREC = findViewById(R.id.drawer_rec_value) //用户REC
         drawerUserHangerValue = findViewById(R.id.drawer_hanger_value) //用户机库价值
         val drawerLayout: DrawerLayout = findViewById(R.id.root_drawer) //滑动菜单
+        val filterButton = findViewById<ImageView>(R.id.filter_icon)
 
 
         bottomShopIcon.setColorFilter(Color.GRAY)
@@ -195,30 +197,41 @@ class MainActivity : AppCompatActivity() {
                         bottomShopIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
                         bottomHangerIcon.setColorFilter(Color.GRAY)
                         bottomMainIcon.setColorFilter(Color.GRAY)
+                        searchButton.setColorFilter(getColor(R.color.avatar_left_line))
+                        filterButton.setImageDrawable(getDrawable(R.drawable.ic_filter))
+                        filterButton.setColorFilter(getColor(R.color.avatar_left_line))
+                        filterButton.visibility = View.VISIBLE
                     }
                     FragmentType.HANGER.value -> {
                         bottomShopIcon.setColorFilter(Color.GRAY)
                         bottomHangerIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
                         bottomMainIcon.setColorFilter(Color.GRAY)
+                        filterButton.setImageDrawable(getDrawable(R.drawable.ic_hanger_switch))
+                        searchButton.setColorFilter(getColor(R.color.avatar_left_line))
+                        filterButton.setColorFilter(getColor(R.color.avatar_left_line))
+                        filterButton.visibility = View.VISIBLE
                     }
                     FragmentType.MAIN.value -> {
                         bottomShopIcon.setColorFilter(Color.GRAY)
                         bottomHangerIcon.setColorFilter(Color.GRAY)
                         bottomMainIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
+                        searchButton.setColorFilter(Color.WHITE)
+                        filterButton.visibility = View.GONE
                     }
                     FragmentType.ME.value -> {
                         bottomShopIcon.setColorFilter(Color.GRAY)
                         bottomHangerIcon.setColorFilter(Color.GRAY)
                         bottomMainIcon.setColorFilter(Color.GRAY)
+                        filterButton.visibility = View.GONE
                     }
                 }
                 super.onPageSelected(position)
             }
         })
 
-        val filterButton = findViewById<ImageView>(R.id.filter_icon)
-
         val shoppingViewModel = ViewModelProvider(this).get(ShoppingViewModel::class.java)
+
+        val homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
 
         filterButton.setOnClickListener {
             when(mPager.currentItem) {
@@ -247,6 +260,15 @@ class MainActivity : AppCompatActivity() {
                             dialog.dismiss()
                         }
                         .show()
+                }
+                FragmentType.HANGER.value -> {
+                    if(homeViewModel.currentMode.value == HomeViewModel.Mode.HANGER) {
+                        homeViewModel.currentMode.value = HomeViewModel.Mode.BUYBACK
+                        homeViewModel.refreshBuybackItems()
+                    } else {
+                        homeViewModel.currentMode.value = HomeViewModel.Mode.HANGER
+                        homeViewModel.refresh()
+                    }
                 }
             }
         }

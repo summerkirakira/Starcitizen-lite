@@ -3,6 +3,7 @@ package vip.kirakira.starcitizenlite.ui.home
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
@@ -23,7 +24,7 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
 
     val preferences = application.getSharedPreferences(application.getString(R.string.preference_file_key), 0)
 
-    val primaryUserId = preferences.getInt(application.getString(R.string.primary_user_key), 0)
+    private val primaryUserId = preferences.getInt(application.getString(R.string.primary_user_key), 0)
 
     val isBuybackRefreshing = buybackItemRepository.isRefreshing
 
@@ -35,19 +36,28 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
 
     var currentUser: LiveData<User> = userRepository.getUserById(primaryUserId)
 
-    init {
-//        refreshBuybackItems()
-        refresh()
+    var currentMode = MutableLiveData<Mode>(Mode.HANGER)
 
+    enum class Mode {
+        BUYBACK,
+        HANGER
+    }
+
+    init {
+        refreshBuybackItems()
+        refresh()
     }
 
     fun refresh() {
         viewModelScope.launch {
+            println("refreshing")
             hangerItemRepository.refreshItems()
             if(currentUser.value != null) {
                 val newUser = currentUser.value
                 newUser?.hanger_value = hangerItemRepository.getTotalValue()
-                userRepository.insertUser(newUser!!)
+                if (newUser != null) {
+                    userRepository.insertUser(newUser)
+                }
             }
         }
     }

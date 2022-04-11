@@ -21,9 +21,9 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
     val allItems: LiveData<List<ShopItem>> = database.shopItemDao.getAll()
     var isRefreshing: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    suspend fun getAll() = database.shopItemDao.getAll()
-    suspend fun getShopItem(id: Int) = database.shopItemDao.getById(id)
-    suspend fun insertShopItems(shopItems: List<ShopItem>) = database.shopItemDao.insertAll(shopItems)
+//    suspend fun getAll() = database.shopItemDao.getAll()
+//    suspend fun getShopItem(id: Int) = database.shopItemDao.getById(id)
+//    suspend fun insertShopItems(shopItems: List<ShopItem>) = database.shopItemDao.insertAll(shopItems)
 
     suspend fun refreshItems() {
         withContext(Dispatchers.IO) {
@@ -37,7 +37,6 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
                     break
                 }
                 database.shopItemDao.insertAll(data.toShopItem())
-                println("Crawling page: $page")
                 page++
             }
             isRefreshing.postValue(false)
