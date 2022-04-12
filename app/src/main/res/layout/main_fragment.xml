@@ -1,14 +1,184 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+
+    </data>
+
+    <ScrollView android:layout_width="match_parent"
+                android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         tools:context=".ui.main.MainFragment">
 
-    <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="Hello"/>
+    <com.youth.banner.Banner
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+             android:id="@+id/banner"
+             android:layout_width="match_parent"
+            app:banner_loop_time="3000"
+             android:layout_height="300dp">
 
-</FrameLayout>
+    </com.youth.banner.Banner>
+    <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
+                                                       android:layout_height="wrap_content"
+                                                       app:layout_constraintTop_toBottomOf="@+id/banner"
+                                                       android:background="@color/white"
+                                                       android:elevation="20dp" >
+        <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
+                                                           android:layout_height="wrap_content"
+                                                           android:id="@+id/shortcuts_container"
+                                                           android:paddingBottom="20dp"
+                                                           app:layout_constraintStart_toStartOf="parent"
+                                                           app:layout_constraintTop_toTopOf="parent"
+                                                           tools:ignore="UseCompoundDrawables">
+            <LinearLayout android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:id="@+id/ship_search_layout"
+                          android:orientation="vertical"
+                          android:layout_marginTop="20dp"
+                          android:layout_marginStart="20dp"
+                          app:layout_constraintEnd_toStartOf="@+id/player_search_layout"
+                          app:layout_constraintStart_toStartOf="parent"
+                          app:layout_constraintTop_toTopOf="parent">
+                <ImageView
+                        android:id="@+id/ship_info_icon"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:src="@drawable/ic_ship_info_icon" style="@style/main_page_image"/>
+                <TextView
+                        android:text="@string/ship_info"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" style="@style/main_page_icon"/>
+            </LinearLayout>
+            <LinearLayout
+                    android:layout_marginStart="20dp"
+                    android:id="@+id/player_search_layout"
+                    app:layout_constraintStart_toEndOf="@+id/ship_search_layout"
+                    app:layout_constraintEnd_toStartOf="@+id/component_search_layout"
+                    app:layout_constraintTop_toTopOf="@+id/ship_search_layout"
+                    style="@style/main_fragment_icon_layout"
+                   >
+                <ImageView
+                        android:id="@+id/player_id_icon"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:src="@drawable/ic_player_search"
+                        style="@style/main_page_image"/>
+                <TextView
+                        android:src="@drawable/ic_player_search"
+                        android:text="@string/player_search"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        style="@style/main_page_icon"/>
+            </LinearLayout>
+            <LinearLayout
+                    android:layout_marginStart="20dp"
+                    android:id="@+id/component_search_layout"
+                    app:layout_constraintStart_toEndOf="@+id/player_search_layout"
+                    app:layout_constraintEnd_toStartOf="@id/organization_search_layout"
+                    app:layout_constraintTop_toTopOf="@+id/ship_search_layout"
+                    style="@style/main_fragment_icon_layout"
+            >
+                <ImageView
+                        android:id="@+id/component_icon"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:src="@drawable/ic_network"
+                        style="@style/main_page_image"/>
+                <TextView
+                        android:src="@drawable/ic_player_search"
+                        android:text="@string/component_search"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        style="@style/main_page_icon"/>
+            </LinearLayout>
+            <LinearLayout
+                    android:layout_marginStart="20dp"
+                    android:id="@+id/organization_search_layout"
+                    app:layout_constraintStart_toEndOf="@+id/component_search_layout"
+                    app:layout_constraintEnd_toEndOf="@+id/spectrum_layout"
+                    app:layout_constraintTop_toTopOf="@+id/ship_search_layout"
+                    style="@style/main_fragment_icon_layout"
+            >
+                <ImageView
+                        android:id="@+id/organization_icon"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:src="@drawable/ic_product"
+                        style="@style/main_page_image"/>
+                <TextView
+                        android:src="@drawable/ic_player_search"
+                        android:text="@string/my_organization"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        style="@style/main_page_icon"/>
+            </LinearLayout>
+            <LinearLayout
+                    android:layout_marginStart="20dp"
+                    android:id="@+id/spectrum_layout"
+                    app:layout_constraintStart_toEndOf="@+id/organization_search_layout"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/ship_search_layout"
+                    android:layout_marginEnd="20dp"
+                    style="@style/main_fragment_icon_layout"
+            >
+                <ImageView
+                        android:id="@+id/spectrum_icon"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:src="@drawable/ic_spectrum"
+                        style="@style/main_page_image"/>
+                <TextView
+                        android:src="@drawable/ic_player_search"
+                        android:text="@string/spectrum"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        style="@style/main_page_icon"/>
+            </LinearLayout>
+
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
+                                                           android:layout_height="wrap_content"
+                                                           android:layout_marginTop="15dp"
+                                                           android:background="@color/white"
+                                                           android:id="@+id/how_to_play_layout"
+                                                           app:layout_constraintTop_toBottomOf="@+id/shortcuts_container">
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      app:layout_constraintTop_toTopOf="parent"
+                      app:layout_constraintStart_toStartOf="parent"
+                      app:layout_constraintEnd_toEndOf="parent"
+                      android:text="@string/latest_update"
+                      android:textSize="22sp" />
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:id="@+id/more_info_text"
+                      app:layout_constraintTop_toTopOf="parent"
+                      android:layout_marginTop="6dp"
+                      app:layout_constraintEnd_toEndOf="parent"
+                      android:layout_marginEnd="20dp"
+                      android:text="@string/more"
+                      android:textSize="14sp" />
+            <ImageView android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:id="@+id/more_info_icon"
+                       app:layout_constraintTop_toTopOf="parent"
+                       app:layout_constraintEnd_toEndOf="parent"
+                       android:layout_marginTop="4dp"
+                       android:layout_marginEnd="2dp"
+                       android:src="@drawable/ic_baseline_chevron_right_24" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</layout>

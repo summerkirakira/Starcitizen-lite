@@ -32,6 +32,9 @@ class HangerViewAdapter(private val onClickListener: HangerViewAdapter.OnClickLi
         holder.itemView.findViewById<QMUIRoundButton>(R.id.hanger_item_status).setOnClickListener {
             onTagClickListener.onClick("status", item)
         }
+        holder.itemView.findViewById<QMUIRoundButton>(R.id.can_upgrade).setOnClickListener {
+            onTagClickListener.onClick("can_upgrade", item)
+        }
         holder.bind(item)
     }
 

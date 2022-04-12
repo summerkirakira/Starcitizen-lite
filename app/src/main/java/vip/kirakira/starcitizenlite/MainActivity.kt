@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.PendingIntent.getActivity
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -23,9 +24,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.slider.Slider
+import com.qmuiteam.qmui.layout.QMUIButton
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper
 import com.qmuiteam.qmui.widget.QMUIEmptyView
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog
+import com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
 import com.wyt.searchbox.SearchFragment
 import vip.kirakira.starcitizenlite.activities.WebLoginActivity
 import vip.kirakira.starcitizenlite.database.User
@@ -57,6 +60,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var drawerUserUEC: TextView
     private lateinit var drawerUserREC: TextView
     private lateinit var drawerUserHangerValue: TextView
+    private lateinit var firstLine: QMUIRoundButton
+    private lateinit var secondLine: QMUIRoundButton
+    private lateinit var thirdLine: QMUIRoundButton
 
     private var  density: Float = 0f
 
@@ -104,7 +110,11 @@ class MainActivity : AppCompatActivity() {
         drawerUserREC = findViewById(R.id.drawer_rec_value) //用户REC
         drawerUserHangerValue = findViewById(R.id.drawer_hanger_value) //用户机库价值
         val drawerLayout: DrawerLayout = findViewById(R.id.root_drawer) //滑动菜单
+        firstLine = findViewById(R.id.avatar_first_line)
+        secondLine = findViewById(R.id.avatar_second_line)
+        thirdLine = findViewById(R.id.avatar_third_line)
         val filterButton = findViewById<ImageView>(R.id.filter_icon)
+
 
 
         bottomShopIcon.setColorFilter(Color.GRAY)
@@ -117,7 +127,7 @@ class MainActivity : AppCompatActivity() {
                 setRSICookie(it.rsi_token, it.rsi_device)
                 loadUserAvatar(userAvatar, it.profile_image)
                 loadUserAvatar(bottomMeIcon, it.profile_image)
-                loadUserAvatar(drawerUserAvatar, it.profile_image)
+                loadUserAvatar(drawerUserAvatar, it.profile_image.replace("avatar", "heap_infobox"))
                 val userCredit = "${it.store.toFloat() / 100.0f} USD"
                 val userUEC = "${it.uec} UEC"
                 val userREC = "${it.rec} REC"
@@ -142,10 +152,6 @@ class MainActivity : AppCompatActivity() {
                 keyword -> Toast.makeText(this, keyword, Toast.LENGTH_SHORT).show()
             }
         })
-
-//        val item1 = PrimaryDrawerItem().apply { nameRes = R.string.app_name; identifier = 1 }
-//
-//        slider.itemAdapter.add(item1)
 
 
 
@@ -198,6 +204,7 @@ class MainActivity : AppCompatActivity() {
                         filterButton.setImageDrawable(getDrawable(R.drawable.ic_filter))
                         filterButton.setColorFilter(getColor(R.color.avatar_left_line))
                         filterButton.visibility = View.VISIBLE
+                        setAvatarLine(ColorStateList.valueOf(getColor(R.color.avatar_left_line)))
                     }
                     FragmentType.HANGER.value -> {
                         bottomShopIcon.setColorFilter(Color.GRAY)
@@ -207,12 +214,14 @@ class MainActivity : AppCompatActivity() {
                         searchButton.setColorFilter(getColor(R.color.avatar_left_line))
                         filterButton.setColorFilter(getColor(R.color.avatar_left_line))
                         filterButton.visibility = View.VISIBLE
+                        setAvatarLine(ColorStateList.valueOf(getColor(R.color.avatar_left_line)))
                     }
                     FragmentType.MAIN.value -> {
                         bottomShopIcon.setColorFilter(Color.GRAY)
                         bottomHangerIcon.setColorFilter(Color.GRAY)
                         bottomMainIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
                         searchButton.setColorFilter(Color.WHITE)
+                        setAvatarLine(ColorStateList.valueOf(Color.WHITE))
                         filterButton.visibility = View.GONE
                     }
                     FragmentType.ME.value -> {
@@ -220,6 +229,7 @@ class MainActivity : AppCompatActivity() {
                         bottomHangerIcon.setColorFilter(Color.GRAY)
                         bottomMainIcon.setColorFilter(Color.GRAY)
                         filterButton.visibility = View.GONE
+                        setAvatarLine(ColorStateList.valueOf(Color.WHITE))
                     }
                 }
                 super.onPageSelected(position)
@@ -233,7 +243,7 @@ class MainActivity : AppCompatActivity() {
         filterButton.setOnClickListener {
             when(mPager.currentItem) {
                 FragmentType.SHOPPING.value -> {
-                    val itemTypes = listOf("单船", "涂装", "装备", "附加包", "信用点", "UEC", "礼品卡")
+                    val itemTypes = listOf("单船", "涂装", "装备", "附加包", "UEC", "礼品卡")
                     val builder = QMUIDialog.MultiCheckableDialogBuilder(this)
                     builder.setTitle("请选择商品种类")
                         .setCheckedItems(arrayOf(0).toIntArray())
@@ -246,11 +256,9 @@ class MainActivity : AppCompatActivity() {
                                     0 -> filterList.add(ShopItemType.SHIP.itemName)
                                     1 -> filterList.add(ShopItemType.PAINT.itemName)
                                     2 -> filterList.add(ShopItemType.GEAR.itemName)
-                                    3 -> filterList.add(ShopItemType.PACKS.itemName)
-                                    4 -> filterList.add(ShopItemType.ADDON.itemName)
-                                    5 -> filterList.add(ShopItemType.CREDITS.itemName)
-                                    6 -> filterList.add(ShopItemType.UEC.itemName)
-                                    7 -> filterList.add(ShopItemType.GIFT.itemName)
+                                    3 -> filterList.add(ShopItemType.ADDON.itemName)
+                                    4 -> filterList.add(ShopItemType.UEC.itemName)
+                                    5 -> filterList.add(ShopItemType.GIFT.itemName)
                                 }
                                 shoppingViewModel.setFilter(filterList)
                             }
@@ -269,6 +277,17 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
     }
+    fun setAvatarLine(colorStateList: ColorStateList) {
+        firstLine.setBgData(colorStateList)
+        firstLine.setStrokeData(4, colorStateList)
+        secondLine.setBgData(colorStateList)
+        secondLine.setStrokeData(4, colorStateList)
+        thirdLine.setBgData(colorStateList)
+        thirdLine.setStrokeData(4, colorStateList)
+    }
+
+
 
 }

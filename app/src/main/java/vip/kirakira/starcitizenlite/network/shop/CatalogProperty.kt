@@ -29,6 +29,29 @@ data class CatalogResponse(val data: Data) {
     }
 }
 
+data class UpgradeShip(val id: Int, val flyableStatus: String,
+                       val focus: String,
+                       val link: String,
+                       val manufacturer: Manufacturer,
+                       val media: Media,
+                       val msrp: Int,
+                       val name: String,
+                       val owned: Boolean,
+                       val skus: List<Sku>,
+                       val type: String){
+    data class Manufacturer(val id: Int, val name: String)
+    data class Media(val productThumbMediumAndSmall: String, val slideShow: String)
+    data class Sku(val available: Boolean, val availableStock: Int,
+                   val id: Int, val price: Int, val title: String,
+                   val unlimitedStock: Boolean)
+}
+
+data class initShipUpgradeResponse(val contents: List<Content>) {
+    data class Content(val data: Data) {
+        data class Data(val ships: List<UpgradeShip>)
+    }
+}
+
 data class CatalogVariables(var query: Query) {
     data class Query(var page: Int, var sort: Sort, var skus: Skus){
         data class Sort(var field: String, var direction: String)

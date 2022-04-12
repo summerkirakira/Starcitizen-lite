@@ -8,16 +8,19 @@
         <entry key="app/src/main/res/drawable/ic_broken_image.xml" value="0.1875" />
         <entry key="app/src/main/res/drawable/ic_search.xml" value="0.1875" />
         <entry key="app/src/main/res/drawable/ic_stock_ok.xml" value="0.1875" />
+        <entry key="app/src/main/res/drawable/loading_img.xml" value="0.13453947368421051" />
         <entry key="app/src/main/res/drawable/top_toolbar_button_ripple.xml" value="0.14429967426710097" />
         <entry key="app/src/main/res/layout/activity_cart.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.3496491731789749" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1122905027932961" />
+        <entry key="app/src/main/res/layout/activity_player_search.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_web_login.xml" value="0.17135416666666667" />
         <entry key="app/src/main/res/layout/drawer_content.xml" value="0.2614942528735632" />
         <entry key="app/src/main/res/layout/hanger_detail_item.xml" value="0.1" />
         <entry key="app/src/main/res/layout/hanger_list_item.xml" value="0.2770083102493075" />
-        <entry key="app/src/main/res/layout/home_fragment.xml" value="0.29720853858784896" />
-        <entry key="app/src/main/res/layout/main_fragment.xml" value="0.17135416666666667" />
-        <entry key="app/src/main/res/layout/me_fragment.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/home_fragment.xml" value="0.25110619469026546" />
+        <entry key="app/src/main/res/layout/image_banner.xml" value="0.12368421052631579" />
+        <entry key="app/src/main/res/layout/main_fragment.xml" value="0.375" />
+        <entry key="app/src/main/res/layout/me_fragment.xml" value="0.3448401810603289" />
         <entry key="app/src/main/res/layout/pop_up_shop_item_detail.xml" value="0.25" />
         <entry key="app/src/main/res/layout/shopping_catalog_list_item.xml" value="0.2066115702479339" />
         <entry key="app/src/main/res/layout/shopping_fragment.xml" value="0.17135416666666667" />

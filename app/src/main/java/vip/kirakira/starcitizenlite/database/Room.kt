@@ -3,6 +3,7 @@ package vip.kirakira.starcitizenlite.database
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import vip.kirakira.starcitizenlite.ui.main.Banner
 
 @Dao
 interface ShopItemDao {
@@ -84,12 +85,22 @@ interface UserDao {
     fun getByHandle(handle: String): LiveData<User>
 }
 
-@Database(entities = [ShopItem::class, HangerItem::class, HangerPackage::class, BuybackItem::class, User::class], version = 1)
+@Dao
+interface BannerDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(Banners: List<BannerImage>)
+
+    @Query("SELECT * FROM banner_image")
+    fun getAll(): LiveData<List<BannerImage>>
+}
+
+@Database(entities = [ShopItem::class, HangerItem::class, HangerPackage::class, BuybackItem::class, User::class, BannerImage::class], version = 1)
 abstract class ShopItemDatabase: RoomDatabase() {
     abstract val shopItemDao: ShopItemDao
     abstract val hangerItemDao: HangerItemDao
     abstract val buybackItemDao: BuybackItemDao
     abstract val userDao: UserDao
+    abstract val bannerDao: BannerDao
 }
 
 private lateinit var INSTANCE: ShopItemDatabase

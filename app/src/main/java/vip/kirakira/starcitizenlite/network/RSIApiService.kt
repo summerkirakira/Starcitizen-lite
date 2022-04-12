@@ -28,14 +28,14 @@ val client: OkHttpClient = OkHttpClient
     .Builder()
     .addInterceptor { chain ->
         val request = chain.request()
-        if(request.url().toString() == "https://robertsspaceindustries.com/graphql"){
+        if(request.url.toString() == "https://robertsspaceindustries.com/graphql"){
             val newRequest = request.newBuilder()
                 .addHeader("cookie", rsi_cookie)
                 .addHeader("referer", "https://robertsspaceindustries.com/")
                 .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
                 .build()
             return@addInterceptor chain.proceed(newRequest)
-        } else if(request.url().toString().startsWith("https://robertsspaceindustries.com/api/account")) {
+        } else if(request.url.toString().startsWith("https://robertsspaceindustries.com/api/account")) {
             val newRequest = request.newBuilder()
                 .addHeader("cookie", rsi_cookie)
                 .addHeader("x-rsi-token", rsi_token)
@@ -110,7 +110,7 @@ object RSIApi {
             .addHeader("cookie", headers["cookie"]!!)
             .build()
         val response = client.newCall(request).execute()
-        return response.body()!!.string()
+        return response.body!!.string()
     }
 
     fun getBuybackPage(page: Int, page_size: Int=250, headers: Map<String, String> = mapOf("cookie" to rsi_cookie)) : String {
@@ -118,7 +118,23 @@ object RSIApi {
             .addHeader("cookie", headers["cookie"]!!)
             .build()
         val response = client.newCall(request).execute()
-        return response.body()!!.string()
+        return response.body!!.string()
+    }
+
+    fun getFleetYardsShipsPage(): String {
+        val request = Request.Builder().url(URL("https://api.fleetyards.net/v1/models?page=1&perPage=100"))
+            .get()
+            .build()
+        val response = client.newCall(request).execute()
+        return response.body!!.string()
+    }
+
+    fun getPlayerInfoPage(name: String): String {
+        val request = Request.Builder().url(URL("https://robertsspaceindustries.com/citizens/$name"))
+            .get()
+            .build()
+        val response = client.newCall(request).execute()
+        return response.body!!.string()
     }
 }
 

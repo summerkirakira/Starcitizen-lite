@@ -17,8 +17,6 @@ fun loadImage(imgView: ImageView, url: String?) {
     Glide.with(imgView.context)
         .load(imageUrl).apply(
             RequestOptions()
-                .placeholder(R.drawable.loading_animation)
-                .error(R.drawable.ic_broken_image)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .transform(RoundedCorners(8))
         )
@@ -33,8 +31,6 @@ fun loadUserAvatar(imgView: ImageView, url: String?) {
     Glide.with(imgView.context)
         .load(imageUrl).apply(
             RequestOptions()
-                .placeholder(R.drawable.loading_animation)
-                .error(R.drawable.ic_broken_image)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .transform(RoundedCorners(1000))
         )

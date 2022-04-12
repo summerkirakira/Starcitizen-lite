@@ -125,21 +125,30 @@ class HomeFragment : Fragment() {
                         .addAction(0, getString(R.string.confirm)) { dialog, _ ->
                             dialog.dismiss()
                             scope.launch {
-                                val message = HangerService().reclaimPledge(item.id.toString(), viewModel.currentUser.value!!.password)
-                                if (message.code == "OK") {
+                                try {
+                                    val message = HangerService().reclaimPledge(item.id.toString(), viewModel.currentUser.value!!.password)
+                                    if (message.code == "OK") {
+                                        Alerter.create(activity!!)
+                                            .setTitle(getString(R.string.reclaim_success))
+                                            .setText("已返还${item.price.toFloat() / 100f}信用点")
+                                            .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background))
+                                            .show()
+                                        viewModel.refresh()
+                                    } else {
+                                        Alerter.create(activity!!)
+                                            .setTitle(getString(R.string.reclaim_failed))
+                                            .setText(message.msg)
+                                            .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
+                                            .show()
+                                    }
+                                } catch (e: Exception) {
                                     Alerter.create(activity!!)
-                                        .setTitle("回收成功")
-                                        .setText("已返还${item.price.toFloat() / 100f}信用点")
-                                        .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background))
-                                        .show()
-                                    viewModel.refresh()
-                                } else {
-                                    Alerter.create(activity!!)
-                                        .setTitle("回收失败")
-                                        .setText(message.msg)
+                                        .setTitle(getString(R.string.reclaim_failed))
+                                        .setText(getString(R.string.network_error))
                                         .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
                                         .show()
                                 }
+
                             }
                         }
                         .show()
@@ -155,54 +164,76 @@ class HomeFragment : Fragment() {
                         .addAction(0, getString(R.string.confirm)) { dialog, index ->
                             dialog.dismiss()
                             scope.launch {
-                                val message = HangerService().giftPledge(item.id.toString(), viewModel.currentUser.value!!.password, "Powered by Starcitizen lite", builder.getEditText().getText().toString())
-                                if (message.code == "OK") {
-                                    Alerter.create(activity!!)
-                                        .setTitle("赠送成功")
-                                        .setText("已赠送${item.price.toFloat() / 100f}信用点")
-                                        .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background))
-                                        .show()
-                                    viewModel.refresh()
-                                } else {
-                                    Alerter.create(activity!!)
-                                        .setTitle("赠送失败")
-                                        .setText(message.msg)
-                                        .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
-                                        .show()
-                                }
-                            }
-                        }
-                        .show()
-                }
-                else if (tag == "status") {
-                    if (item.status == "已礼物") {
-                        val builder = QMUIDialog.MessageDialogBuilder(activity)
-                        builder
-                            .setTitle(getString(R.string.cancel_gift))
-                            .setMessage("要撤回礼物${item.name}吗？")
-                            .addAction(getString(R.string.cancel)) { dialog, _ -> dialog.dismiss() }
-                            .addAction(getString(R.string.confirm)) { dialog, _ ->
-                                dialog.dismiss()
-                                scope.launch {
-                                    val message = HangerService().cancelPledge(item.id.toString())
+                                try {
+                                    val message = HangerService().giftPledge(item.id.toString(), viewModel.currentUser.value!!.password, "Powered by Starcitizen lite", builder.getEditText().getText().toString())
                                     if (message.code == "OK") {
                                         Alerter.create(activity!!)
-                                            .setTitle("撤回成功")
-                                            .setText("已撤回${item.name}")
+                                            .setTitle(getString(R.string.gift_success))
+                                            .setText("已赠送${item.price.toFloat() / 100f}信用点")
                                             .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background))
                                             .show()
                                         viewModel.refresh()
                                     } else {
                                         Alerter.create(activity!!)
-                                            .setTitle("撤回失败")
+                                            .setTitle(getString(R.string.gift_failed))
                                             .setText(message.msg)
                                             .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
                                             .show()
                                     }
+                                } catch (e: Exception) {
+                                    Alerter.create(activity!!)
+                                        .setTitle(getString(R.string.gift_failed))
+                                        .setText(getString(R.string.network_error))
+                                        .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
+                                        .show()
                                 }
+
                             }
+                        }.show()
+                }
+                else if (tag == "status") {
+                    try {
+                        if (item.status == "已礼物") {
+                            val builder = QMUIDialog.MessageDialogBuilder(activity)
+                            builder
+                                .setTitle(getString(R.string.cancel_gift))
+                                .setMessage("要撤回礼物${item.name}吗？")
+                                .addAction(getString(R.string.cancel)) { dialog, _ -> dialog.dismiss() }
+                                .addAction(getString(R.string.confirm)) { dialog, _ ->
+                                    dialog.dismiss()
+                                    scope.launch {
+                                        val message = HangerService().cancelPledge(item.id.toString())
+                                        if (message.code == "OK") {
+                                            Alerter.create(activity!!)
+                                                .setTitle(getString(R.string.cancel_gift_success))
+                                                .setText("已撤回${item.name}")
+                                                .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background))
+                                                .show()
+                                            viewModel.refresh()
+                                        } else {
+                                            Alerter.create(activity!!)
+                                                .setTitle(getString(R.string.cancel_gift_success))
+                                                .setText(message.msg)
+                                                .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
+                                                .show()
+                                        }
+                                    }
+                                }.show()
+                        }
+                    } catch (e: Exception) {
+                        Alerter.create(activity!!)
+                            .setTitle(getString(R.string.cancel_gift_failed))
+                            .setText(getString(R.string.network_error))
+                            .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
                             .show()
                     }
+
+                } else if(tag == "can_upgrade") {
+                    Alerter.create(activity!!)
+                        .setTitle(getString(R.string.unsupport_now))
+                        .setText(getString(R.string.please_go_to_site))
+                        .setBackgroundColorInt(getColor(context!!, R.color.shop_fab))
+                        .show()
                 }
             }
         )
@@ -239,6 +270,26 @@ class HomeFragment : Fragment() {
                 viewModel.refreshBuybackItems()
             } else {
                 viewModel.refresh()
+            }
+        }
+
+        viewModel.refreshBuybackError.observe(viewLifecycleOwner) {
+            if (it == true) {
+                Alerter.create(activity!!)
+                    .setTitle(getString(R.string.buyback_refresh_failed))
+                    .setText(getString(R.string.network_error))
+                    .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
+                    .show()
+            }
+        }
+
+        viewModel.refreshHangerError.observe(viewLifecycleOwner) {
+            if (it == true) {
+                Alerter.create(activity!!)
+                    .setTitle(getString(R.string.hanger_refresh_failed))
+                    .setText(getString(R.string.network_error))
+                    .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
+                    .show()
             }
         }
 

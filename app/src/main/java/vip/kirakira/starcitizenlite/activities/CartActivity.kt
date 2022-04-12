@@ -54,7 +54,7 @@ class CartActivity : AppCompatActivity() {
                         .get()
                         .build()
                     val response = OkHttpClient().newCall(newRequest).execute()
-                    val newHtml = response.body()!!.string()
+                    val newHtml = response.body!!.string()
                     return WebResourceResponse(
                         "text/html",
                         "UTF-8",

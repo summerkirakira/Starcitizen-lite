@@ -7,13 +7,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.webkit.*
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.tapadoo.alerter.Alerter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
@@ -25,6 +25,7 @@ import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.network.DEFAULT_USER_AGENT
 import vip.kirakira.starcitizenlite.network.RSI_COOKIE_CONSTENT
+import vip.kirakira.starcitizenlite.network.search.getPlayerSearchResult
 import vip.kirakira.starcitizenlite.repositories.UserRepository
 import vip.kirakira.viewpagertest.network.graphql.SignInMutation
 
@@ -80,7 +81,17 @@ class WebLoginActivity : AppCompatActivity() {
                 scope.launch {
                     userRepository.insertUser(it)
                 }
+//                Alerter.create(this@WebLoginActivity)
+//                    .setTitle("登陆成功")
+//                    .setText("Login Success")
+//                    .setBackgroundColorRes(R.color.alerter_default_success_background)
+//                    .setDuration(2000)
+//                    .enableSwipeToDismiss()
+//                    .enableIconPulse(true)
+//                    .enableVibration(true)
+//                    .show()
                 val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra("isLongin", true)
                 startActivity(intent)
                 finish()
             }
@@ -114,11 +125,11 @@ class WebLoginActivity : AppCompatActivity() {
                             val req = builder.url("https://robertsspaceindustries.com/graphql")
                                 .addHeader("user-agent", DEFAULT_USER_AGENT)
                                 .addHeader("content-type", "application/json")
-                                .post(RequestBody.create(MediaType.parse("application/json"), payload))
+                                .post(RequestBody.create("application/json".toMediaTypeOrNull(), payload))
                                 .build();
                             val response = OkHttpClient().newCall(req).execute()
                             val contentType = response.header("content-type")
-                            val responseBody = response.body()?.string()
+                            val responseBody = response.body?.string()
                             if("errors" in responseBody!!){
                                 val error = SignInMutation().parseFailure(responseBody).errors[0]
                                 if(error.message == "MultiStepRequired"){
@@ -136,16 +147,15 @@ class WebLoginActivity : AppCompatActivity() {
                             .addHeader("user-agent", DEFAULT_USER_AGENT)
                             .addHeader("content-type", "application/json")
                             .addHeader("cookie", "CookieConsent=$RSI_COOKIE_CONSTENT;Rsi-Token=$temp_rsi_token; _rsi_device=$temp_device_id")
-                            .post(RequestBody.create(MediaType.parse("application/json"), payload))
+                            .post(RequestBody.create("application/json".toMediaTypeOrNull(), payload))
                             .build();
                         val response = OkHttpClient().newCall(req).execute()
-                        val responseBody = response.body()?.string()
+                        val responseBody = response.body?.string()
                         Log.i("WebLoginActivity", responseBody!!)
                         if("RsiAuthenticatedAccount" in responseBody!!){
                             val successLoginInfo = SignInMutation().parseLoginSuccess(responseBody)
                             val newUser = saveUserData(successLoginInfo.data.account_multistep.id, temp_device_id, temp_rsi_token, email!!, password!!)
                             isLogin.postValue(newUser)
-//                            Log.i("WebLoginActivity", "-----------Success-----------")
                         }
                     }
 
@@ -172,7 +182,7 @@ class WebLoginActivity : AppCompatActivity() {
                 val builder = Request.Builder();
                 val req = builder.url(url).get().build();
                 val response = OkHttpClient().newCall(req).execute()
-                return WebResourceResponse(response.body()?.contentType().toString(), "UTF-8", response.body()?.byteStream())
+                return WebResourceResponse(response.body?.contentType().toString(), "UTF-8", response.body?.byteStream())
             }
             return super.shouldInterceptRequest(view, request)
         }
@@ -188,14 +198,22 @@ class WebLoginActivity : AppCompatActivity() {
             .get()
             .build();
         val response = OkHttpClient().newCall(req).execute()
-        val responseBody = response.body()?.string()
+        val responseBody = response.body?.string()
         val doc = Jsoup.parse(responseBody)
         val userName = doc.select(".c-account-sidebar__profile-info-displayname").text()
         val userHandle = doc.select(".c-account-sidebar__profile-info-handle").text()
-        val userImage = doc.select(".c-account-sidebar__profile-metas-avatar").attr("style").replace("background-image:url('", "").replace("');", "")
-        val userCredits = (doc.select(".c-account-sidebar__profile-info-credits-amount--pledge").text().replace("\$","").replace(" ", "").replace("USD", "").replace(",", "").toFloat()*100).toInt()
-        val userUEC = doc.select(".c-account-sidebar__profile-info-credits-amount--uec").text().replace("¤", "").replace(" ", "").replace("UEC", "").replace(",", "").toInt()
-        val userREC = doc.select(".c-account-sidebar__profile-info-credits-amount--rec").text().replace("¤", "").replace(" ", "").replace("REC", "").replace(",", "").toInt()
+        val userImage =
+            doc.select(".c-account-sidebar__profile-metas-avatar").attr("style").replace("background-image:url('", "")
+                .replace("');", "")
+        val userCredits =
+            (doc.select(".c-account-sidebar__profile-info-credits-amount--pledge").text().replace("\$", "")
+                .replace(" ", "").replace("USD", "").replace(",", "").toFloat() * 100).toInt()
+        val userUEC =
+            doc.select(".c-account-sidebar__profile-info-credits-amount--uec").text().replace("¤", "").replace(" ", "")
+                .replace("UEC", "").replace(",", "").toInt()
+        val userREC =
+            doc.select(".c-account-sidebar__profile-info-credits-amount--rec").text().replace("¤", "").replace(" ", "")
+                .replace("REC", "").replace(",", "").toInt()
         val isConcierge = doc.select(".c-account-sidebar__links-link--concierge").isNotEmpty()
         val isSubscribed = doc.select(".c-account-sidebar__links-link--subscribe").isNotEmpty()
         val fleet = doc.select(".c-account-sidebar__profile-metas-badge--org").attr("href").split("/").last()
@@ -209,11 +227,109 @@ class WebLoginActivity : AppCompatActivity() {
             .get()
             .build()
         val refResponse = OkHttpClient().newCall(newRquest).execute()
-        val refResponseBody = refResponse.body()?.string()
+        val refResponseBody = refResponse.body?.string()
         val billingDoc = Jsoup.parse(refResponseBody)
-        val totalSpent = (billingDoc.select(".spent-line").last().select("em").text().replace("\$","").replace(" ", "").replace("USD", "").replace(",", "").toFloat()*100).toInt()
-        val newUser = User(uid, userName, "", email, password, rsi_token, rsi_device, userHandle, userImage, "", "", "", refCode, refNumber, userCredits, userUEC, userREC, 0, totalSpent, isConcierge, isSubscribed, fleet, fleetImage)
-        return newUser
+        val totalSpent = (billingDoc.select(".spent-line").last().select("em").text().replace("\$", "").replace(" ", "")
+            .replace("USD", "").replace(",", "").toFloat() * 100).toInt()
+        val userInfo = getPlayerSearchResult(userHandle)
+            ?: return User(
+                uid,
+                userName,
+                "",
+                email,
+                password,
+                rsi_token,
+                rsi_device,
+                userHandle,
+                userImage,
+                "",
+                "",
+                "",
+                refCode,
+                refNumber,
+                userCredits,
+                userUEC,
+                userREC,
+                0,
+                totalSpent,
+                isConcierge,
+                isSubscribed,
+                fleet,
+                fleetImage,
+                "",
+                "",
+                "",
+                0,
+                "",
+                "",
+                ""
+            )
+        if (userInfo.organization == null) {
+            return User(
+                uid,
+                userName,
+                "",
+                email,
+                password,
+                rsi_token,
+                rsi_device,
+                userHandle,
+                "https://robertsspaceindustries.com/${userInfo.image}",
+                "",
+                "",
+                "",
+                refCode,
+                refNumber,
+                userCredits,
+                userUEC,
+                userREC,
+                0,
+                totalSpent,
+                isConcierge,
+                isSubscribed,
+                fleet,
+                fleetImage,
+                userInfo.location ?: "",
+                "",
+                "",
+                0,
+                "",
+                "",
+                ""
+            )
+        }
+        return User(
+            uid,
+            userName,
+            "",
+            email,
+            password,
+            rsi_token,
+            rsi_device,
+            userHandle,
+            "https://robertsspaceindustries.com/${userInfo.image}",
+            "",
+            "",
+            "",
+            refCode,
+            refNumber,
+            userCredits,
+            userUEC,
+            userREC,
+            0,
+            totalSpent,
+            isConcierge,
+            isSubscribed,
+            fleet,
+            "https://robertsspaceindustries.com/${userInfo.organization.logo}",
+            userInfo.enlisted,
+            userInfo.organization.name,
+            userInfo.organization.logo,
+            userInfo.organization.rank,
+            userInfo.organization.rankName,
+            userInfo.location ?: "",
+            userInfo.fluency
+        )
     }
 
 }

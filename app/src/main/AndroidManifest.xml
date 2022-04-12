@@ -13,6 +13,9 @@
             android:supportsRtl="true"
             android:theme="@style/Theme.StarcitizenLite">
         <activity
+                android:name=".activities.PlayerSearch"
+                android:exported="true"/>
+        <activity
                 android:name=".activities.CartActivity"
                 android:exported="true"/>
         <activity

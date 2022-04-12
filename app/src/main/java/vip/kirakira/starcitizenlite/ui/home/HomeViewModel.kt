@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tapadoo.alerter.Alerter
 import kotlinx.coroutines.launch
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.database.HangerPackageWithItems
@@ -38,6 +39,10 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
 
     var currentMode = MutableLiveData<Mode>(Mode.HANGER)
 
+    var refreshBuybackError = MutableLiveData<Boolean>(false)
+
+    var refreshHangerError = MutableLiveData<Boolean>(false)
+
     enum class Mode {
         BUYBACK,
         HANGER
@@ -51,7 +56,13 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
     fun refresh() {
         viewModelScope.launch {
             println("refreshing")
-            hangerItemRepository.refreshItems()
+            try {
+                hangerItemRepository.refreshItems()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                refreshHangerError.value = true
+            }
+
             if(currentUser.value != null) {
                 val newUser = currentUser.value
                 newUser?.hanger_value = hangerItemRepository.getTotalValue()
@@ -64,7 +75,13 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
 
     fun refreshBuybackItems() {
         viewModelScope.launch {
-            buybackItemRepository.refreshItems()
+            try {
+                buybackItemRepository.refreshItems()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                refreshBuybackError.value = true
+            }
+
         }
     }
 

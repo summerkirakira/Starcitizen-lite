@@ -37,7 +37,15 @@ data class User constructor(
     val is_subscribed: Boolean,
 
     val organization: String,
-    val organization_image: String
+    val organization_image: String,
+
+    val registerTime: String,
+    val orgName: String,
+    val orgLogo: String,
+    val orgRank: Int,
+    val orgRankName: String,
+    val location: String,
+    val fluency: String,
 )
 
 @Entity(tableName = "shop_items")
@@ -105,6 +113,12 @@ data class HangerPackageWithItems constructor(
         entityColumn = "package_id"
     )
     val hangerItems: List<HangerItem>
+)
+
+@Entity(tableName = "banner_image")
+data class BannerImage constructor(
+   @PrimaryKey
+   val image: String
 )
 
 fun List<ShopItem>.toCatalogProperty(): List<CatalogProperty> {

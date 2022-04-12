@@ -60,12 +60,6 @@ class ShoppingFragment : Fragment() {
         }
 
 
-        viewModel.needRefresh.observe(viewLifecycleOwner) {
-            if (it) {
-
-            }
-        }
-
         viewModel.isRefreshing.observe(viewLifecycleOwner) {
             binding.swipeRefreshLayout.isRefreshing = it
             if(!it) {

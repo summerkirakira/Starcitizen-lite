@@ -6,4 +6,35 @@
         <item name="android:padding">4dp</item>
         <item name="android:visibility">gone</item>
     </style>
+    <style name="main_page_icon">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:gravity">center</item>
+    </style>
+    <style name="main_page_image">
+        <item name="android:layout_width">60dp</item>
+        <item name="android:layout_height">60dp</item>
+    </style>
+    <style name="main_fragment_icon_layout">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+    <style name="personal_detail_info">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:layout_marginStart">20dp</item>
+        <item name="android:textColor">@color/avatar_left_line</item>
+    </style>
+    <style name="personal_info_divider">
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:background">@color/personal_info_divider</item>
+        <item name="android:layout_marginStart">20dp</item>
+        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:layout_height">1dp</item>
+    </style>
 </resources>

@@ -82,4 +82,8 @@ dependencies {
     implementation 'com.qmuiteam:qmui:2.0.0-alpha10'
 
     implementation 'com.github.tapadoo:alerter:7.2.4'
+
+    implementation 'io.github.youth5201314:banner:2.2.2'
+
+    implementation "io.getstream:avatarview-coil:1.0.4"
 }
