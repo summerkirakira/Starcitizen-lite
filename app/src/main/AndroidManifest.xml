@@ -8,10 +8,16 @@
     <application
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
+            android:hardwareAccelerated="true"
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/Theme.StarcitizenLite">
+        <meta-data android:name="android.webkit.WebView.EnableSafeBrowsing"
+                   android:value="false" />
+        <activity
+                android:name=".activities.ThreePartySiteActivity"
+                android:exported="true"/>
         <activity
                 android:name=".activities.PlayerSearch"
                 android:exported="true"/>

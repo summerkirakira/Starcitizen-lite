@@ -18,7 +18,6 @@ class BannerRepository(private val database: ShopItemDatabase) {
             val items = getRandomBannerURL()
             database.bannerDao.insertAll(items)
             isRefreshing.postValue(false)
-            println(items)
         }
     }
 

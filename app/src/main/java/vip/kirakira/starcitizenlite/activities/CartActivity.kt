@@ -1,30 +1,41 @@
 package vip.kirakira.starcitizenlite.activities
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.Bitmap
-import androidx.appcompat.app.AppCompatActivity
+import android.net.Uri
+import android.net.http.SslError
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
+import android.view.View
+import android.view.WindowManager
 import android.webkit.*
-import okhttp3.OkHttpClient
-import okhttp3.Request
+import androidx.appcompat.app.AppCompatActivity
+import com.gyf.immersionbar.ImmersionBar
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.network.rsi_cookie
-
-
-
 
 
 class CartActivity : AppCompatActivity() {
     lateinit var loginWebView: WebView
     var recorder = PayloadRecorder()
-    var graphqlInterrupted = 0
 
     val RSI_URL = "https://robertsspaceindustries.com"
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cart)
         supportActionBar?.hide()
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        );
         loginWebView = findViewById(R.id.webView)
+        loginWebView.settings.userAgentString = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:99.0) Gecko/20100101 Firefox/99.0"
+        loginWebView.settings.domStorageEnabled = true
+        loginWebView.settings.javaScriptCanOpenWindowsAutomatically = true
+
         val cookieManager = CookieManager.getInstance()
         cookieManager.removeAllCookies(null)
         cookieManager.setAcceptThirdPartyCookies(loginWebView, true)
@@ -33,6 +44,24 @@ class CartActivity : AppCompatActivity() {
         }
         loginWebView.evaluateJavascript(INTERCEPT_JS, null)
         loginWebView.webViewClient = object : WebLoginActivity.LoginWebViewClient() {
+
+            override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest): WebResourceResponse? {
+                val url = request.url.toString()
+                if (url.startsWith("https://www.paypal.com/checkoutnow")){
+                    val urlList = url.split("&")
+                    var newUrlList = mutableListOf<String>()
+                    urlList.forEach {
+                        if (!it.contains("xcomponent") && !it.contains("version")){
+                            newUrlList.add(it)
+                        }
+                    }
+                    val intent = Intent()
+                    intent.action = "android.intent.action.VIEW"
+                    intent.data = Uri.parse(newUrlList.joinToString("&"))
+                    startActivity(intent)
+                }
+                return super.shouldInterceptRequest(view, request)
+            }
 
             override fun onPageStarted(
                 view: WebView,
@@ -43,46 +72,26 @@ class CartActivity : AppCompatActivity() {
                     INTERCEPT_JS, null
                 )
             }
-
-            override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest): WebResourceResponse? {
-                val url = request.url.toString()
-                if(url.contains("stripe")) {
-                    val builder = Request.Builder()
-                    val newRequest = builder.url(request.url.toString())
-                        .header("cookie", rsi_cookie)
-                        .header("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 9_3 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13E233 Safari/601.1")
-                        .get()
-                        .build()
-                    val response = OkHttpClient().newCall(newRequest).execute()
-                    val newHtml = response.body!!.string()
-                    return WebResourceResponse(
-                        "text/html",
-                        "UTF-8",
-                        newHtml.byteInputStream(Charsets.UTF_8)
-                    )
-
-                }
-                return super.shouldInterceptRequest(view, request)
-            }
         }
+        loginWebView.setOnKeyListener(object : View.OnKeyListener {
+            override fun onKey(v: View?, keyCode: Int, event: KeyEvent): Boolean {
+                if (event.getAction() === KeyEvent.ACTION_DOWN) {
+                    if (keyCode == KeyEvent.KEYCODE_BACK && loginWebView.canGoBack()) {
+                        //表示按返回键时的操作
+                        loginWebView.goBack()
+                        return true
+                    }
+                }
+                return false
+            }
+        })
+
         loginWebView.settings.javaScriptEnabled = true
-        var headers = mutableMapOf<String, String>("referer" to "https://robertsspaceindustries.com/pledge", "user-agent" to "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36")
-        Log.i("Cookie", cookieManager.getCookie(RSI_URL))
+//        val headers = mutableMapOf("referer" to "https://robertsspaceindustries.com", "user-agent" to "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36")
+//        Log.i("Cookie", cookieManager.getCookie(RSI_URL))
         loginWebView.addJavascriptInterface(recorder, "recorder")
         intent.getStringExtra("url")?.let {
-            loginWebView.loadUrl(it, headers)
+            loginWebView.loadUrl(it)
         }
-    }
-}
-
-class Client : WebViewClient() {
-    override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest): WebResourceResponse? {
-        if(request.url.toString().contains("/graphql")) {
-            val builder = Request.Builder()
-            val newRequest = builder.url(request.url.toString()).build()
-            println(request.url.toString())
-
-        }
-        return super.shouldInterceptRequest(view, request)
     }
 }

@@ -344,7 +344,6 @@ class PayloadRecorder {
         payload: String
     ) {
         payloadMap["$method-$url"] = payload
-        println("$method-$url-$payload")
     }
     fun getPayload(
         method: String,

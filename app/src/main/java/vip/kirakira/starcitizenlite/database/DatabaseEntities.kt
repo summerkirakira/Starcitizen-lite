@@ -152,7 +152,7 @@ fun List<CatalogProperty>.toShopItem(): List<ShopItem> {
             slideshow = it.media.thumbnail.slideshow,
             storeSmall = it.media.thumbnail.storeSmall,
             NativePrice = it.nativePrice.amount,
-            excerpt = it.excerpt,
+            excerpt = it.excerpt?: "",
             price = it.price.amount,
             type = it.type,
             insert_time = System.currentTimeMillis()

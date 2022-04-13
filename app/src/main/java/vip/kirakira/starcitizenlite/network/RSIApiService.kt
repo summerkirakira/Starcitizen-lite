@@ -8,6 +8,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.POST
+import vip.kirakira.starcitizenlite.network.account.PtuAccountBody
+import vip.kirakira.starcitizenlite.network.account.ResetCharacterBody
 import vip.kirakira.starcitizenlite.network.hanger.BasicResponseBody
 import vip.kirakira.starcitizenlite.network.hanger.CancelPledgeRequestBody
 import vip.kirakira.starcitizenlite.network.hanger.GiftPledgeRequestBody
@@ -97,6 +99,15 @@ interface RSIApiService {
     @POST("api/account/cancelGift")
     suspend fun cancelGift(@Body body: CancelPledgeRequestBody): BasicResponseBody
 
+    @POST("api/account/v2/resetCharacter")
+    suspend fun resetCharacter(@Body body: ResetCharacterBody): BasicResponseBody
+
+    @POST("api/account/copyAccount")
+    suspend fun copyAccount(@Body body: PtuAccountBody): BasicResponseBody
+
+    @POST("api/account/eraseCopyAccount")
+    suspend fun eraseCopyAccount(@Body body: PtuAccountBody): BasicResponseBody
+
 }
 
 
@@ -135,6 +146,18 @@ object RSIApi {
             .build()
         val response = client.newCall(request).execute()
         return response.body!!.string()
+    }
+
+    suspend fun resetCharacter(password: String, reason: String="Encounter some problems", issue_council: String): BasicResponseBody {
+        return retrofitService.resetCharacter(ResetCharacterBody(password, reason, issue_council))
+    }
+
+    suspend fun copyAccount(): BasicResponseBody {
+        return retrofitService.copyAccount(PtuAccountBody("ptu"))
+    }
+
+    suspend fun eraseCopyAccount(): BasicResponseBody {
+        return retrofitService.eraseCopyAccount(PtuAccountBody("ptu"))
     }
 }
 

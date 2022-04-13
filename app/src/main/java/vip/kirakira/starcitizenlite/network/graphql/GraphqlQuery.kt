@@ -203,7 +203,7 @@ fragment TyBundleProductFragment on TyProduct {
         return CatalogVariables(query)
     }
     fun getRequestBody(page: Int): BaseGraphQLBody {
-        val variables = getCatalogVariables(page, "price", listOf("72", "268", "289", "270", "3", "41", "60"), "asc")
+        val variables = getCatalogVariables(page, "price", listOf("72", "268", "289", "270", "3", "41", "60", "9", "45", "46"), "asc")
         return BaseGraphQLBody(query, variables)
     }
 }

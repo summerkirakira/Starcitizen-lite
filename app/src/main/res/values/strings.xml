@@ -54,4 +54,21 @@
     <string name="organization_position">舰队等级</string>
     <string name="register_location">注册地点</string>
     <string name="only_login_account_can_check_user_info">登陆后才能查看个人信息哦</string>
+    <string name="reset_character">重置角色</string>
+    <string name="ptu_transfer">转移账号</string>
+    <string name="referral_points">邀请点数</string>
+    <string name="tutorial">教程一览</string>
+    <string name="ship_upgrades">舰船升级</string>
+    <string name="is_agree_to_reset">确定要重置角色吗？</string>
+    <string name="reset_warning">重置角色后，你的aUEC和舰船将会保留，但是组件装备有概率丢失，且重置操作不可逆，确定要重置吗？</string>
+    <string name="please_login">请先登录</string>
+    <string name="operate_after_login">请先登录后继续操作哦～</string>
+    <string name="reset_success">重置成功</string>
+    <string name="reset_failed">重置失败</string>
+    <string name="please_login_after_15_mins">请在15分钟后重新登录</string>
+    <string name="access_ptu">进入PTU</string>
+    <string name="copy_success">拷贝成功</string>
+    <string name="please_login_ptu">请在启动器中选择PTU登陆</string>
+    <string name="copy_failed">拷贝失败</string>
+    <string name="please_login_ptu_again">请重新登录PTU账号</string>
 </resources>

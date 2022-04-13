@@ -6,7 +6,7 @@ data class CatalogProperty(
     val title: String,
     val subtitle: String,
     var url: String,
-    var excerpt: String,
+    var excerpt: String?,
     var type: String,
     var media: Media,
     var price: Price,

@@ -7,4 +7,5 @@ enum class ShopItemType(val itemName: String) {
     ADDON("Add-Ons"),
     UEC("UE Credits"),
     GIFT("Gift Cards"),
+    PACKAGE("Package")
 }

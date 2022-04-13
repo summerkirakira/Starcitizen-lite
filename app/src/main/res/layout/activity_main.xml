@@ -185,15 +185,15 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1">
                     <ImageView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
                             android:id="@+id/bottom_me_icon"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent"
                             android:clickable="true"
-                            android:src="@drawable/ic_stock_ok"
+                            android:src="@drawable/ic_bottom_me_icon"
                             android:background="@drawable/bottom_button_ripple"/>
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </LinearLayout>

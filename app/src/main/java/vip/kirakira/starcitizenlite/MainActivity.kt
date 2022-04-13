@@ -24,6 +24,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.slider.Slider
+import com.gyf.immersionbar.ImmersionBar
 import com.qmuiteam.qmui.layout.QMUIButton
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper
 import com.qmuiteam.qmui.widget.QMUIEmptyView
@@ -94,6 +95,7 @@ class MainActivity : AppCompatActivity() {
 //        QMUIStatusBarHelper.setStatusBarLightMode(this)
         QMUIStatusBarHelper.getStatusbarHeight(this)
          //设置状态栏透明
+        initStatusBar()
 
         mMovingBar = findViewById(R.id.bottom_moving_bar) //底部滑动条
         mPager = findViewById(R.id.pager) //ViewPager
@@ -119,6 +121,7 @@ class MainActivity : AppCompatActivity() {
 
         bottomShopIcon.setColorFilter(Color.GRAY)
         bottomHangerIcon.setColorFilter(Color.GRAY)
+        if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
         bottomMainIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
         mMovingBar.setBackgroundColor(getColor(R.color.bottom_icon_selected_color))
 
@@ -200,6 +203,7 @@ class MainActivity : AppCompatActivity() {
                         bottomShopIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
                         bottomHangerIcon.setColorFilter(Color.GRAY)
                         bottomMainIcon.setColorFilter(Color.GRAY)
+                        if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
                         searchButton.setColorFilter(getColor(R.color.avatar_left_line))
                         filterButton.setImageDrawable(getDrawable(R.drawable.ic_filter))
                         filterButton.setColorFilter(getColor(R.color.avatar_left_line))
@@ -210,6 +214,7 @@ class MainActivity : AppCompatActivity() {
                         bottomShopIcon.setColorFilter(Color.GRAY)
                         bottomHangerIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
                         bottomMainIcon.setColorFilter(Color.GRAY)
+                        if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
                         filterButton.setImageDrawable(getDrawable(R.drawable.ic_hanger_switch))
                         searchButton.setColorFilter(getColor(R.color.avatar_left_line))
                         filterButton.setColorFilter(getColor(R.color.avatar_left_line))
@@ -220,6 +225,7 @@ class MainActivity : AppCompatActivity() {
                         bottomShopIcon.setColorFilter(Color.GRAY)
                         bottomHangerIcon.setColorFilter(Color.GRAY)
                         bottomMainIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
+                        if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
                         searchButton.setColorFilter(Color.WHITE)
                         setAvatarLine(ColorStateList.valueOf(Color.WHITE))
                         filterButton.visibility = View.GONE
@@ -228,6 +234,7 @@ class MainActivity : AppCompatActivity() {
                         bottomShopIcon.setColorFilter(Color.GRAY)
                         bottomHangerIcon.setColorFilter(Color.GRAY)
                         bottomMainIcon.setColorFilter(Color.GRAY)
+                        if(primaryUserId == 0) bottomMeIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
                         filterButton.visibility = View.GONE
                         setAvatarLine(ColorStateList.valueOf(Color.WHITE))
                     }
@@ -243,7 +250,7 @@ class MainActivity : AppCompatActivity() {
         filterButton.setOnClickListener {
             when(mPager.currentItem) {
                 FragmentType.SHOPPING.value -> {
-                    val itemTypes = listOf("单船", "涂装", "装备", "附加包", "UEC", "礼品卡")
+                    val itemTypes = listOf("单船", "涂装", "装备", "附加包", "UEC", "礼品卡", "游戏包")
                     val builder = QMUIDialog.MultiCheckableDialogBuilder(this)
                     builder.setTitle("请选择商品种类")
                         .setCheckedItems(arrayOf(0).toIntArray())
@@ -259,6 +266,7 @@ class MainActivity : AppCompatActivity() {
                                     3 -> filterList.add(ShopItemType.ADDON.itemName)
                                     4 -> filterList.add(ShopItemType.UEC.itemName)
                                     5 -> filterList.add(ShopItemType.GIFT.itemName)
+                                    6 -> filterList.add(ShopItemType.PACKAGE.itemName)
                                 }
                                 shoppingViewModel.setFilter(filterList)
                             }
@@ -286,6 +294,12 @@ class MainActivity : AppCompatActivity() {
         secondLine.setStrokeData(4, colorStateList)
         thirdLine.setBgData(colorStateList)
         thirdLine.setStrokeData(4, colorStateList)
+    }
+
+    fun  initStatusBar(){
+        val mImmersionBar = ImmersionBar.with(this)
+        mImmersionBar.transparentBar()
+            .init()
     }
 
 

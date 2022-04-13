@@ -22,7 +22,7 @@
 
     </com.youth.banner.Banner>
     <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
-                                                       android:layout_height="wrap_content"
+                                                       android:layout_height="match_parent"
                                                        app:layout_constraintTop_toBottomOf="@+id/banner"
                                                        android:background="@color/white"
                                                        android:elevation="20dp" >
@@ -37,8 +37,8 @@
                           android:layout_height="wrap_content"
                           android:id="@+id/ship_search_layout"
                           android:orientation="vertical"
-                          android:layout_marginTop="20dp"
                           android:layout_marginStart="20dp"
+                          android:layout_marginTop="20dp"
                           app:layout_constraintEnd_toStartOf="@+id/player_search_layout"
                           app:layout_constraintStart_toStartOf="parent"
                           app:layout_constraintTop_toTopOf="parent">
@@ -98,8 +98,8 @@
                     android:layout_marginStart="20dp"
                     android:id="@+id/organization_search_layout"
                     app:layout_constraintStart_toEndOf="@+id/component_search_layout"
-                    app:layout_constraintEnd_toEndOf="@+id/spectrum_layout"
                     app:layout_constraintTop_toTopOf="@+id/ship_search_layout"
+                    app:layout_constraintEnd_toStartOf="@id/spectrum_layout"
                     style="@style/main_fragment_icon_layout"
             >
                 <ImageView
@@ -119,8 +119,8 @@
                     android:layout_marginStart="20dp"
                     android:id="@+id/spectrum_layout"
                     app:layout_constraintStart_toEndOf="@+id/organization_search_layout"
-                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/ship_search_layout"
+                    app:layout_constraintEnd_toEndOf="parent"
                     android:layout_marginEnd="20dp"
                     style="@style/main_fragment_icon_layout"
             >
@@ -137,6 +137,95 @@
                         app:layout_constraintTop_toTopOf="parent"
                         style="@style/main_page_icon"/>
             </LinearLayout>
+            <LinearLayout
+                    android:id="@+id/character_reset_layout"
+                    app:layout_constraintTop_toBottomOf="@+id/ship_search_layout"
+                    app:layout_constraintStart_toStartOf="@+id/ship_search_layout"
+                    android:layout_marginTop="10dp"
+                    style="@style/main_fragment_icon_layout"
+            >
+                <ImageView
+                        android:id="@+id/reset_character_icon"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:src="@drawable/ic_reset_character_icon"
+                        style="@style/main_page_image"/>
+                <TextView
+                        android:text="@string/reset_character"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        style="@style/main_page_icon"/>
+            </LinearLayout>
+            <LinearLayout
+                    android:id="@+id/ptu_layout"
+                    app:layout_constraintTop_toTopOf="@+id/character_reset_layout"
+                    app:layout_constraintStart_toStartOf="@+id/player_search_layout"
+                    style="@style/main_fragment_icon_layout"
+            >
+                <ImageView
+                        android:id="@+id/ptu_icon"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:src="@drawable/ic_account_transfer"
+                        style="@style/main_page_image"/>
+                <TextView
+                        android:text="@string/ptu_transfer"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        style="@style/main_page_icon"/>
+            </LinearLayout>
+            <LinearLayout
+                    android:id="@+id/referral_code_layout"
+                    app:layout_constraintTop_toTopOf="@+id/character_reset_layout"
+                    app:layout_constraintStart_toStartOf="@+id/component_search_layout"
+                    style="@style/main_fragment_icon_layout"
+            >
+                <ImageView
+                        android:id="@+id/referral_code_icon"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:src="@drawable/ic_referral_code"
+                        style="@style/main_page_image"/>
+                <TextView
+                        android:text="@string/referral_points"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        style="@style/main_page_icon"/>
+            </LinearLayout>
+            <LinearLayout
+                    android:id="@+id/tutorial_layout"
+                    app:layout_constraintTop_toTopOf="@+id/character_reset_layout"
+                    app:layout_constraintStart_toStartOf="@+id/organization_search_layout"
+                    style="@style/main_fragment_icon_layout">
+                <ImageView
+                        android:id="@+id/tutorial_icon"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:src="@drawable/ic_idea"
+                        style="@style/main_page_image"/>
+                <TextView
+                        android:text="@string/tutorial"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        style="@style/main_page_icon"/>
+            </LinearLayout>
+            <LinearLayout
+                    android:id="@+id/upgrade_layout"
+                    app:layout_constraintTop_toTopOf="@+id/character_reset_layout"
+                    app:layout_constraintStart_toStartOf="@+id/spectrum_layout"
+                    style="@style/main_fragment_icon_layout">
+                <ImageView
+                        android:id="@+id/upgrade_icon"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:src="@drawable/ic_upgrade_icon"
+                        style="@style/main_page_image"/>
+                <TextView
+                        android:text="@string/ship_upgrades"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        style="@style/main_page_icon"/>
+            </LinearLayout>
 
 
 
@@ -145,6 +234,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
                                                            android:layout_height="wrap_content"
                                                            android:layout_marginTop="15dp"
+                                                           android:visibility="gone"
                                                            android:background="@color/white"
                                                            android:id="@+id/how_to_play_layout"
                                                            app:layout_constraintTop_toBottomOf="@+id/shortcuts_container">
