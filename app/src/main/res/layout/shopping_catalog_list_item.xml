@@ -29,8 +29,7 @@
                         android:scaleType="fitXY"
                         android:elevation="20dp"
                         android:background="@color/white"
-                        android:imageUrl="@{property.slideshow}"
-                        android:src="@drawable/ic_launcher_background" />
+                        android:imageUrl="@{property.slideshow}" />
                 <TextView android:layout_width="0dp"
                           app:layout_constraintHorizontal_weight="1"
                           app:layout_constraintEnd_toEndOf="parent"
