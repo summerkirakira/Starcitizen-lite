@@ -18,9 +18,7 @@
              android:id="@+id/banner"
              android:layout_width="match_parent"
             app:banner_loop_time="3000"
-             android:layout_height="300dp">
-
-    </com.youth.banner.Banner>
+             android:layout_height="300dp" />
     <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
                                                        android:layout_height="match_parent"
                                                        app:layout_constraintTop_toBottomOf="@+id/banner"

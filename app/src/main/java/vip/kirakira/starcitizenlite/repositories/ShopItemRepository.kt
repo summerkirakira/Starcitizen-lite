@@ -29,16 +29,21 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
         withContext(Dispatchers.IO) {
             var page = 1;
             isRefreshing.postValue(true)
-            while (true) {
-                val data = RSIApi.retrofitService.getCatalog(
-                    UpdateCatalogMutation().getRequestBody(page)
-                ).data.store.listing.resources
-                if (data.isEmpty()) {
-                    break
+            try {
+                while (true) {
+                    val data = RSIApi.retrofitService.getCatalog(
+                        UpdateCatalogMutation().getRequestBody(page)
+                    ).data.store.listing.resources
+                    if (data.isEmpty()) {
+                        break
+                    }
+                    database.shopItemDao.insertAll(data.toShopItem())
+                    page++
                 }
-                database.shopItemDao.insertAll(data.toShopItem())
-                page++
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
+
             isRefreshing.postValue(false)
         }
     }

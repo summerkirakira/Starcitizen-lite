@@ -53,7 +53,8 @@ class HangerProcess {
         for (pledge in doc.select("article.pledge")) {
             val image = pledge.select("img").attr("src")
             val title = pledge.select(".information").select("h1").text()
-            val time = pledge.select("dl").select("dd")[0].text()
+            val timeString = pledge.select("dl").select("dd")[0].text()
+            val time = convertDateToLong(timeString)
             val contains = pledge.select("dl").select("dd")[2].text()
             var pledgeId = 0
             try {

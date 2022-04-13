@@ -38,7 +38,7 @@ fun List<BuybackItem>.toItemProperty(): List<HangerItemProperty> {
                 number = 1,
                 status = "回购中",
                 tags = listOf(),
-                date = item.date,
+                date = convertLongToDate(item.date),
                 contains = item.contains,
                 price = -1,
                 insurance = "",

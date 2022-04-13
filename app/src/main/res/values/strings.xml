@@ -71,4 +71,9 @@
     <string name="please_login_ptu">请在启动器中选择PTU登陆</string>
     <string name="copy_failed">拷贝失败</string>
     <string name="please_login_ptu_again">请重新登录PTU账号</string>
+    <string name="credits_add_success">信用点添加成功</string>
+    <string name="credits_add_failed">信用点不足...添加失败</string>
+    <string name="switch_account">切换账号</string>
+    <string name="my_buyback">我的回购</string>
+    <string name="my_hanger">我的机库</string>
 </resources>

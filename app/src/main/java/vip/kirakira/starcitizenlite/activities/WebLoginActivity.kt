@@ -17,6 +17,8 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import org.json.JSONException
+import org.json.JSONObject
 import org.jsoup.Jsoup
 import vip.kirakira.starcitizenlite.MainActivity
 import vip.kirakira.starcitizenlite.R
@@ -55,6 +57,8 @@ class WebLoginActivity : AppCompatActivity() {
 //    var needMultiStep = MutableLiveData<Boolean>(false)
     var isLogin = MutableLiveData<User>(null)
 
+    var isRegistered = MutableLiveData<Boolean>(false)
+
     val scope = CoroutineScope(Job() + Dispatchers.Main)
 
     lateinit var database: ShopItemDatabase
@@ -81,19 +85,44 @@ class WebLoginActivity : AppCompatActivity() {
                 scope.launch {
                     userRepository.insertUser(it)
                 }
-//                Alerter.create(this@WebLoginActivity)
-//                    .setTitle("登陆成功")
-//                    .setText("Login Success")
-//                    .setBackgroundColorRes(R.color.alerter_default_success_background)
-//                    .setDuration(2000)
-//                    .enableSwipeToDismiss()
-//                    .enableIconPulse(true)
-//                    .enableVibration(true)
-//                    .show()
-                val intent = Intent(this, MainActivity::class.java)
-                intent.putExtra("isLongin", true)
-                startActivity(intent)
-                finish()
+                Alerter.create(this@WebLoginActivity)
+                    .setTitle("登陆成功")
+                    .setText("Login Success")
+                    .setBackgroundColorRes(R.color.alerter_default_success_background)
+                    .setDuration(2000)
+                    .enableSwipeToDismiss()
+                    .enableIconPulse(true)
+                    .enableVibration(true)
+                    .setOnHideListener {
+                        val intent = Intent(this, MainActivity::class.java)
+                        intent.putExtra("isLongin", true)
+                        startActivity(intent)
+                        finish()
+                    }
+                    .show()
+            }
+        })
+        isRegistered.observe(this, androidx.lifecycle.Observer {
+            if (it) {
+                Alerter.create(this@WebLoginActivity)
+                    .setTitle("注册成功")
+                    .setText("点击此处以登陆账号")
+                    .setBackgroundColorRes(R.color.alerter_default_success_background)
+                    .setDuration(6000)
+                    .enableSwipeToDismiss()
+                    .enableIconPulse(true)
+                    .enableVibration(true)
+                    .setOnHideListener {
+                        val intent = Intent(this, WebLoginActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }
+                    .setOnClickListener {
+                        val intent = Intent(this, WebLoginActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }
+                    .show()
             }
         })
 
@@ -142,7 +171,6 @@ class WebLoginActivity : AppCompatActivity() {
                         }
                     } else if(payload?.contains("multistep") == true) {
                         val builder = Request.Builder()
-                        Log.i("WebLoginActivity", "CookieConsent=$RSI_COOKIE_CONSTENT;Rsi-Token=$temp_rsi_token; _device_id=$temp_device_id")
                         val req = builder.url("https://robertsspaceindustries.com/graphql")
                             .addHeader("user-agent", DEFAULT_USER_AGENT)
                             .addHeader("content-type", "application/json")
@@ -151,12 +179,56 @@ class WebLoginActivity : AppCompatActivity() {
                             .build();
                         val response = OkHttpClient().newCall(req).execute()
                         val responseBody = response.body?.string()
-                        Log.i("WebLoginActivity", responseBody!!)
                         if("RsiAuthenticatedAccount" in responseBody!!){
                             val successLoginInfo = SignInMutation().parseLoginSuccess(responseBody)
                             val newUser = saveUserData(successLoginInfo.data.account_multistep.id, temp_device_id, temp_rsi_token, email!!, password!!)
                             isLogin.postValue(newUser)
                         }
+                    } else if (payload?.contains("mutation signup") == true){
+                        val payloadObject = JSONObject(payload)
+                        try {
+                            val code = payloadObject.getJSONObject("variables").getString("referralCode")
+                        } catch (e: Exception) {
+                            payloadObject.getJSONObject("variables").put("referralCode", "STAR-QSCF-FXKT")
+                        }
+                        val signUpEmail = payloadObject.getJSONObject("variables").getString("email")
+                        val signUpPassword = payloadObject.getJSONObject("variables").getString("password")
+                        val webviewCookies = CookieManager.getInstance().getCookie("https://robertsspaceindustries.com")
+                        var rsiToken: String? = null
+                        webviewCookies.split(";").forEach {
+                            if(it.contains("Rsi-Token")){
+                                rsiToken = it.split("=")[1]
+                            }
+                        }
+                        val builder = Request.Builder()
+                        val req = builder.url("https://robertsspaceindustries.com/graphql")
+                            .addHeader("user-agent", DEFAULT_USER_AGENT)
+                            .addHeader("content-type", "application/json")
+                            .addHeader("cookie", "${RSI_COOKIE_CONSTENT}; Rsi-Token=${rsiToken}")
+                            .post(RequestBody.create("application/json".toMediaTypeOrNull(), payloadObject.toString()))
+                            .build()
+                        val response = OkHttpClient().newCall(req).execute()
+
+                        val headers = response.headers.toMap()
+                        try {
+                            val rsiDevice = headers["set-cookie"]?.split(";")!!.get(0).split("=").get(1)
+                            if (rsiToken != null && rsiDevice.isNotEmpty()){
+//                            val newUser = saveUserData((1..60000).random(), rsiDevice, rsiToken!!, signUpEmail, signUpPassword)
+//                            isLogin.postValue(newUser)
+                                isRegistered.postValue(true)
+                            }
+                        } catch (e: Exception) {
+                            runOnUiThread {
+                                Alerter.create(this@WebLoginActivity)
+                                    .setTitle("注册失败")
+                                    .setText("用户名或邮箱已被注册")
+                                    .setBackgroundColorRes(R.color.alert_dialog_background_failure)
+                                    .setIcon(R.drawable.ic_warning)
+                                    .show()
+                            }
+                        }
+
+
                     }
 
                     return super.shouldInterceptRequest(view, request)
@@ -344,6 +416,7 @@ class PayloadRecorder {
         payload: String
     ) {
         payloadMap["$method-$url"] = payload
+        Log.i("PayloadRecorder", "$method-$payload")
     }
     fun getPayload(
         method: String,

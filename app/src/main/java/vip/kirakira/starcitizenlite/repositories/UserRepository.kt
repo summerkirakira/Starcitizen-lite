@@ -7,6 +7,7 @@ import vip.kirakira.starcitizenlite.database.ShopItemDatabase
 import vip.kirakira.starcitizenlite.database.User
 
 class UserRepository(private val database: ShopItemDatabase) {
+    val user: LiveData<List<User>> = database.userDao.getAll()
     fun getUserById(id: Int): LiveData<User> {
         return database.userDao.getById(id)
     }

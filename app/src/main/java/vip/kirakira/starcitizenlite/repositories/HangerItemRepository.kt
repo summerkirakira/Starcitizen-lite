@@ -24,16 +24,21 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
             isRefreshing.postValue(true)
             if (rsi_cookie.contains("_rsi_device")) {
                 val getTime = System.currentTimeMillis()
-                while (true) {
-                    val data = HangerService().getHangerInfo(page)
-                    if (data.hangerPackages.isEmpty()) {
-                        break
+                try {
+                    while (true) {
+                        val data = HangerService().getHangerInfo(page)
+                        if (data.hangerPackages.isEmpty()) {
+                            break
+                        }
+                        database.hangerItemDao.insertAllItems(data.hangerItems)
+                        database.hangerItemDao.insertAllPackages(data.hangerPackages)
+                        page++
                     }
-                    database.hangerItemDao.insertAllItems(data.hangerItems)
-                    database.hangerItemDao.insertAllPackages(data.hangerPackages)
-                    page++
+                    database.hangerItemDao.deleteAllOldPackage(getTime)
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
-                database.hangerItemDao.deleteAllOldPackage(getTime)
+
             }
             isRefreshing.postValue(false)
         }

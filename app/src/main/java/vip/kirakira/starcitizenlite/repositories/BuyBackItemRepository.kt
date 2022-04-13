@@ -16,13 +16,18 @@ class BuyBackItemRepository(private val database: ShopItemDatabase) {
         withContext(Dispatchers.IO) {
             var page = 1
             isRefreshing.postValue(true)
-            while (true) {
-                val data = HangerService().getBuybackInfo(page)
-                if (data.isEmpty()) {
-                    break
+            try {
+                while (true) {
+                    val data = HangerService().getBuybackInfo(page)
+                    if (data.isEmpty()) {
+                        break
+                    }
+                    database.buybackItemDao.insertAll(data)
+                    page++
                 }
-                database.buybackItemDao.insertAll(data)
-                page++
+            }
+            catch (e: Exception) {
+                e.printStackTrace()
             }
         }
         isRefreshing.postValue(false)

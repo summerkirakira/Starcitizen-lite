@@ -245,6 +245,14 @@ class HomeFragment : Fragment() {
                 adapter.submitList(it.toItemPropertyList())
             } else if (viewModel.currentMode.value == HomeViewModel.Mode.BUYBACK) {
                 adapter.submitList(viewModel.buybackItems.value?.toItemProperty())
+
+            }
+        }
+        viewModel.currentMode.observe(viewLifecycleOwner) {
+            if (it == HomeViewModel.Mode.HANGER) {
+                binding.fragmentTitle.text = getString(R.string.my_hanger)
+            } else if (it == HomeViewModel.Mode.BUYBACK) {
+                binding.fragmentTitle.text = getString(R.string.my_buyback)
             }
         }
 

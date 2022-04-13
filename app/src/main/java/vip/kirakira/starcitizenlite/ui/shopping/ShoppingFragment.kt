@@ -94,7 +94,8 @@ class ShoppingFragment : Fragment() {
 
         binding.fab.setOnClickListener {
             if(selectedItem != null) {
-                val dialog = QMUIDialog.CheckBoxMessageDialogBuilder(context)
+                val builder = QMUIDialog.CheckBoxMessageDialogBuilder(context)
+                val dialog = builder
                     .setTitle("是否添加${selectedItem!!.name}(${selectedItem!!.price / 100f}USD)\n到购物车？")
                     .setMessage("自动补全信用点")
                     .setChecked(true)
@@ -105,19 +106,21 @@ class ShoppingFragment : Fragment() {
                         dialog.dismiss()
                         scope.launch {
                             clearCart()
-                            addToCart(selectedItem!!.id, 3)
-                            val cartInfo = getCartSummary()
-                            val applicableCredit: Int = cartInfo.data.store.cart.totals.credits.maxApplicable - cartInfo.data.store.cart.totals.credits.amount
-                            val addCredits = addCredit(applicableCredit / 100f)
+                            addToCart(selectedItem!!.id, 1)
+                            if(builder.isChecked){
+                                val cartInfo = getCartSummary()
+                                val applicableCredit: Int = cartInfo.data.store.cart.totals.credits.maxApplicable - cartInfo.data.store.cart.totals.credits.amount
+                                val addCredits = addCredit(applicableCredit / 100f)
+                                if(addCredits.errors == null) {
+                                    Toast.makeText(context, getString(R.string.credits_add_success), Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(context, getString(R.string.credits_add_failed), Toast.LENGTH_SHORT).show()
+                                }
+                            }
                             nextStep()
 //                            val address = cartAddressQuery()
 //                            val assignAddress = cartAddressAssign(address.data.store.addressBook.first().id)
 //                            println(cartValidation("03AGdBq27y9ldoo5gKZTkYZ2S_LEDgEI_iw1UUp9nMjsIW_Z0pywtluUGpXyisHFpdGB9sG84Zryqy3woCnhqGOR1mdIF6aGf1GGoGHe9C3QhpBk7S25IfLHbc2ticW4iw1fuUD6RLT-00vkTwZFwULI_p16BLRAHFLOwwFaJViXuXhlYpjc5Ot-CoQkbf2d-0MP9EpNiSWqF2gsZrje58g8AFF3rgRb19DSfDnVKQS0kE-Tl9zvrJwU-pLKIu_CaPiR2L5jVOItBMhCWe5iMInJN1rck-jUoLONhIc1MummaiyGrdVDHLYu2xb7_V2ipDSNqc_IZ30fJN_bT6RUUnFzFBJeea6hwR91VX34IrN1Tu3eok_7M6ZHRyk5IB_fGu2q5e4G0WfkR5QlEAOGwC6_5LCwlHyI5lRtMirIG2hsBjsbuoVzvYrPhalHHXr9zfxk6t-IDYAayQx3yApVLSBbbai0jGdjkqHeWUwJ3vI85MJhM5mYQRpH1bUCeJLY0snFpF5Lnli5GmeQwuxOiGOuw07JKwbXc1iyNWil9OXnBfGI9_1e4ijHJq0GIZQtg6N5cE1D1MMa37QYbUb8fy96NGurih1EezNDX-AmxWZzhsJ74O72CMIitn0BhpctSrcKHy-beFl6c1zz72vpMRVSgsH9Zg5Zb0QlN9zs6LA60ikLscWyyszeeup__oktpHGsjGE8D1N1zgOTjv2rBW8CsxQq7Q3FU2OJwBej5tZ8eW2udlGEWsHugamTGkdh1osrtgHvcwTsacvoxZXKeV_j2vzA2_iYsgAaNOQpzJzKMDApJd20lXMFyzT--CUZgYhfI0OpU5IUjOgUr0TmVGmouDwmlRUWFFu4Ui_9Cur65SgfE-saWHwyXIxHW72Uy6mQ97PslG69sydlIq-d-8v1350ZaZNJoA9kG_9bNJ7fhxGtjQWvraer8FphO5o8cGrA2ODjOesmYJP6VxeNe7TEhwMKwD3IwUdw1HxW6-2an1NYNMFRisX0Z2PyESqVn6hp1pqGufF6zIecYu0K9VR2MPbEJlktgKzT-pej95E857cimHU0OWgchmq5LYaKIkC95cPoZtIpg9llZ1o2lZ0wtZTFqWEzpJizZsX676cWEEvAaNMG-ksH18C1reNJcpq_QG4ICESXOBZHZbaBA252OnDA4p_Sfir-lYLIQOTYNyuw79Ml3hXnaDkvJHs3Tjv-bmHLoFTuZFaKKbfwG3ai9h_GRaKO6A4cTr0dO7osDDqMtmIXrcAWlgBtKwS8a8X-oOj1dYtwk-1JGFyYEqA5sidnLXLVFyvFJbdLfH88y1Ocy-yWoso5QfVimHQyYkQViNa0GitLcuWE3Q1u15nmnpsZ_mvV4-j-7GZPRFJoR-K5kGFHGmwciU-FrTxOWtTnxuBXqTKNLZPLPIV5IR5P8PIhV2Ur2RwWpaNFqGA9epnv-yJoQtfXewWFWrkH77Y29rUvqM1k04asj5xmyzSSbi43_hJnJVRV6Fo3dnzymgfgJ8tbbBSZ0EOdKTJL4KPeDs-_nZYycmnwwzsEWDqdfo9io7v4GgCrDbEY5GIIyb8Ixnc0KG6Gw"))
-                            if(addCredits.errors == null) {
-                                Toast.makeText(context, "添加成功", Toast.LENGTH_SHORT).show()
-                            } else {
-                                Toast.makeText(context, "添加失败", Toast.LENGTH_SHORT).show()
-                            }
                             val bundle = Bundle()
                             bundle.putString("url", "https://robertsspaceindustries.com/store/pledge/cart")
                             val intent = Intent(context, CartActivity::class.java)

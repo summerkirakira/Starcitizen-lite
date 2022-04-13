@@ -15,8 +15,12 @@ class BannerRepository(private val database: ShopItemDatabase) {
     suspend fun refresh() {
         withContext(Dispatchers.IO) {
             isRefreshing.postValue(true)
-            val items = getRandomBannerURL()
-            database.bannerDao.insertAll(items)
+            try {
+                val items = getRandomBannerURL()
+                database.bannerDao.insertAll(items)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
             isRefreshing.postValue(false)
         }
     }

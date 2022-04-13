@@ -97,7 +97,7 @@
                        android:id="@+id/search_icon"
                        app:layout_constraintTop_toTopOf="parent"
                        app:layout_constraintBottom_toBottomOf="parent"
-                       android:src="@drawable/ic_search"
+                       android:src="@drawable/ic_top_search"
                        android:clickable="true"
                        android:background="@drawable/top_toolbar_button_ripple"
                        app:tint="@color/white"/>

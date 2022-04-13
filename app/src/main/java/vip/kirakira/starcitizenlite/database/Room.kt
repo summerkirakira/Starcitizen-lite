@@ -27,6 +27,9 @@ interface ShopItemDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(shopItems: List<ShopItem>)
+
+    @Query("DELETE FROM shop_items")
+    fun deleteAll()
 }
 
 @Dao
@@ -54,7 +57,7 @@ interface HangerItemDao {
 
 @Dao
 interface BuybackItemDao {
-    @Query("SELECT * FROM buyback")
+    @Query("SELECT * FROM buyback ORDER BY date DESC")
     fun getAll(): LiveData<List<BuybackItem>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
