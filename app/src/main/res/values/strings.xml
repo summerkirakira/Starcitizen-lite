@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">星际助手</string>
+    <string name="app_name">星河避难所</string>
     <string name="preference_file_key">vip.kirakira.starcitizenlite.kirakira</string>
     <string name="primary_user_key">PRIMARY_USER</string>
     <string name="is_log_in">IS_USER_LOG_IN</string>

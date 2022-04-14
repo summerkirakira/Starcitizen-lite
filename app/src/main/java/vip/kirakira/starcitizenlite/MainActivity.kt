@@ -1,6 +1,5 @@
 package vip.kirakira.starcitizenlite
 
-import android.app.PendingIntent.getActivity
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -63,6 +62,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var secondLine: QMUIRoundButton
     private lateinit var thirdLine: QMUIRoundButton
     private lateinit var switchAccount: ConstraintLayout
+    private lateinit var homeViewModel: HomeViewModel
+    private lateinit var shoppingViewModel: ShoppingViewModel
+
 
     private var  density: Float = 0f
 
@@ -82,6 +84,10 @@ class MainActivity : AppCompatActivity() {
 
         supportActionBar?.hide() //隐藏标题栏
 
+        shoppingViewModel = ViewModelProvider(this).get(ShoppingViewModel::class.java)
+
+        homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
+
         val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
 
         var primaryUserId = sharedPreferences.getInt(getString(R.string.primary_user_key), 0)
@@ -92,17 +98,15 @@ class MainActivity : AppCompatActivity() {
 
         val allUsers: LiveData<List<User>> = database.userDao.getAll()
 
-        val shoppingViewModel = ViewModelProvider(this).get(ShoppingViewModel::class.java)
 
-        val homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
 
         allUsers.observe(this) {
 
         }
 
-        QMUIStatusBarHelper.translucent(this)
+//        QMUIStatusBarHelper.translucent(this)
 //        QMUIStatusBarHelper.setStatusBarLightMode(this)
-        QMUIStatusBarHelper.getStatusbarHeight(this)
+//        QMUIStatusBarHelper.getStatusbarHeight(this)
          //设置状态栏透明
         initStatusBar()
 
@@ -389,8 +393,30 @@ class MainActivity : AppCompatActivity() {
     fun  initStatusBar(){
         val mImmersionBar = ImmersionBar.with(this)
         mImmersionBar.transparentBar()
+            .fullScreen(false)
+            .navigationBarColor(R.color.white)
             .init()
+
     }
+
+    override fun onBackPressed() {
+        when(mPager.currentItem) {
+            FragmentType.HANGER.value -> {
+                if (homeViewModel.isDetailShowing.value == true){
+                    homeViewModel.isDetailShowing.value = false
+                    return
+                }
+            }
+            FragmentType.SHOPPING.value -> {
+                if (shoppingViewModel.isDetailShowing.value == true){
+                    shoppingViewModel.isDetailShowing.value = false
+                    return
+                }
+            }
+        }
+        super.onBackPressed()
+    }
+
 
 
 

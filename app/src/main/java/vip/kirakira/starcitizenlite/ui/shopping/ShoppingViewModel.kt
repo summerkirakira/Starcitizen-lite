@@ -29,6 +29,8 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
     val filter = MutableLiveData<ShopItemFilter>().apply { value = ShopItemFilter("", listOf("Standalone Ship")) }
 
+    var isDetailShowing = MutableLiveData<Boolean>(false)
+
     init {
         getCatalog()
         sortByName()

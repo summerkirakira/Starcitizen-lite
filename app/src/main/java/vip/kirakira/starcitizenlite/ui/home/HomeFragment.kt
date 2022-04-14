@@ -52,6 +52,7 @@ class HomeFragment : Fragment() {
 
         binding.contentContainer.setOnClickListener(View.OnClickListener {
             binding.popupLayout.visibility = View.GONE
+            viewModel.isDetailShowing.value = false
         })
 
         viewModel.currentUser.observe(viewLifecycleOwner) {
@@ -72,10 +73,19 @@ class HomeFragment : Fragment() {
             }
         }
 
+        viewModel.isDetailShowing.observe(viewLifecycleOwner) {
+            if (it) {
+                binding.popupLayout.visibility = View.VISIBLE
+            } else {
+                binding.popupLayout.visibility = View.GONE
+            }
+        }
+
         val adapter = HangerViewAdapter(
             HangerViewAdapter.OnClickListener {
                 if(binding.popupLayout.visibility == View.VISIBLE) {
                     binding.popupLayout.visibility = View.GONE
+                    viewModel.isDetailShowing.value = false
                     return@OnClickListener
                 }
                 binding.itemsLinearLayout.removeAllViews()
@@ -114,6 +124,7 @@ class HomeFragment : Fragment() {
                     binding.alsoContainsLinearLayout.addView(alsoContainsView)
                 }
                 binding.popupLayout.visibility = View.VISIBLE
+                viewModel.isDetailShowing.value = true
             },
             HangerViewAdapter.OnTagClickListener {
                 tag, item ->
@@ -304,5 +315,4 @@ class HomeFragment : Fragment() {
 
         return binding.root
     }
-
 }

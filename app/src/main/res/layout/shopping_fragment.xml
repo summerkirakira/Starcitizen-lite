@@ -5,6 +5,7 @@
 >
     <androidx.constraintlayout.widget.ConstraintLayout
             tools:context=".ui.shopping.ShoppingFragment"
+            android:background="@color/white"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
         <androidx.constraintlayout.widget.ConstraintLayout

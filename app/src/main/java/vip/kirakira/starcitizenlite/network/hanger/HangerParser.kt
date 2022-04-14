@@ -21,9 +21,9 @@ class HangerProcess {
             val pledgeList = doc.select(".list-items").select(".row")
             for(pledge in pledgeList) {
                 val pledgeId = pledge.select(".js-pledge-id").attr("value").toInt()
-                val pledgeValue = (pledge.select(".js-pledge-value").attr("value").replace("$", "").replace(" USD", "").toFloat() * 100).toInt()
+                val pledgeValue = (pledge.select(".js-pledge-value").attr("value").replace("$", "").replace(" USD", "").replace(",", "").toFloat() * 100).toInt()
                 val pledgeImage = pledge.select("div.image").attr("style").replace("background-image:url('", "").replace("');", "")
-                val pledgeTitle = pledge.select(".title-col")[0].text()
+                val pledgeTitle = pledge.select(".title-col")[0].select("h3").text()
                 val pledgeStatus = pledge.select(".availability").text()
                 val pledgeDate = convertDateToLong( pledge.select(".date-col").text().replace("Created: ", ""))
                 val pledgeContains = pledge.select(".items-col").text().replace("Contains:", "")

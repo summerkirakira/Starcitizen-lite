@@ -48,6 +48,8 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
 
     var buybackItemFilter = MutableLiveData<String>("")
 
+    var isDetailShowing = MutableLiveData<Boolean>(false)
+
     enum class Mode {
         BUYBACK,
         HANGER

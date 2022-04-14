@@ -69,11 +69,8 @@ class ShoppingFragment : Fragment() {
 
         binding.fab.hide()
 
-        viewModel.popUpItem.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
-            binding.textViewShopItemDetailTitle.text = it.name
-            binding.textViewShopItemDetailSubtitle.text = it.subtitle
-            binding.textViewShopItemDetailDescription.text = it.excerpt
-            if(binding.popupLayout.visibility == View.INVISIBLE) {
+        viewModel.isDetailShowing.observe(viewLifecycleOwner) {
+            if(it) {
                 binding.popupLayout.visibility = View.VISIBLE
                 binding.fab.show()
                 ObjectAnimator.ofFloat(binding.fab, "rotation", 0f, 90f).apply {
@@ -81,10 +78,21 @@ class ShoppingFragment : Fragment() {
                     start()
                 }
                 binding.fab.elevation = 15f
-                selectedItem = it
             } else {
                 binding.popupLayout.visibility = View.INVISIBLE
                 binding.fab.hide()
+            }
+        }
+
+        viewModel.popUpItem.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+            binding.textViewShopItemDetailTitle.text = it.name
+            binding.textViewShopItemDetailSubtitle.text = it.subtitle
+            binding.textViewShopItemDetailDescription.text = it.excerpt
+            if(binding.popupLayout.visibility == View.INVISIBLE) {
+                viewModel.isDetailShowing.value = true
+                selectedItem = it
+            } else {
+                viewModel.isDetailShowing.value = false
             }
         })
 

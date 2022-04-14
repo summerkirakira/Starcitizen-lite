@@ -113,22 +113,17 @@
                   app:layout_constraintEnd_toEndOf="parent"
                   app:layout_constraintBottom_toBottomOf="parent" />
 
-        <TextView android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
+        <TextView style="@style/shop_item_dollar_text"
                   android:id="@+id/dollar_icon"
-                  android:textSize="20sp"
                   app:layout_constraintStart_toStartOf="@+id/hanger_item_title"
                   app:layout_constraintBottom_toBottomOf="parent"
                   android:text="@string/dollar"/>
-        <TextView android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
+        <TextView style="@style/shop_item_price_text"
                   android:id="@+id/price_text"
                   app:layout_constraintStart_toEndOf="@+id/dollar_icon"
                   app:layout_constraintBaseline_toBaselineOf="@+id/dollar_icon"
                   tools:text="40"
-                  android:textSize="24sp"
-                  android:text="@{String.valueOf(Float.valueOf(hangerItemProperty.price) / 100.0f)}"
-                  android:layout_marginStart="2dp" />
+                  android:text="@{String.valueOf(Float.valueOf(hangerItemProperty.price) / 100.0f)}"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
