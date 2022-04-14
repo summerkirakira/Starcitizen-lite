@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import kotlinx.coroutines.launch
 import vip.kirakira.starcitizenlite.database.ShopItem
 import vip.kirakira.starcitizenlite.database.getDatabase
+import vip.kirakira.starcitizenlite.ui.shopping.ShopItemFilter
 import vip.kirakira.viewpagertest.repositories.ShopItemRepository
 
 class ShoppingViewModel(application: Application) : AndroidViewModel(application) {
@@ -26,7 +27,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
     var catalog = itemsAfterFilter
 
-    val filter = MutableLiveData<List<String>>().apply { value = listOf("Standalone Ship") }
+    val filter = MutableLiveData<ShopItemFilter>().apply { value = ShopItemFilter("", listOf("Standalone Ship")) }
 
     init {
         getCatalog()
@@ -39,14 +40,16 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     }
     private fun isNew(item: ShopItem): Boolean = System.currentTimeMillis() - item.insert_time < 1000 * 60 * 60
 
-    fun setFilter(filter: List<String>) {
+    fun setFilter(filter: ShopItemFilter) {
         this.filter.value = filter
     }
 
-    fun filterBySubtitle(subtitle: List<String>, canBuy: Boolean = false): LiveData<List<ShopItem>> {
+    fun filterBySubtitle(subtitle: ShopItemFilter, canBuy: Boolean = false): LiveData<List<ShopItem>> {
         return Transformations.map(dataResource) {
             it.filter {
-                    item -> subtitle.any {value -> value.equals(item.subtitle, true)} && (!canBuy || isNew(item))
+                    item -> (subtitle.name.isEmpty() && subtitle.type.any {value -> value.equals(item.subtitle, true)})
+                    || (subtitle.name.isNotEmpty() && item.name.contains(subtitle.name, true))
+                    && (!canBuy || isNew(item))
             }
         }
     }
@@ -84,6 +87,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     fun getCatalog() {
         viewModelScope.launch {
             try{
+                setFilter(ShopItemFilter("", listOf("Standalone Ship")))
                shopItemsRepository.refreshItems()
             } catch (e: Exception) {
                 e.printStackTrace()

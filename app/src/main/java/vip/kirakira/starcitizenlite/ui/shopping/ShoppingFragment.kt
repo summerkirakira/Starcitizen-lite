@@ -135,9 +135,9 @@ class ShoppingFragment : Fragment() {
         return binding.root
     }
 
-    fun shopItemFilter(filters: List<String>) {
-        viewModel.filterBySubtitle(filters)
-    }
+//    fun shopItemFilter(filters: List<String>) {
+//        viewModel.filterBySubtitle(filters)
+//    }
 
 
 

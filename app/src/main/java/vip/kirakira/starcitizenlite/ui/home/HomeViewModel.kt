@@ -1,14 +1,11 @@
 package vip.kirakira.starcitizenlite.ui.home
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.tapadoo.alerter.Alerter
 import kotlinx.coroutines.launch
 import vip.kirakira.starcitizenlite.R
+import vip.kirakira.starcitizenlite.database.BuybackItem
 import vip.kirakira.starcitizenlite.database.HangerPackageWithItems
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
@@ -29,11 +26,15 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
 
     val isBuybackRefreshing = buybackItemRepository.isRefreshing
 
-    val buybackItems = buybackItemRepository.allItems
+    private val originBuyBackItems = buybackItemRepository.allItems
+
+    private val originHangerItems = hangerItemRepository.allPackagesAndItems
+
+    var buybackItems = originBuyBackItems
 
     var isRefreshing = hangerItemRepository.isRefreshing
 
-    val hangerItems = hangerItemRepository.allPackagesAndItems
+    var hangerItems = originHangerItems
 
     var currentUser: LiveData<User> = userRepository.getUserById(primaryUserId)
 
@@ -43,19 +44,32 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
 
     var refreshHangerError = MutableLiveData<Boolean>(false)
 
+    var hangerItemFilter = MutableLiveData<String>("")
+
+    var buybackItemFilter = MutableLiveData<String>("")
+
     enum class Mode {
         BUYBACK,
         HANGER
     }
 
     init {
-        refreshBuybackItems()
+//        refreshBuybackItems()
         refresh()
+
+        hangerItems = Transformations.switchMap(hangerItemFilter){
+            filterHangerByTitle(it)
+        }
+
+        buybackItems = Transformations.switchMap(buybackItemFilter){
+            filterBuybackByTitle(it)
+        }
+
     }
 
     fun refresh() {
         viewModelScope.launch {
-            println("refreshing")
+            hangerItemFilter.value = ""
             try {
                 hangerItemRepository.refreshItems()
             } catch (e: Exception) {
@@ -75,6 +89,7 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
 
     fun refreshBuybackItems() {
         viewModelScope.launch {
+            buybackItemFilter.value = ""
             try {
                 buybackItemRepository.refreshItems()
             } catch (e: Exception) {
@@ -82,6 +97,33 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
                 refreshBuybackError.value = true
             }
 
+        }
+    }
+
+    private fun filterHangerByTitle(filter: String):  LiveData<List<HangerPackageWithItems>> {
+        return Transformations.map(originHangerItems) {
+            it.filter {
+                item -> item.hangerPackage.title.contains(filter, true)
+            }
+        }
+    }
+
+    private fun filterBuybackByTitle(filter: String):  LiveData<List<BuybackItem>> {
+        return Transformations.map(originBuyBackItems) {
+            it.filter {
+                item -> item.title.contains(filter, true)
+            }
+        }
+    }
+
+    fun setFilter(filter: String) {
+        when(currentMode.value) {
+            Mode.HANGER -> {
+                hangerItemFilter.value = filter
+            }
+            Mode.BUYBACK -> {
+                buybackItemFilter.value = filter
+            }
         }
     }
 

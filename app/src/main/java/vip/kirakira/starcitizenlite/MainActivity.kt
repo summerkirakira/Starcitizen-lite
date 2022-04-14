@@ -37,6 +37,7 @@ import vip.kirakira.starcitizenlite.ui.home.HomeViewModel
 import vip.kirakira.starcitizenlite.ui.loadUserAvatar
 import vip.kirakira.starcitizenlite.ui.main.MainFragment
 import vip.kirakira.starcitizenlite.ui.me.MeFragment
+import vip.kirakira.starcitizenlite.ui.shopping.ShopItemFilter
 import vip.kirakira.viewpagertest.ui.shopping.ShoppingFragment
 import vip.kirakira.viewpagertest.ui.shopping.ShoppingViewModel
 import kotlin.concurrent.thread
@@ -90,6 +91,10 @@ class MainActivity : AppCompatActivity() {
         val currentUser: LiveData<User> = database.userDao.getById(primaryUserId)
 
         val allUsers: LiveData<List<User>> = database.userDao.getAll()
+
+        val shoppingViewModel = ViewModelProvider(this).get(ShoppingViewModel::class.java)
+
+        val homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
 
         allUsers.observe(this) {
 
@@ -188,11 +193,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         //设置底部图标的点击事件
+
+
         searchButton.setOnClickListener(View.OnClickListener {
             val searchFragment = SearchFragment.newInstance()
             searchFragment.show(supportFragmentManager, "search")
             searchFragment.setOnSearchClickListener {
-                keyword -> Toast.makeText(this, keyword, Toast.LENGTH_SHORT).show()
+                keyword -> when(mPager.currentItem){
+                    FragmentType.SHOPPING.value -> {
+                        shoppingViewModel.setFilter(ShopItemFilter(keyword, listOf("")))
+                    }
+                    FragmentType.HANGER.value -> {
+                        homeViewModel.setFilter(keyword)
+                    }
+                }
             }
         })
 
@@ -283,9 +297,9 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        val shoppingViewModel = ViewModelProvider(this).get(ShoppingViewModel::class.java)
 
-        val homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
+
+
 
         filterButton.setOnClickListener {
             when(mPager.currentItem) {
@@ -308,7 +322,7 @@ class MainActivity : AppCompatActivity() {
                                     5 -> filterList.add(ShopItemType.GIFT.itemName)
                                     6 -> filterList.add(ShopItemType.PACKAGE.itemName)
                                 }
-                                shoppingViewModel.setFilter(filterList)
+                                shoppingViewModel.setFilter(ShopItemFilter("", filterList))
                             }
                             dialog.dismiss()
                         }
