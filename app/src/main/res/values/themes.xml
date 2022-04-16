@@ -2,8 +2,8 @@
     <!-- Base application theme. -->
     <style name="Theme.StarcitizenLite" parent="QMUI.Compat.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimary">@color/transparent</item>
+        <item name="colorPrimaryVariant">@color/transparent</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
@@ -12,6 +12,8 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="qmui_dialog_max_width">420dp</item>
+        <item name="qmui_dialog_min_width">320dp</item>
     </style>
 
     <style name="BottomButtonRipple">

@@ -15,4 +15,6 @@
     <color name="alert_dialog_background_failure">#FF6A65</color>
     <color name="personal_info_background">#4FC3F7</color>
     <color name="personal_info_divider">#81BDBDBD</color>
+    <color name="drawer_top_info_value_text">#94000000</color>
+    <color name="drawer_options_color">#535353</color>
 </resources>

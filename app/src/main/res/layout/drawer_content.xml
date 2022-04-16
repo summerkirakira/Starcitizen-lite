@@ -16,34 +16,34 @@
                app:layout_constraintTop_toTopOf="parent"
                android:background="@drawable/drawer_background"
                android:alpha="0.25"/>
-    <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundFrameLayout
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_marginTop="50dp"
             android:id="@+id/drawer_avatar"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="20dp" >
-
-        <ImageView
+        <io.getstream.avatarview.AvatarView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerInside"
+                app:avatarViewBorderColor="#6864B5F6"
                 android:id="@+id/drawer_avatar_image"
+                app:avatarViewShape="rounded_rect"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" />
-    </com.qmuiteam.qmui.widget.roundwidget.QMUIRoundFrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
     <TextView android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
+              android:layout_height="wrap_content"
               android:textStyle="bold"
-              android:layout_marginTop="10dp"
-               app:layout_constraintTop_toBottomOf="@+id/drawer_avatar"
-               android:id="@+id/drawer_handle_name"
-               tools:text="CirnoBaka"
-               app:layout_constraintStart_toStartOf="@+id/drawer_avatar"
-               android:textColor="#000000"
-               android:textSize="20sp" />
+              android:layout_marginTop="6dp"
+              app:layout_constraintTop_toBottomOf="@+id/drawer_avatar"
+              android:id="@+id/drawer_handle_name"
+              tools:text="CirnoBakahellowore"
+              app:layout_constraintStart_toStartOf="@+id/drawer_avatar"
+              android:textSize="22sp" android:fontFamily="sans-serif-light"/>
     <TextView android:layout_width="wrap_content"
                android:layout_height="wrap_content"
                app:layout_constraintTop_toBottomOf="@+id/drawer_handle_name"
@@ -53,7 +53,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:layout_marginStart="38dp"
+                  android:layout_marginStart="25dp"
                   app:layout_constraintTop_toTopOf="@+id/drawer_avatar"
                   app:layout_constraintLeft_toRightOf="@+id/drawer_avatar">
             <TextView android:layout_width="wrap_content"
@@ -65,14 +65,12 @@
                       android:textStyle="bold"
                       android:textSize="16sp"
                       android:text="@string/credits" />
-            <TextView android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      app:layout_constraintLeft_toRightOf="@+id/drawer_store"
-                      app:layout_constraintBaseline_toBaselineOf="@+id/drawer_store"
-                      android:layout_marginStart="50dp"
-                      android:id="@+id/drawer_store_value"
-                      android:textSize="16sp"
-                      tools:text="400.55 USD" />
+            <TextView
+                    app:layout_constraintLeft_toRightOf="@+id/drawer_store"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/drawer_store"
+                    android:layout_marginStart="50dp"
+                    android:id="@+id/drawer_store_value"
+                    tools:text="400.55 USD" style="@style/drawer_top_text_value"/>
         <TextView android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   app:layout_constraintStart_toStartOf="parent"
@@ -82,13 +80,10 @@
                   android:textStyle="bold"
                   android:textSize="16sp"
                   android:text="@string/uec" />
-        <TextView android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
+        <TextView style="@style/drawer_top_text_value"
                   app:layout_constraintRight_toRightOf="@+id/drawer_store_value"
                   app:layout_constraintBaseline_toBaselineOf="@+id/drawer_uec"
-                  android:layout_marginStart="30dp"
                   android:id="@+id/drawer_uec_value"
-                  android:textSize="16sp"
                   tools:text="5,000 UEC" />
         <TextView android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
@@ -99,13 +94,10 @@
                   android:textStyle="bold"
                   android:textSize="16sp"
                   android:text="@string/rec" />
-        <TextView android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
+        <TextView style="@style/drawer_top_text_value"
                   app:layout_constraintRight_toRightOf="@+id/drawer_store_value"
                   app:layout_constraintBaseline_toBaselineOf="@+id/drawer_rec"
-                  android:layout_marginStart="30dp"
                   android:id="@+id/drawer_rec_value"
-                  android:textSize="16sp"
                   tools:text="41,727 REC" />
         <TextView android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
@@ -116,47 +108,81 @@
                   android:textStyle="bold"
                   android:textSize="16sp"
                   android:text="@string/hanger_value" />
-        <TextView android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
+        <TextView style="@style/drawer_top_text_value"
                   app:layout_constraintRight_toRightOf="@+id/drawer_store_value"
                   app:layout_constraintBaseline_toBaselineOf="@+id/drawer_hanger"
-                  android:layout_marginStart="30dp"
                   android:id="@+id/drawer_hanger_value"
-                  android:textSize="16sp"
-                  tools:text="41,727 REC" />
+                  tools:text="41,727 REC"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:elevation="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/switch_account"
-            android:padding="20dp"
+            android:id="@+id/drawer_lower_container"
             android:clickable="true"
-            android:background="?selectableItemBackground"
             app:layout_constraintTop_toBottomOf="@+id/personal_info_layout">
         <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-        <ImageView android:layout_width="30dp"
-                   android:layout_height="30dp"
-                   app:layout_constraintStart_toStartOf="parent"
-                   app:layout_constraintTop_toTopOf="parent"
-                   android:src="@drawable/ic_drawer_settings"
-                   android:id="@+id/option_icon" />
-        <TextView android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  app:layout_constraintStart_toEndOf="@+id/option_icon"
-                  app:layout_constraintTop_toTopOf="@+id/option_icon"
-                  app:layout_constraintBottom_toBottomOf="@+id/option_icon"
-                  android:layout_marginStart="20dp"
-                  android:id="@+id/option_text"
-                  android:layout_marginTop="4dp"
-                  android:textStyle="bold"
-                  android:textSize="16sp"
-                  android:text="@string/switch_account" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:clickable="true"
+                android:id="@+id/switch_account_layout"
+                style="@style/drawer_option_layout">
+        <ImageView
+                app:tint="@color/drawer_options_color"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:src="@drawable/ic_drawer_switch"
+                android:id="@+id/option_icon" style="@style/drawer_option_content_img"/>
+        <TextView
+                app:layout_constraintStart_toEndOf="@+id/option_icon"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:id="@+id/option_text"
+                android:text="@string/switch_account"
+                style="@style/drawer_option_content_text"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                style="@style/drawer_option_layout"
+                android:id="@+id/setting_layout"
+                android:clickable="true"
+                app:layout_constraintTop_toBottomOf="@+id/switch_account_layout">
+            <ImageView style="@style/drawer_option_content_img"
+                       app:tint="@color/drawer_options_color"
+                       app:layout_constraintBottom_toBottomOf="parent"
+                       app:layout_constraintStart_toStartOf="parent"
+                       app:layout_constraintTop_toTopOf="parent"
+                       android:src="@drawable/ic_drawer_setting"
+                       android:id="@+id/drawer_setting_icon"/>
+            <TextView style="@style/drawer_option_content_text"
+                       app:layout_constraintStart_toEndOf="@+id/drawer_setting_icon"
+                       app:layout_constraintTop_toTopOf="parent"
+                       app:layout_constraintBottom_toBottomOf="parent"
+                       android:id="@+id/drawer_setting_text"
+                       android:text="@string/setting"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                style="@style/drawer_option_layout"
+                android:id="@+id/drawer_feedback_loyout"
+                android:clickable="true"
+                app:layout_constraintTop_toBottomOf="@+id/setting_layout">
+            <ImageView style="@style/drawer_option_content_img"
+                       app:tint="@color/drawer_options_color"
+                       app:layout_constraintBottom_toBottomOf="parent"
+                       app:layout_constraintStart_toStartOf="parent"
+                       app:layout_constraintTop_toTopOf="parent"
+                       android:layout_marginStart="30dp"
+                       android:src="@drawable/ic_drawer_feedback"
+                       android:id="@+id/drawer_feedback_icon"/>
+            <TextView style="@style/drawer_option_content_text"
+                      app:layout_constraintStart_toEndOf="@+id/drawer_feedback_icon"
+                      app:layout_constraintTop_toTopOf="parent"
+                      app:layout_constraintBottom_toBottomOf="parent"
+                      android:id="@+id/drawer_feedback_text"
+                      android:text="@string/drawer_feedback"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.util.DisplayMetrics
 import android.view.WindowManager
+import androidx.core.content.ContextCompat.startActivity
 import java.lang.reflect.Method
 
 
@@ -52,4 +53,18 @@ fun getVirtualBarHeigh(context: Context): Int {
         e.printStackTrace()
     }
     return vh
+}
+
+fun compareVersion(currentVersion: String, newVersion: String): Boolean {
+    val currentVersionArray = currentVersion.split(".")
+    val newVersionArray = newVersion.split(".")
+    for (i in 0 until currentVersionArray.size) {
+        if (newVersionArray.size <= i) {
+            return false
+        }
+        if (currentVersionArray[i].toInt() < newVersionArray[i].toInt()) {
+            return false
+        }
+    }
+    return true
 }

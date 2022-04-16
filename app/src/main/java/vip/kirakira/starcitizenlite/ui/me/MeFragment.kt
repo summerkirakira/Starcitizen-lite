@@ -14,9 +14,11 @@ import androidx.lifecycle.LiveData
 import io.getstream.avatarview.coil.loadImage
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.activities.WebLoginActivity
+import vip.kirakira.starcitizenlite.activities.saveUserData
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.databinding.MeFragmentBinding
+import kotlin.concurrent.thread
 
 class MeFragment : Fragment() {
 
@@ -43,7 +45,7 @@ class MeFragment : Fragment() {
         println(primaryUserId)
         currentUser.observe(viewLifecycleOwner){
             if(it == null){
-                binding.rootLayout.visibility = View.GONE
+                binding.swipeRefresh.visibility = View.GONE
                 binding.errorBox.setTitleText(getString(R.string.only_login_account_can_check_user_info))
                 binding.errorBox.setDetailText(getString(R.string.not_login_error_box_detail))
                 binding.errorBox.setButton(
@@ -55,10 +57,28 @@ class MeFragment : Fragment() {
                 binding.errorBox.show()
                 return@observe
             }
+
+            binding.swipeRefresh.setOnRefreshListener {
+                if(currentUser.value != null){
+                    thread {
+                        val newUser = saveUserData(
+                            currentUser.value!!.id,
+                            currentUser.value!!.rsi_device,
+                            currentUser.value!!.rsi_token,
+                            currentUser.value!!.email,
+                            currentUser.value!!.password
+                        )
+                        newUser.hanger_value = currentUser.value!!.hanger_value
+                        database.userDao.insert(newUser)
+                        binding.swipeRefresh.isRefreshing = false
+                    }
+                }
+                binding.swipeRefresh.isRefreshing = false
+            }
+
             binding.errorBox.hide()
             binding.rootLayout.visibility = View.VISIBLE
             binding.avatar.loadImage(it.profile_image)
-            println(it)
             if(it.organization_image.isNotEmpty()){
                 binding.organizationImage.loadImage(it.organization_image)
             }

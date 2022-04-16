@@ -73,7 +73,7 @@
                        android:layout_height="20dp"
                        android:id="@+id/can_buy"
                        android:layout_marginEnd="5dp"
-                       app:tint="#FFD54F"
+                       app:tint="#904DD0E1"
                        android:src="@drawable/ic_double_check"
                        app:layout_constraintEnd_toEndOf="parent"
                        app:layout_constraintBottom_toBottomOf="parent"/>

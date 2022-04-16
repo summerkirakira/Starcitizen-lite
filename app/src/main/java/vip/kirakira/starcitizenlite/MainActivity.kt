@@ -2,7 +2,10 @@ package vip.kirakira.starcitizenlite
 
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -16,18 +19,23 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
+import com.azhon.appupdate.manager.DownloadManager
+import com.azhon.appupdate.util.ApkUtil
 import com.gyf.immersionbar.ImmersionBar
-import com.qmuiteam.qmui.util.QMUIStatusBarHelper
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog
 import com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
 import com.tapadoo.alerter.Alerter
 import com.wyt.searchbox.SearchFragment
+import io.getstream.avatarview.AvatarView
+import io.getstream.avatarview.coil.loadImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import vip.kirakira.starcitizenlite.activities.WebLoginActivity
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
+import vip.kirakira.starcitizenlite.network.CirnoApi
+import vip.kirakira.starcitizenlite.network.CirnoProperty.Announcement
 import vip.kirakira.starcitizenlite.network.setRSICookie
 import vip.kirakira.starcitizenlite.network.shop.getCartSummary
 import vip.kirakira.starcitizenlite.ui.ScreenSlidePagerAdapter
@@ -52,7 +60,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottomMainIcon: ImageView
     private lateinit var bottomMeIcon: ImageView
     private lateinit var userAvatar: ImageView
-    private lateinit var drawerUserAvatar: ImageView
+    private lateinit var drawerUserAvatar: AvatarView
     private lateinit var drawerUserName: TextView
     private lateinit var drawerUserCredit: TextView
     private lateinit var drawerUserUEC: TextView
@@ -64,6 +72,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var switchAccount: ConstraintLayout
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var shoppingViewModel: ShoppingViewModel
+    private lateinit var feedbackButton: ConstraintLayout
 
 
     private var  density: Float = 0f
@@ -124,12 +133,15 @@ class MainActivity : AppCompatActivity() {
         drawerUserUEC = findViewById(R.id.drawer_uec_value) //用户UEC
         drawerUserREC = findViewById(R.id.drawer_rec_value) //用户REC
         drawerUserHangerValue = findViewById(R.id.drawer_hanger_value) //用户机库价值
-        switchAccount = findViewById(R.id.switch_account) //切换账号按钮
+        switchAccount = findViewById(R.id.switch_account_layout) //切换账号按钮
+        feedbackButton = findViewById(R.id.drawer_feedback_loyout) //反馈按钮
         val drawerLayout: DrawerLayout = findViewById(R.id.root_drawer) //滑动菜单
         firstLine = findViewById(R.id.avatar_first_line)
         secondLine = findViewById(R.id.avatar_second_line)
         thirdLine = findViewById(R.id.avatar_third_line)
         val filterButton = findViewById<ImageView>(R.id.filter_icon)
+
+        val immersionBar = ImmersionBar.with(this)
 
 
 
@@ -145,9 +157,9 @@ class MainActivity : AppCompatActivity() {
                 loadUserAvatar(userAvatar, it.profile_image)
                 loadUserAvatar(bottomMeIcon, it.profile_image)
                 if("default" !in it.profile_image) {
-                    loadUserAvatar(drawerUserAvatar, it.profile_image.replace("avatar", "heap_infobox"))
+                    drawerUserAvatar.loadImage(it.profile_image.replace("avatar", "heap_infobox"))
                 } else {
-                    loadUserAvatar(drawerUserAvatar, it.profile_image)
+                    drawerUserAvatar.loadImage(it.profile_image)
                 }
 
                 val userCredit = "${it.store.toFloat() / 100.0f} USD"
@@ -236,7 +248,7 @@ class MainActivity : AppCompatActivity() {
             mPager.currentItem = FragmentType.ME.value
         }
 
-        density = resources.displayMetrics.density
+        density = resources!!.displayMetrics.density
 
         val shopFragment = ShoppingFragment.newInstance()
         val homeFragment = HomeFragment.newInstance()
@@ -267,6 +279,7 @@ class MainActivity : AppCompatActivity() {
                         filterButton.setColorFilter(getColor(R.color.avatar_left_line))
                         filterButton.visibility = View.VISIBLE
                         setAvatarLine(ColorStateList.valueOf(getColor(R.color.avatar_left_line)))
+                        immersionBar.statusBarDarkFont(true).init()
                     }
                     FragmentType.HANGER.value -> {
                         bottomShopIcon.setColorFilter(Color.GRAY)
@@ -278,6 +291,7 @@ class MainActivity : AppCompatActivity() {
                         filterButton.setColorFilter(getColor(R.color.avatar_left_line))
                         filterButton.visibility = View.VISIBLE
                         setAvatarLine(ColorStateList.valueOf(getColor(R.color.avatar_left_line)))
+                        immersionBar.statusBarDarkFont(true).init()
                     }
                     FragmentType.MAIN.value -> {
                         bottomShopIcon.setColorFilter(Color.GRAY)
@@ -287,6 +301,7 @@ class MainActivity : AppCompatActivity() {
                         searchButton.setColorFilter(Color.WHITE)
                         setAvatarLine(ColorStateList.valueOf(Color.WHITE))
                         filterButton.visibility = View.GONE
+                        immersionBar.statusBarDarkFont(false).init()
                     }
                     FragmentType.ME.value -> {
                         bottomShopIcon.setColorFilter(Color.GRAY)
@@ -295,6 +310,7 @@ class MainActivity : AppCompatActivity() {
                         if(primaryUserId == 0) bottomMeIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
                         filterButton.visibility = View.GONE
                         setAvatarLine(ColorStateList.valueOf(Color.WHITE))
+                        immersionBar.statusBarDarkFont(false).init()
                     }
                 }
                 super.onPageSelected(position)
@@ -378,9 +394,57 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        feedbackButton.setOnClickListener {
+            joinQQGroup("LzRUVOyetWjRlVyNh24tN2gU8KZZvDcB")
+        }
 
+        if(sharedPreferences.getBoolean(getString(R.string.CHECK_UPDATE_KEY), true)) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    checkUpdate()
+                    checkAnnouncement(sharedPreferences.getInt(getString(R.string.CURRENT_ANNOUNCEMENT_ID), 0))
+                    sharedPreferences.edit().putBoolean(getString(R.string.CHECK_UPDATE_KEY), false).apply()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        } else {
+            val result = ApkUtil.deleteOldApk(this, "${externalCacheDir?.path}/refuge_update.apk")
+        }
 
     }
+
+    private suspend fun checkUpdate() {
+        val latestVersion = CirnoApi.retrofitService.getVersion()
+        if(compareVersion(latestVersion.version, BuildConfig.VERSION_NAME)) {
+            val manager = DownloadManager.Builder(this).run {
+                apkUrl(latestVersion.url)
+                apkName("refuge_update.apk")
+                smallIcon(R.mipmap.ic_launcher)
+                apkDescription("更新星河避难所...")
+                //省略一些非必须参数...
+                build()
+            }
+            manager.download()
+        }
+    }
+
+    private suspend fun checkAnnouncement(currentAnnouncementId: Int = 0) {
+        val latestAnnouncement = CirnoApi.retrofitService.getAnnouncement()
+        if(latestAnnouncement.id > currentAnnouncementId) {
+            val builder = QMUIDialog.MessageDialogBuilder(this)
+            builder.setTitle(latestAnnouncement.title)
+                .setMessage(latestAnnouncement.content)
+                .addAction("确定") { dialog, index ->
+                    dialog.dismiss()
+                    getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
+                        .edit().putInt(getString(R.string.CURRENT_ANNOUNCEMENT_ID), latestAnnouncement.id).apply()
+                }
+                .show()
+        }
+    }
+
+
     fun setAvatarLine(colorStateList: ColorStateList) {
         firstLine.setBgData(colorStateList)
         firstLine.setStrokeData(4, colorStateList)
@@ -418,6 +482,36 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    override fun getResources(): Resources? {
+        val res: Resources = super.getResources()
+        val config = Configuration()
+        config.setToDefaults()
+        res.updateConfiguration(config, res.getDisplayMetrics())
+        return res
+    }
+
+
+    /****************
+     *
+     * 发起添加群流程。群号：星河避难所(696608010) 的 key 为： LzRUVOyetWjRlVyNh24tN2gU8KZZvDcB
+     * 调用 joinQQGroup(LzRUVOyetWjRlVyNh24tN2gU8KZZvDcB) 即可发起手Q客户端申请加群 星河避难所(696608010)
+     *
+     * @param key 由官网生成的key
+     * @return 返回true表示呼起手Q成功，返回false表示呼起失败
+     */
+    fun joinQQGroup(key: String): Boolean {
+        val intent = Intent()
+        intent.data =
+            Uri.parse("mqqopensdkapi://bizAgent/qm/qr?url=http%3A%2F%2Fqm.qq.com%2Fcgi-bin%2Fqm%2Fqr%3Ffrom%3Dapp%26p%3Dandroid%26jump_from%3Dwebapi%26k%3D$key")
+        // 此Flag可根据具体产品需要自定义，如设置，则在加群界面按返回，返回手Q主界面，不设置，按返回会返回到呼起产品界面    //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        return try {
+            startActivity(intent)
+            true
+        } catch (e: java.lang.Exception) {
+            // 未安装手Q或安装的版本不支持
+            false
+        }
+    }
 
 
 }

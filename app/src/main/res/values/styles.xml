@@ -13,6 +13,7 @@
         <item name="android:textStyle">bold</item>
         <item name="android:gravity">center</item>
         <item name="android:autoSizeMinTextSize">6dp</item>
+        <item name="android:textColor">@color/avatar_left_line</item>
     </style>
     <style name="main_page_image">
         <item name="android:layout_width">50dp</item>
@@ -35,8 +36,8 @@
         <item name="android:layout_marginBottom">10dp</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:background">@color/personal_info_divider</item>
-        <item name="android:layout_marginStart">20dp</item>
-        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:layout_marginStart">25dp</item>
+        <item name="android:layout_marginEnd">15dp</item>
         <item name="android:layout_height">1dp</item>
     </style>
     <style name="shop_item_price_text">
@@ -52,5 +53,32 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">16sp</item>
         <item name="android:fontFamily">serif</item>
+    </style>
+    <style name="drawer_top_text_value">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/drawer_top_info_value_text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">casual</item>
+    </style>
+    <style name="drawer_option_content_text">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">20dp</item>
+        <item name="android:textColor">@color/drawer_options_color</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:gravity">center</item>
+    </style>
+    <style name="drawer_option_content_img">
+        <item name="android:layout_margin">15dp</item>
+        <item name="android:layout_width">30dp</item>
+        <item name="android:layout_height">30dp</item>
+    </style>
+    <style name="drawer_option_layout">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">?selectableItemBackground</item>
     </style>
 </resources>

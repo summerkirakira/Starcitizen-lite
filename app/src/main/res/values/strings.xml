@@ -76,4 +76,9 @@
     <string name="switch_account">切换账号</string>
     <string name="my_buyback">我的回购</string>
     <string name="my_hanger">我的机库</string>
+    <string name="setting">设置</string>
+    <string name="drawer_feedback">问题反馈</string>
+    <string name="CHECK_UPDATE_KEY">check_update</string>
+    <string name="background_downloading">少女祈祷中…</string>
+    <string name="CURRENT_ANNOUNCEMENT_ID">announcement_id</string>
 </resources>
