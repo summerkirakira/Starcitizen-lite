@@ -16,6 +16,8 @@ A Star Citizen Android Application.
 
 ### 实现功能
 
+---
+
 + 官网登录相关
   + [x] 免代理登录/注册
   + [x] 多账号一键切换
@@ -43,6 +45,8 @@ A Star Citizen Android Application.
   + [x] 离线缓存
 
 ### 实现截图
+
+---
 
 <details>
 <summary>部分截图</summary>
