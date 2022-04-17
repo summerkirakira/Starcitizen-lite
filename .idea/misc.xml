@@ -13,10 +13,12 @@
         <entry key="app/src/main/res/drawable/loading_img.xml" value="0.13453947368421051" />
         <entry key="app/src/main/res/drawable/top_toolbar_button_ripple.xml" value="0.14429967426710097" />
         <entry key="app/src/main/res/layout/activity_cart.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_cool_photo_view.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1122905027932961" />
         <entry key="app/src/main/res/layout/activity_player_search.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_three_party_site.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_web_login.xml" value="0.17135416666666667" />
+        <entry key="app/src/main/res/layout/cool_photo_viewer.xml" value="0.2125126433579356" />
         <entry key="app/src/main/res/layout/drawer_content.xml" value="0.5" />
         <entry key="app/src/main/res/layout/feed_layout.xml" value="0.10756578947368421" />
         <entry key="app/src/main/res/layout/hanger_detail_item.xml" value="0.1" />

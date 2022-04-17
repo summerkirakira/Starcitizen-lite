@@ -81,4 +81,8 @@
     <string name="CHECK_UPDATE_KEY">check_update</string>
     <string name="background_downloading">少女祈祷中…</string>
     <string name="CURRENT_ANNOUNCEMENT_ID">announcement_id</string>
+    <string name="title_activity_cool_photo_view">CoolPhotoVIewActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="FIRST_START_KEY">first_start_key</string>
 </resources>

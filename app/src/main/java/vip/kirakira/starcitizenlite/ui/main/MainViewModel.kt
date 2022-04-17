@@ -2,15 +2,13 @@ package vip.kirakira.starcitizenlite.ui.main
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.tapadoo.alerter.Alerter
 import kotlinx.coroutines.launch
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
-import vip.kirakira.starcitizenlite.network.RSIApi
 import vip.kirakira.starcitizenlite.repositories.BannerRepository
 import vip.kirakira.starcitizenlite.repositories.UserRepository
-import vip.kirakira.viewpagertest.repositories.ShopItemRepository
+import java.security.AccessController.getContext
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     val bannerRepository = BannerRepository(getDatabase(application))

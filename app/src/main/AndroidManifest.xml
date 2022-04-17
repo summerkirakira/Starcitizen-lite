@@ -6,16 +6,25 @@
     <uses-permission android:name="android.permission.BLUETOOTH"/>
 
     <application
-            android:allowBackup="true"
             android:name=".RefugeApplication"
-            android:icon="@mipmap/ic_launcher"
+            android:allowBackup="true"
             android:hardwareAccelerated="true"
+            android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/Theme.StarcitizenLite">
-        <meta-data android:name="android.webkit.WebView.EnableSafeBrowsing"
-                   android:value="false" />
+        <activity
+                android:name=".activities.CoolPhotoVIewActivity"
+                android:configChanges="orientation|keyboardHidden|screenSize"
+                android:exported="true"
+                android:label="@string/title_activity_cool_photo_view"
+                android:theme="@style/Theme.StarcitizenLite.Fullscreen"/>
+
+        <meta-data
+                android:name="android.webkit.WebView.EnableSafeBrowsing"
+                android:value="false"/>
+
         <activity
                 android:name=".activities.ThreePartySiteActivity"
                 android:exported="true"/>

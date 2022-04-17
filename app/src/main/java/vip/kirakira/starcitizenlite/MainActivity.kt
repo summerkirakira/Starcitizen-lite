@@ -17,6 +17,8 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.azhon.appupdate.manager.DownloadManager
@@ -401,6 +403,7 @@ class MainActivity : AppCompatActivity() {
         if(sharedPreferences.getBoolean(getString(R.string.CHECK_UPDATE_KEY), true)) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
+                    checkStartUp()
                     checkUpdate()
                     checkAnnouncement(sharedPreferences.getInt(getString(R.string.CURRENT_ANNOUNCEMENT_ID), 0))
                     sharedPreferences.edit().putBoolean(getString(R.string.CHECK_UPDATE_KEY), false).apply()
@@ -411,6 +414,8 @@ class MainActivity : AppCompatActivity() {
         } else {
             val result = ApkUtil.deleteOldApk(this, "${externalCacheDir?.path}/refuge_update.apk")
         }
+
+
 
     }
 
@@ -431,16 +436,38 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun checkAnnouncement(currentAnnouncementId: Int = 0) {
         val latestAnnouncement = CirnoApi.retrofitService.getAnnouncement()
-        if(latestAnnouncement.id > currentAnnouncementId) {
-            val builder = QMUIDialog.MessageDialogBuilder(this)
-            builder.setTitle(latestAnnouncement.title)
-                .setMessage(latestAnnouncement.content)
-                .addAction("确定") { dialog, index ->
-                    dialog.dismiss()
-                    getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
-                        .edit().putInt(getString(R.string.CURRENT_ANNOUNCEMENT_ID), latestAnnouncement.id).apply()
-                }
-                .show()
+        if(latestAnnouncement != null && latestAnnouncement.id > currentAnnouncementId) {
+            this.runOnUiThread {
+                val builder = QMUIDialog.MessageDialogBuilder(this)
+                builder.setTitle(latestAnnouncement.title)
+                    .setMessage(latestAnnouncement.content)
+                    .addAction("确定") { dialog, index ->
+                        dialog.dismiss()
+                        getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE).edit().putInt(getString(R.string.CURRENT_ANNOUNCEMENT_ID), latestAnnouncement.id).apply()
+                    }
+                    .show()
+            }
+        }
+    }
+
+    private suspend fun checkStartUp() {
+        val preference = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
+        if(preference.getBoolean(getString(R.string.FIRST_START_KEY), true)) {
+            val startUpMessage = CirnoApi.retrofitService.getStartup()
+            this.runOnUiThread {
+                val builder = QMUIDialog.MessageDialogBuilder(this)
+                builder.setTitle(startUpMessage.title)
+                    .setMessage(startUpMessage.content)
+                    .addAction("取消") { dialog, index ->
+                        dialog.dismiss()
+                        finish()
+                    }
+                    .addAction("确定") { dialog, index ->
+                        dialog.dismiss()
+                        preference.edit().putBoolean(getString(R.string.FIRST_START_KEY), false).apply()
+                    }
+                    .show()
+            }
         }
     }
 

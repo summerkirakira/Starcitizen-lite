@@ -96,4 +96,6 @@ dependencies {
     implementation 'androidx.preference:preference-ktx:1.2.0'
 
     implementation 'com.github.azhon:AppUpdate:4.0.0'
+
+//    implementation 'com.github.Hitomis.transferee:Transferee:1.6.1'
 }

@@ -93,6 +93,9 @@ interface BannerDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(Banners: List<BannerImage>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(Banner: BannerImage)
+
     @Query("SELECT * FROM banner_image")
     fun getAll(): LiveData<List<BannerImage>>
 }

@@ -5,7 +5,6 @@ data class Announcement(
     val title: String,
     val content: String,
     val date: String,
-    val url: String
 )
 
 data class Version (
@@ -13,4 +12,10 @@ data class Version (
     val version: String,
     val url: String,
     val date: String
+)
+
+data class StarUp(
+    val id: Int,
+    val title: String,
+    val content: String,
 )
