@@ -240,6 +240,7 @@ class WebLoginActivity : AppCompatActivity() {
         loginWebView.settings.javaScriptEnabled = true
         val cookieManager = CookieManager.getInstance()
         cookieManager.removeAllCookies(null)
+        loginWebView.setInitialScale(230)
 
         loginWebView.loadUrl("https://robertsspaceindustries.com/connect")
 

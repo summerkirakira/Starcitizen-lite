@@ -66,5 +66,8 @@ fun compareVersion(currentVersion: String, newVersion: String): Boolean {
             return false
         }
     }
+    if(currentVersion == newVersion) {
+        return false
+    }
     return true
 }
