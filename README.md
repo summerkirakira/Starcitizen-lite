@@ -5,7 +5,7 @@
 <div align=center>
   <img src="https://img.shields.io/badge/chat-QQ-blue" alt="QQ" >
 <img src="https://img.shields.io/badge/Android-8.0+-yellow" alt="QQ" >
-<img src="https://img.shields.io/badge/StarCitizen-QQ-green" alt="QQ" >
+<img src="https://img.shields.io/badge/StarCitizen-3.16-green" alt="QQ" >
 </div>
 
 ---
