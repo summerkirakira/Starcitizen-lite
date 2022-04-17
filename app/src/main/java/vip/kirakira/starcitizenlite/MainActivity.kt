@@ -403,9 +403,9 @@ class MainActivity : AppCompatActivity() {
         if(sharedPreferences.getBoolean(getString(R.string.CHECK_UPDATE_KEY), true)) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
+                    checkAnnouncement(sharedPreferences.getInt(getString(R.string.CURRENT_ANNOUNCEMENT_ID), 0))
                     checkStartUp()
                     checkUpdate()
-                    checkAnnouncement(sharedPreferences.getInt(getString(R.string.CURRENT_ANNOUNCEMENT_ID), 0))
                     sharedPreferences.edit().putBoolean(getString(R.string.CHECK_UPDATE_KEY), false).apply()
                 } catch (e: Exception) {
                     e.printStackTrace()
