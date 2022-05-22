@@ -436,6 +436,15 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun checkAnnouncement(currentAnnouncementId: Int = 0) {
         val latestAnnouncement = CirnoApi.retrofitService.getAnnouncement()
+//        this.runOnUiThread {
+//            val builder = QMUIDialog.MessageDialogBuilder(this)
+//            builder.setTitle("汉化启动公告")
+//                .setMessage("登登登登～星河避难所汉化行动正式开始啦，目标是对商店/个人机库/回购等进行彻底汉化，鉴于文本量比较大，所以需要小伙伴的协助...\n有兴趣参加的小伙伴请点击侧边栏中的问题反馈加入我们！\n\nBy: 妖精")
+//                .addAction("确定") { dialog, index ->
+//                    dialog.dismiss()
+//                }
+//                .show()
+//        }
         if(latestAnnouncement != null && latestAnnouncement.id > currentAnnouncementId) {
             this.runOnUiThread {
                 val builder = QMUIDialog.MessageDialogBuilder(this)

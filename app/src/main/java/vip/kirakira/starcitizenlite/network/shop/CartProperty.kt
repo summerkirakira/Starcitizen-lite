@@ -31,11 +31,11 @@ data class CartSummaryProperty(val errors: List<Error>?, val data: CartData){
     }
 }
 
-data class AddCartItemProperty(val errors: List<Error>?, val data: Data) {
+data class AddCartItemProperty(val errors: List<Error>?, val data: Data?) {
     data class Data(val store: Store) {
         data class Store(val cart: Cart) {
             data class Cart(val mutations: Mutations) {
-                data class Mutations(val add: Boolean)
+                data class Mutations(val add: Boolean?)
             }
         }
     }

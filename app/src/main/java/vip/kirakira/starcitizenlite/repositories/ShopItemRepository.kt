@@ -37,6 +37,7 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
                     if (data.isEmpty()) {
                         break
                     }
+                    val test = data
                     database.shopItemDao.insertAll(data.toShopItem())
                     page++
                 }

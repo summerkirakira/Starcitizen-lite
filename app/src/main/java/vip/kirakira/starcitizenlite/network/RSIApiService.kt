@@ -2,8 +2,11 @@ package vip.kirakira.starcitizenlite.network
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.Body
@@ -15,6 +18,7 @@ import vip.kirakira.starcitizenlite.network.hanger.CancelPledgeRequestBody
 import vip.kirakira.starcitizenlite.network.hanger.GiftPledgeRequestBody
 import vip.kirakira.starcitizenlite.network.hanger.ReclaimRequestBody
 import vip.kirakira.starcitizenlite.network.shop.*
+import vip.kirakira.starcitizenlite.network.upgrades.InitUpgradeProperty
 import vip.kirakira.viewpagertest.network.graphql.BaseGraphQLBody
 import java.net.URL
 
@@ -34,8 +38,10 @@ val client: OkHttpClient = OkHttpClient
             val newRequest = request.newBuilder()
                 .addHeader("cookie", rsi_cookie)
                 .addHeader("referer", "https://robertsspaceindustries.com/")
+                .addHeader("origin", "https://robertsspaceindustries.com")
                 .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
                 .build()
+//            print(rsi_cookie)
             return@addInterceptor chain.proceed(newRequest)
         } else if(request.url.toString().startsWith("https://robertsspaceindustries.com/api/account")) {
             val newRequest = request.newBuilder()
@@ -108,6 +114,9 @@ interface RSIApiService {
     @POST("api/account/eraseCopyAccount")
     suspend fun eraseCopyAccount(@Body body: PtuAccountBody): BasicResponseBody
 
+    @POST("pledge-store/api/upgrade/graphql")
+    suspend fun initUpgrade(@Body body: BaseGraphQLBody): InitUpgradeProperty
+
 }
 
 
@@ -159,6 +168,27 @@ object RSIApi {
     suspend fun eraseCopyAccount(): BasicResponseBody {
         return retrofitService.eraseCopyAccount(PtuAccountBody("ptu"))
     }
+
+    suspend fun setAuthToken(headers: Map<String, String> = mapOf("cookie" to rsi_cookie)): String {
+        val request = Request.Builder().url(URL("https://robertsspaceindustries.com/api/account/v2/setAuthToken"))
+            .post(RequestBody.create("application/json".toMediaTypeOrNull(), "{}"))
+            .addHeader("cookie", headers["cookie"]!!)
+            .addHeader("x-rsi-token", rsi_token)
+            .build()
+        val response = client.newCall(request).execute()
+        return response.header("set-cookie")!!
+    }
+
+    suspend fun setUpgradeToken(rsi_auth_token: String): String {
+        val request = Request.Builder().url(URL("https://robertsspaceindustries.com/api/ship-upgrades/setContextToken"))
+            .post(RequestBody.create("application/json".toMediaTypeOrNull(), "{}"))
+            .addHeader("cookie", "$rsi_cookie; Rsi-Account-Auth=$rsi_auth_token")
+            .addHeader("x-rsi-token", rsi_token)
+            .build()
+        val response = client.newCall(request).execute()
+        return response.header("set-cookie")!!
+    }
+
 }
 
 

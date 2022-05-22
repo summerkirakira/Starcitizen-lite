@@ -72,6 +72,7 @@ fragment TyItemFragment on TyItem {
   ... on TyProduct {
     skus {
       id
+      title
       isDirectCheckout
       __typename
     }
@@ -203,7 +204,7 @@ fragment TyBundleProductFragment on TyProduct {
         return CatalogVariables(query)
     }
     fun getRequestBody(page: Int): BaseGraphQLBody {
-        val variables = getCatalogVariables(page, "price", listOf("72", "268", "289", "270", "3", "41", "60", "9", "45", "46"), "asc")
+        val variables = getCatalogVariables(page, "price", listOf("72", "268", "289", "270", "3", "41", "60", "9", "45", "46"), "desc")
         return BaseGraphQLBody(query, variables)
     }
 }
@@ -1343,3 +1344,103 @@ fragment TyCartTotalFragment on TyCartTotal {
     }
 }
 
+class initShipUpgradeQuery {
+    val query = """query initShipUpgrade {
+  ships {
+    id
+    name
+    medias {
+      productThumbMediumAndSmall
+      slideShow
+    }
+    manufacturer {
+      id
+      name
+    }
+    focus
+    type
+    flyableStatus
+    owned
+    msrp
+    link
+    skus {
+      id
+      title
+      available
+      price
+      body
+      unlimitedStock
+      availableStock
+    }
+  }
+  manufacturers {
+    id
+    name
+  }
+  app {
+    version
+    env
+    cookieName
+    sentryDSN
+    pricing {
+      currencyCode
+      currencySymbol
+      exchangeRate
+      taxRate
+      isTaxInclusive
+    }
+    mode
+    isAnonymous
+    buyback {
+      credit
+    }
+  }
+}
+"""
+    class Variables()
+
+    fun getRequestBody(): BaseGraphQLBody {
+        return BaseGraphQLBody(query, Variables())
+    }
+}
+
+class filterShipsAuery {
+    val query = """query filterShips(${"$"}fromId: Int, ${"$"}toId: Int, ${"$"}fromFilters: [FilterConstraintValues], ${"$"}toFilters: [FilterConstraintValues]) {
+  from(to: ${"$"}toId, filters: ${"$"}fromFilters) {
+    ships {
+      id
+    }
+  }
+  to(from: ${"$"}fromId, filters: ${"$"}toFilters) {
+    featured {
+      reason
+      style
+      tagLabel
+      tagStyle
+      footNotes
+      shipId
+    }
+    ships {
+      id
+      skus {
+        id
+        price
+        upgradePrice
+        unlimitedStock
+        showStock
+        available
+        availableStock
+      }
+    }
+  }
+}
+"""
+    class Variables(
+        val fromFilters: List<String> = listOf(),
+        val toFilters: List<String> = listOf()
+    )
+
+    fun getRequestBody(fromFilters: List<String> = listOf(), toFilters: List<String> = listOf()): BaseGraphQLBody {
+        return BaseGraphQLBody(query, Variables(fromFilters = fromFilters, toFilters = toFilters))
+    }
+}
