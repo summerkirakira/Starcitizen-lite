@@ -10,6 +10,8 @@ import okhttp3.RequestBody
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.Header
+import retrofit2.http.Headers
 import retrofit2.http.POST
 import vip.kirakira.starcitizenlite.network.account.PtuAccountBody
 import vip.kirakira.starcitizenlite.network.account.ResetCharacterBody
@@ -20,6 +22,7 @@ import vip.kirakira.starcitizenlite.network.hanger.ReclaimRequestBody
 import vip.kirakira.starcitizenlite.network.shop.*
 import vip.kirakira.starcitizenlite.network.upgrades.InitUpgradeProperty
 import vip.kirakira.viewpagertest.network.graphql.BaseGraphQLBody
+import vip.kirakira.viewpagertest.network.graphql.UpgradeAddToCartQuery
 import java.net.URL
 
 //private const val BASE_URL = "http://100.70.59.3:6000"
@@ -41,7 +44,6 @@ val client: OkHttpClient = OkHttpClient
                 .addHeader("origin", "https://robertsspaceindustries.com")
                 .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
                 .build()
-//            print(rsi_cookie)
             return@addInterceptor chain.proceed(newRequest)
         } else if(request.url.toString().startsWith("https://robertsspaceindustries.com/api/account")) {
             val newRequest = request.newBuilder()
@@ -117,6 +119,9 @@ interface RSIApiService {
     @POST("pledge-store/api/upgrade/graphql")
     suspend fun initUpgrade(@Body body: BaseGraphQLBody): InitUpgradeProperty
 
+    @POST("pledge-store/api/upgrade/graphql")
+    suspend fun pledgeAddToCart(@Body body: BaseGraphQLBody): AddCartItemProperty
+
 }
 
 
@@ -176,7 +181,8 @@ object RSIApi {
             .addHeader("x-rsi-token", rsi_token)
             .build()
         val response = client.newCall(request).execute()
-        return response.header("set-cookie")!!
+        val setCookie = response.header("set-cookie")!!
+        return setCookie.split(";")[0].split("=")[1]
     }
 
     suspend fun setUpgradeToken(rsi_auth_token: String): String {
@@ -186,7 +192,13 @@ object RSIApi {
             .addHeader("x-rsi-token", rsi_token)
             .build()
         val response = client.newCall(request).execute()
-        return response.header("set-cookie")!!
+        val setCookie = response.header("set-cookie")!!
+        return setCookie.split(";")[0].split("=")[1]
+    }
+
+    suspend fun upgradeAddToCart(from: Int, to: Int): AddCartItemProperty {
+        TODO()
+        return retrofitService.pledgeAddToCart(UpgradeAddToCartQuery().getRequestBody(from, to))
     }
 
 }

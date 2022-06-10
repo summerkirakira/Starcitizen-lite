@@ -326,7 +326,7 @@ class MainActivity : AppCompatActivity() {
         filterButton.setOnClickListener {
             when(mPager.currentItem) {
                 FragmentType.SHOPPING.value -> {
-                    val itemTypes = listOf("单船", "涂装", "装备", "附加包", "UEC", "礼品卡", "游戏包")
+                    val itemTypes = listOf("单船", "涂装", "装备", "附加包", "UEC", "礼品卡", "资格包", "组合包")
                     val builder = QMUIDialog.MultiCheckableDialogBuilder(this)
                     builder.setTitle("请选择商品种类")
                         .setCheckedItems(arrayOf(0).toIntArray())
@@ -343,6 +343,7 @@ class MainActivity : AppCompatActivity() {
                                     4 -> filterList.add(ShopItemType.UEC.itemName)
                                     5 -> filterList.add(ShopItemType.GIFT.itemName)
                                     6 -> filterList.add(ShopItemType.PACKAGE.itemName)
+                                    7 -> filterList.add(ShopItemType.PACKS.itemName)
                                 }
                                 shoppingViewModel.setFilter(ShopItemFilter("", filterList))
                             }

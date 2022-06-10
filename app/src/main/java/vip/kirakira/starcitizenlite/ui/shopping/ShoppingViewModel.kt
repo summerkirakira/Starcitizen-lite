@@ -89,7 +89,11 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     fun getCatalog() {
         viewModelScope.launch {
             try{
-                setFilter(ShopItemFilter("", listOf("Standalone Ship")))
+                if (filter.value != null && filter.value!!.name.isEmpty()) {
+                    setFilter(filter.value!!)
+                } else {
+                    setFilter(ShopItemFilter("", listOf("Standalone Ship")))
+                }
                shopItemsRepository.refreshItems()
             } catch (e: Exception) {
                 e.printStackTrace()

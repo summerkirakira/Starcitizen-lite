@@ -1,12 +1,16 @@
 package vip.kirakira.viewpagertest.ui.shopping
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.database.ShopItem
 import vip.kirakira.starcitizenlite.databinding.ShoppingCatalogListItemBinding
+import kotlin.coroutines.coroutineContext
 
 class ShoppingAdapter(private val onClickListener: OnClickListener) : ListAdapter<ShopItem, ShoppingAdapter.ViewHolder>(DiffCallback) {
 
@@ -27,6 +31,25 @@ class ShoppingAdapter(private val onClickListener: OnClickListener) : ListAdapte
         fun bind(shopItem: ShopItem) {
             binding.property = shopItem
             binding.executePendingBindings()
+            if (System.currentTimeMillis() - shopItem.insert_time > 60 * 60 * 1000 * 24) {
+                binding.canBuy.setImageDrawable(
+                    ResourcesCompat.getDrawable(
+                        binding.root.context.resources,
+                        R.drawable.ic_shop_no_data,
+                        null
+                    )
+                )
+                binding.canBuy.setColorFilter(binding.root.context.resources.getColor(R.color.shop_item_no_data))
+            } else {
+                binding.canBuy.setImageDrawable(
+                    ResourcesCompat.getDrawable(
+                        binding.root.context.resources,
+                        R.drawable.ic_double_check,
+                        null
+                    )
+                )
+                binding.canBuy.setColorFilter(binding.root.context.resources.getColor(R.color.shop_item_can_buy))
+            }
         }
 
         companion object {

@@ -22,4 +22,6 @@
     <color name="light_blue_A200">#FF40C4FF</color>
     <color name="light_blue_A400">#FF00B0FF</color>
     <color name="black_overlay">#66000000</color>
+    <color name="shop_item_no_data">#E57373</color>
+    <color name="shop_item_can_buy">#ADF659</color>
 </resources>

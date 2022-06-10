@@ -1404,7 +1404,7 @@ class initShipUpgradeQuery {
     }
 }
 
-class filterShipsAuery {
+class filterShipsQuery {
     val query = """query filterShips(${"$"}fromId: Int, ${"$"}toId: Int, ${"$"}fromFilters: [FilterConstraintValues], ${"$"}toFilters: [FilterConstraintValues]) {
   from(to: ${"$"}toId, filters: ${"$"}fromFilters) {
     ships {
@@ -1442,5 +1442,22 @@ class filterShipsAuery {
 
     fun getRequestBody(fromFilters: List<String> = listOf(), toFilters: List<String> = listOf()): BaseGraphQLBody {
         return BaseGraphQLBody(query, Variables(fromFilters = fromFilters, toFilters = toFilters))
+    }
+}
+
+class UpgradeAddToCartQuery {
+    val query = """mutation addToCart(${"$"}from: Int!, ${"$"}to: Int!) {
+  addToCart(from: ${"$"}from, to: ${"$"}to) {
+    jwt
+  }
+}
+"""
+    class Variables(
+        val from: Int,
+        val to: Int
+    )
+
+    fun getRequestBody(from: Int, to: Int): BaseGraphQLBody {
+        return BaseGraphQLBody(query, Variables(from = from, to = to))
     }
 }
