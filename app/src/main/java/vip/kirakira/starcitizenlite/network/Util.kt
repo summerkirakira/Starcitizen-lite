@@ -1,6 +1,11 @@
 package vip.kirakira.starcitizenlite.network
 
 import android.app.Application
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.jsoup.Jsoup
+import vip.kirakira.starcitizenlite.database.User
+import vip.kirakira.starcitizenlite.network.search.getPlayerSearchResult
 import vip.kirakira.starcitizenlite.repositories.UserRepository
 import java.text.SimpleDateFormat
 
@@ -10,6 +15,7 @@ val RSI_COOKIE_CONSTENT = "{stamp:%27yW0Q5I4vGut12oNYLMr/N0OUTu+Q5WcW8LJgDKocZw3
 var rsi_cookie = RSI_COOKIE_CONSTENT
 var rsi_device = ""
 var rsi_token = ""
+var csrf_token = ""
 
 
 fun setRSICookie(rsiToken: String, rsiDevice: String) {
@@ -27,4 +33,150 @@ fun convertDateToLong(date: String): Long {
 fun convertLongToDate(date: Long): String {
     val stringDate: SimpleDateFormat = SimpleDateFormat("yyyy年MM月dd日", java.util.Locale.CHINA)
     return stringDate.format(date)
+}
+
+fun saveUserData(uid: Int, rsi_device: String, rsi_token: String, email: String, password: String): User {
+    val cookie = "CookieConsent=$RSI_COOKIE_CONSTENT;Rsi-Token=$rsi_token; _rsi_device=$rsi_device"
+    val builder = Request.Builder()
+    val req = builder.url("https://robertsspaceindustries.com/account/referral-program")
+        .addHeader("cookie", cookie)
+        .get()
+        .build();
+    val response = OkHttpClient().newCall(req).execute()
+    val responseBody = response.body?.string()
+    val doc = Jsoup.parse(responseBody)
+    val csrfToken = doc.select("meta[name=csrf-token]").first().attr("content")
+    if (csrfToken.isNotEmpty()) {
+        csrf_token = csrfToken
+    }
+    val userName = doc.select(".c-account-sidebar__profile-info-displayname").text()
+    val userHandle = doc.select(".c-account-sidebar__profile-info-handle").text()
+    val userImage =
+        doc.select(".c-account-sidebar__profile-metas-avatar").attr("style").replace("background-image:url('", "")
+            .replace("');", "")
+    val userCredits =
+        (doc.select(".c-account-sidebar__profile-info-credits-amount--pledge").text().replace("\$", "")
+            .replace(" ", "").replace("USD", "").replace(",", "").toFloat() * 100).toInt()
+    val userUEC =
+        doc.select(".c-account-sidebar__profile-info-credits-amount--uec").text().replace("¤", "").replace(" ", "")
+            .replace("UEC", "").replace(",", "").toInt()
+    val userREC =
+        doc.select(".c-account-sidebar__profile-info-credits-amount--rec").text().replace("¤", "").replace(" ", "")
+            .replace("REC", "").replace(",", "").toInt()
+    val isConcierge = doc.select(".c-account-sidebar__links-link--concierge").isNotEmpty()
+    val isSubscribed = doc.select(".c-account-sidebar__links-link--subscribe").isNotEmpty()
+    val fleet = doc.select(".c-account-sidebar__profile-metas-badge--org").attr("href").split("/").last()
+    val fleetImage = doc.select(".c-account-sidebar__profile-metas-badge--org").select("img").attr("src")
+    val refNumber = doc.select("div.progress").select(".label").text().replace("Total recruits: ", "").toInt()
+    val refCode = doc.select("#share-referral-form").select("input").attr("value")
+
+    val newRquest = Request.Builder()
+        .url("https://robertsspaceindustries.com/account/billing")
+        .addHeader("cookie", cookie)
+        .get()
+        .build()
+    val refResponse = OkHttpClient().newCall(newRquest).execute()
+    val refResponseBody = refResponse.body?.string()
+    val billingDoc = Jsoup.parse(refResponseBody)
+    val totalSpent = (billingDoc.select(".spent-line").last().select("em").text().replace("\$", "").replace(" ", "")
+        .replace("USD", "").replace(",", "").toFloat() * 100).toInt()
+    val userInfo = getPlayerSearchResult(userHandle)
+        ?: return User(
+            uid,
+            userName,
+            "",
+            email,
+            password,
+            rsi_token,
+            rsi_device,
+            userHandle,
+            userImage,
+            "",
+            "",
+            "",
+            refCode,
+            refNumber,
+            userCredits,
+            userUEC,
+            userREC,
+            0,
+            totalSpent,
+            isConcierge,
+            isSubscribed,
+            fleet,
+            fleetImage,
+            "",
+            "",
+            "",
+            0,
+            "",
+            "",
+            ""
+        )
+    if (userInfo.organization == null) {
+        return User(
+            uid,
+            userName,
+            "",
+            email,
+            password,
+            rsi_token,
+            rsi_device,
+            userHandle,
+            "https://robertsspaceindustries.com/${userInfo.image}",
+            "",
+            "",
+            "",
+            refCode,
+            refNumber,
+            userCredits,
+            userUEC,
+            userREC,
+            0,
+            totalSpent,
+            isConcierge,
+            isSubscribed,
+            fleet,
+            fleetImage,
+            userInfo.location ?: "",
+            "",
+            "",
+            0,
+            "",
+            "",
+            ""
+        )
+    }
+    return User(
+        uid,
+        userName,
+        "",
+        email,
+        password,
+        rsi_token,
+        rsi_device,
+        userHandle,
+        "https://robertsspaceindustries.com/${userInfo.image}",
+        "",
+        "",
+        "",
+        refCode,
+        refNumber,
+        userCredits,
+        userUEC,
+        userREC,
+        0,
+        totalSpent,
+        isConcierge,
+        isSubscribed,
+        fleet,
+        "https://robertsspaceindustries.com/${userInfo.organization.logo}",
+        userInfo.enlisted,
+        userInfo.organization.name,
+        userInfo.organization.logo,
+        userInfo.organization.rank,
+        userInfo.organization.rankName,
+        userInfo.location ?: "",
+        userInfo.fluency
+    )
 }

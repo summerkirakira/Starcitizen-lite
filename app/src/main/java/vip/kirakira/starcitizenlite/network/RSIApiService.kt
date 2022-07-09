@@ -40,6 +40,7 @@ val client: OkHttpClient = OkHttpClient
         if(request.url.toString() == "https://robertsspaceindustries.com/graphql"){
             val newRequest = request.newBuilder()
                 .addHeader("cookie", rsi_cookie)
+                .addHeader("x-csrf-token", csrf_token)
                 .addHeader("referer", "https://robertsspaceindustries.com/")
                 .addHeader("origin", "https://robertsspaceindustries.com")
                 .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")

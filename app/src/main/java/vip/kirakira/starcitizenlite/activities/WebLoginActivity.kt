@@ -27,11 +27,19 @@ import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.network.DEFAULT_USER_AGENT
 import vip.kirakira.starcitizenlite.network.RSI_COOKIE_CONSTENT
+import vip.kirakira.starcitizenlite.network.csrf_token
+import vip.kirakira.starcitizenlite.network.saveUserData
 import vip.kirakira.starcitizenlite.network.search.getPlayerSearchResult
 import vip.kirakira.starcitizenlite.repositories.UserRepository
 import vip.kirakira.viewpagertest.network.graphql.SignInMutation
+import java.io.ByteArrayInputStream
 
-val INTERCEPT_JS = """XMLHttpRequest.prototype.origOpen = XMLHttpRequest.prototype.open;
+val INTERCEPT_JS = """
+    var csrf = "";
+    window.onload = function() {
+        csrf = document.querySelector('meta[name="csrf-token"]').content;
+    }
+    XMLHttpRequest.prototype.origOpen = XMLHttpRequest.prototype.open;
 XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
     // these will be the key to retrieve the payload
     this.recordedMethod = method;
@@ -41,7 +49,7 @@ XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
 XMLHttpRequest.prototype.origSend = XMLHttpRequest.prototype.send;
 XMLHttpRequest.prototype.send = function(body) {
     // interceptor is a Kotlin interface added in WebView
-    if(body) recorder.recordPayload(this.recordedMethod, this.recordedUrl, body);
+    if(body) recorder.recordPayload(this.recordedMethod, this.recordedUrl, body, csrf);
     this.origSend(body);
 };"""
 
@@ -54,7 +62,8 @@ class WebLoginActivity : AppCompatActivity() {
     lateinit var temp_device_id: String
     var password: String? = null
     var email: String? = null
-//    var needMultiStep = MutableLiveData<Boolean>(false)
+
+    //    var needMultiStep = MutableLiveData<Boolean>(false)
     var isLogin = MutableLiveData<User>(null)
 
     var isRegistered = MutableLiveData<Boolean>(false)
@@ -140,28 +149,32 @@ class WebLoginActivity : AppCompatActivity() {
 
             override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest): WebResourceResponse? {
                 val url = request.url.toString()
-                if (url.equals("https://robertsspaceindustries.com/graphql")){
+                if (url.equals("https://robertsspaceindustries.com/graphql")) {
                     val payload = recorder.getPayload(request.method, "/graphql")
+                    csrf_token = recorder.getCsrfToken()!!
+                    val webviewCookie = CookieManager.getInstance().getCookie(url)
 
 //                    Log.i("WebLoginActivity", "request: $request payload: $payload")
                     // handle the request with the given payload and return the response
-                    if (payload?.contains("signin") == true){
+                    if (payload?.contains("signin") == true) {
                         signInVariables = SignInMutation().parseRequest(payload)
                         email = signInVariables.variables.email
                         password = signInVariables.variables.password
-                        if(signInVariables.variables.captcha != null) {
+                        if (signInVariables.variables.captcha != null) {
                             val builder = Request.Builder()
                             val req = builder.url("https://robertsspaceindustries.com/graphql")
                                 .addHeader("user-agent", DEFAULT_USER_AGENT)
+                                .addHeader("cookie", webviewCookie)
+                                .addHeader("x-csrf-token", recorder.getCsrfToken()!!)
                                 .addHeader("content-type", "application/json")
                                 .post(RequestBody.create("application/json".toMediaTypeOrNull(), payload))
                                 .build();
                             val response = OkHttpClient().newCall(req).execute()
                             val contentType = response.header("content-type")
                             val responseBody = response.body?.string()
-                            if("errors" in responseBody!!){
+                            if ("errors" in responseBody!!) {
                                 val error = SignInMutation().parseFailure(responseBody).errors[0]
-                                if(error.message == "MultiStepRequired"){
+                                if (error.message == "MultiStepRequired") {
 //                                    Log.w("WebLoginActivity", "-----------MultiStepRequired-----------")
                                     temp_device_id = error.extensions.details.device_id
                                     temp_rsi_token = error.extensions.details.session_id
@@ -169,22 +182,32 @@ class WebLoginActivity : AppCompatActivity() {
                             }
                             return WebResourceResponse(contentType, "UTF-8", responseBody.byteInputStream())
                         }
-                    } else if(payload?.contains("multistep") == true) {
+                    } else if (payload?.contains("multistep") == true) {
                         val builder = Request.Builder()
                         val req = builder.url("https://robertsspaceindustries.com/graphql")
                             .addHeader("user-agent", DEFAULT_USER_AGENT)
                             .addHeader("content-type", "application/json")
-                            .addHeader("cookie", "CookieConsent=$RSI_COOKIE_CONSTENT;Rsi-Token=$temp_rsi_token; _rsi_device=$temp_device_id")
+                            .addHeader("x-csrf-token", recorder.getCsrfToken()!!)
+                            .addHeader(
+                                "cookie",
+                                "CookieConsent=$RSI_COOKIE_CONSTENT;Rsi-Token=$temp_rsi_token; _rsi_device=$temp_device_id"
+                            )
                             .post(RequestBody.create("application/json".toMediaTypeOrNull(), payload))
                             .build();
                         val response = OkHttpClient().newCall(req).execute()
                         val responseBody = response.body?.string()
-                        if("RsiAuthenticatedAccount" in responseBody!!){
+                        if ("RsiAuthenticatedAccount" in responseBody!!) {
                             val successLoginInfo = SignInMutation().parseLoginSuccess(responseBody)
-                            val newUser = saveUserData(successLoginInfo.data.account_multistep.id, temp_device_id, temp_rsi_token, email!!, password!!)
+                            val newUser = saveUserData(
+                                successLoginInfo.data.account_multistep.id,
+                                temp_device_id,
+                                temp_rsi_token,
+                                email!!,
+                                password!!
+                            )
                             isLogin.postValue(newUser)
                         }
-                    } else if (payload?.contains("mutation signup") == true){
+                    } else if (payload?.contains("mutation signup") == true) {
                         val payloadObject = JSONObject(payload)
                         try {
                             val code = payloadObject.getJSONObject("variables").getString("referralCode")
@@ -196,7 +219,7 @@ class WebLoginActivity : AppCompatActivity() {
                         val webviewCookies = CookieManager.getInstance().getCookie("https://robertsspaceindustries.com")
                         var rsiToken: String? = null
                         webviewCookies.split(";").forEach {
-                            if(it.contains("Rsi-Token")){
+                            if (it.contains("Rsi-Token")) {
                                 rsiToken = it.split("=")[1]
                             }
                         }
@@ -204,6 +227,7 @@ class WebLoginActivity : AppCompatActivity() {
                         val req = builder.url("https://robertsspaceindustries.com/graphql")
                             .addHeader("user-agent", DEFAULT_USER_AGENT)
                             .addHeader("content-type", "application/json")
+                            .addHeader("x-csrf-token", recorder.getCsrfToken()!!)
                             .addHeader("cookie", "${RSI_COOKIE_CONSTENT}; Rsi-Token=${rsiToken}")
                             .post(RequestBody.create("application/json".toMediaTypeOrNull(), payloadObject.toString()))
                             .build()
@@ -212,7 +236,7 @@ class WebLoginActivity : AppCompatActivity() {
                         val headers = response.headers.toMap()
                         try {
                             val rsiDevice = headers["set-cookie"]?.split(";")!!.get(0).split("=").get(1)
-                            if (rsiToken != null && rsiDevice.isNotEmpty()){
+                            if (rsiToken != null && rsiDevice.isNotEmpty()) {
 //                            val newUser = saveUserData((1..60000).random(), rsiDevice, rsiToken!!, signUpEmail, signUpPassword)
 //                            isLogin.postValue(newUser)
                                 isRegistered.postValue(true)
@@ -255,7 +279,11 @@ class WebLoginActivity : AppCompatActivity() {
                 val builder = Request.Builder();
                 val req = builder.url(url).get().build();
                 val response = OkHttpClient().newCall(req).execute()
-                return WebResourceResponse(response.body?.contentType().toString(), "UTF-8", response.body?.byteStream())
+                return WebResourceResponse(
+                    response.body?.contentType().toString(),
+                    "UTF-8",
+                    response.body?.byteStream()
+                )
             }
             return super.shouldInterceptRequest(view, request)
         }
@@ -263,307 +291,29 @@ class WebLoginActivity : AppCompatActivity() {
 
     }
 
-    fun saveUserData(uid: Int, rsi_device: String, rsi_token: String, email: String, password: String): User {
-        val cookie = "CookieConsent=$RSI_COOKIE_CONSTENT;Rsi-Token=$rsi_token; _rsi_device=$rsi_device"
-        val builder = Request.Builder()
-        val req = builder.url("https://robertsspaceindustries.com/account/referral-program")
-            .addHeader("cookie", cookie)
-            .get()
-            .build();
-        val response = OkHttpClient().newCall(req).execute()
-        val responseBody = response.body?.string()
-        val doc = Jsoup.parse(responseBody)
-        val userName = doc.select(".c-account-sidebar__profile-info-displayname").text()
-        val userHandle = doc.select(".c-account-sidebar__profile-info-handle").text()
-        val userImage =
-            doc.select(".c-account-sidebar__profile-metas-avatar").attr("style").replace("background-image:url('", "")
-                .replace("');", "")
-        val userCredits =
-            (doc.select(".c-account-sidebar__profile-info-credits-amount--pledge").text().replace("\$", "")
-                .replace(" ", "").replace("USD", "").replace(",", "").toFloat() * 100).toInt()
-        val userUEC =
-            doc.select(".c-account-sidebar__profile-info-credits-amount--uec").text().replace("¤", "").replace(" ", "")
-                .replace("UEC", "").replace(",", "").toInt()
-        val userREC =
-            doc.select(".c-account-sidebar__profile-info-credits-amount--rec").text().replace("¤", "").replace(" ", "")
-                .replace("REC", "").replace(",", "").toInt()
-        val isConcierge = doc.select(".c-account-sidebar__links-link--concierge").isNotEmpty()
-        val isSubscribed = doc.select(".c-account-sidebar__links-link--subscribe").isNotEmpty()
-        val fleet = doc.select(".c-account-sidebar__profile-metas-badge--org").attr("href").split("/").last()
-        val fleetImage = doc.select(".c-account-sidebar__profile-metas-badge--org").select("img").attr("src")
-        val refNumber = doc.select("div.progress").select(".label").text().replace("Total recruits: ", "").toInt()
-        val refCode = doc.select("#share-referral-form").select("input").attr("value")
+    class PayloadRecorder {
+        private val payloadMap: MutableMap<String, String> =
+            mutableMapOf()
+        private var csrfToken: String? = null
 
-        val newRquest = Request.Builder()
-            .url("https://robertsspaceindustries.com/account/billing")
-            .addHeader("cookie", cookie)
-            .get()
-            .build()
-        val refResponse = OkHttpClient().newCall(newRquest).execute()
-        val refResponseBody = refResponse.body?.string()
-        val billingDoc = Jsoup.parse(refResponseBody)
-        val totalSpent = (billingDoc.select(".spent-line").last().select("em").text().replace("\$", "").replace(" ", "")
-            .replace("USD", "").replace(",", "").toFloat() * 100).toInt()
-        val userInfo = getPlayerSearchResult(userHandle)
-            ?: return User(
-                uid,
-                userName,
-                "",
-                email,
-                password,
-                rsi_token,
-                rsi_device,
-                userHandle,
-                userImage,
-                "",
-                "",
-                "",
-                refCode,
-                refNumber,
-                userCredits,
-                userUEC,
-                userREC,
-                0,
-                totalSpent,
-                isConcierge,
-                isSubscribed,
-                fleet,
-                fleetImage,
-                "",
-                "",
-                "",
-                0,
-                "",
-                "",
-                ""
-            )
-        if (userInfo.organization == null) {
-            return User(
-                uid,
-                userName,
-                "",
-                email,
-                password,
-                rsi_token,
-                rsi_device,
-                userHandle,
-                "https://robertsspaceindustries.com/${userInfo.image}",
-                "",
-                "",
-                "",
-                refCode,
-                refNumber,
-                userCredits,
-                userUEC,
-                userREC,
-                0,
-                totalSpent,
-                isConcierge,
-                isSubscribed,
-                fleet,
-                fleetImage,
-                userInfo.location ?: "",
-                "",
-                "",
-                0,
-                "",
-                "",
-                ""
-            )
+        @JavascriptInterface
+        fun recordPayload(
+            method: String,
+            url: String,
+            payload: String,
+            csrf: String
+        ) {
+            payloadMap["$method-$url"] = payload
+            Log.i("PayloadRecorder", "$method-$payload")
+            csrfToken = csrf
         }
-        return User(
-            uid,
-            userName,
-            "",
-            email,
-            password,
-            rsi_token,
-            rsi_device,
-            userHandle,
-            "https://robertsspaceindustries.com/${userInfo.image}",
-            "",
-            "",
-            "",
-            refCode,
-            refNumber,
-            userCredits,
-            userUEC,
-            userREC,
-            0,
-            totalSpent,
-            isConcierge,
-            isSubscribed,
-            fleet,
-            "https://robertsspaceindustries.com/${userInfo.organization.logo}",
-            userInfo.enlisted,
-            userInfo.organization.name,
-            userInfo.organization.logo,
-            userInfo.organization.rank,
-            userInfo.organization.rankName,
-            userInfo.location ?: "",
-            userInfo.fluency
-        )
+
+        fun getPayload(
+            method: String,
+            url: String
+        ): String? =
+            payloadMap["$method-$url"]
+
+        fun getCsrfToken(): String? = csrfToken
     }
-
-}
-
-class PayloadRecorder {
-    private val payloadMap: MutableMap<String, String> =
-        mutableMapOf()
-    @JavascriptInterface
-    fun recordPayload(
-        method: String,
-        url: String,
-        payload: String
-    ) {
-        payloadMap["$method-$url"] = payload
-        Log.i("PayloadRecorder", "$method-$payload")
-    }
-    fun getPayload(
-        method: String,
-        url: String
-    ): String? =
-        payloadMap["$method-$url"]
-}
-
-fun saveUserData(uid: Int, rsi_device: String, rsi_token: String, email: String, password: String): User {
-    val cookie = "CookieConsent=$RSI_COOKIE_CONSTENT;Rsi-Token=$rsi_token; _rsi_device=$rsi_device"
-    val builder = Request.Builder()
-    val req = builder.url("https://robertsspaceindustries.com/account/referral-program")
-        .addHeader("cookie", cookie)
-        .get()
-        .build();
-    val response = OkHttpClient().newCall(req).execute()
-    val responseBody = response.body?.string()
-    val doc = Jsoup.parse(responseBody)
-    val userName = doc.select(".c-account-sidebar__profile-info-displayname").text()
-    val userHandle = doc.select(".c-account-sidebar__profile-info-handle").text()
-    val userImage =
-        doc.select(".c-account-sidebar__profile-metas-avatar").attr("style").replace("background-image:url('", "")
-            .replace("');", "")
-    val userCredits =
-        (doc.select(".c-account-sidebar__profile-info-credits-amount--pledge").text().replace("\$", "")
-            .replace(" ", "").replace("USD", "").replace(",", "").toFloat() * 100).toInt()
-    val userUEC =
-        doc.select(".c-account-sidebar__profile-info-credits-amount--uec").text().replace("¤", "").replace(" ", "")
-            .replace("UEC", "").replace(",", "").toInt()
-    val userREC =
-        doc.select(".c-account-sidebar__profile-info-credits-amount--rec").text().replace("¤", "").replace(" ", "")
-            .replace("REC", "").replace(",", "").toInt()
-    val isConcierge = doc.select(".c-account-sidebar__links-link--concierge").isNotEmpty()
-    val isSubscribed = doc.select(".c-account-sidebar__links-link--subscribe").isNotEmpty()
-    val fleet = doc.select(".c-account-sidebar__profile-metas-badge--org").attr("href").split("/").last()
-    val fleetImage = doc.select(".c-account-sidebar__profile-metas-badge--org").select("img").attr("src")
-    val refNumber = doc.select("div.progress").select(".label").text().replace("Total recruits: ", "").toInt()
-    val refCode = doc.select("#share-referral-form").select("input").attr("value")
-
-    val newRquest = Request.Builder()
-        .url("https://robertsspaceindustries.com/account/billing")
-        .addHeader("cookie", cookie)
-        .get()
-        .build()
-    val refResponse = OkHttpClient().newCall(newRquest).execute()
-    val refResponseBody = refResponse.body?.string()
-    val billingDoc = Jsoup.parse(refResponseBody)
-    val totalSpent = (billingDoc.select(".spent-line").last().select("em").text().replace("\$", "").replace(" ", "")
-        .replace("USD", "").replace(",", "").toFloat() * 100).toInt()
-    val userInfo = getPlayerSearchResult(userHandle)
-        ?: return User(
-            uid,
-            userName,
-            "",
-            email,
-            password,
-            rsi_token,
-            rsi_device,
-            userHandle,
-            userImage,
-            "",
-            "",
-            "",
-            refCode,
-            refNumber,
-            userCredits,
-            userUEC,
-            userREC,
-            0,
-            totalSpent,
-            isConcierge,
-            isSubscribed,
-            fleet,
-            fleetImage,
-            "",
-            "",
-            "",
-            0,
-            "",
-            "",
-            ""
-        )
-    if (userInfo.organization == null) {
-        return User(
-            uid,
-            userName,
-            "",
-            email,
-            password,
-            rsi_token,
-            rsi_device,
-            userHandle,
-            "https://robertsspaceindustries.com/${userInfo.image}",
-            "",
-            "",
-            "",
-            refCode,
-            refNumber,
-            userCredits,
-            userUEC,
-            userREC,
-            0,
-            totalSpent,
-            isConcierge,
-            isSubscribed,
-            fleet,
-            fleetImage,
-            userInfo.location ?: "",
-            "",
-            "",
-            0,
-            "",
-            "",
-            ""
-        )
-    }
-    return User(
-        uid,
-        userName,
-        "",
-        email,
-        password,
-        rsi_token,
-        rsi_device,
-        userHandle,
-        "https://robertsspaceindustries.com/${userInfo.image}",
-        "",
-        "",
-        "",
-        refCode,
-        refNumber,
-        userCredits,
-        userUEC,
-        userREC,
-        0,
-        totalSpent,
-        isConcierge,
-        isSubscribed,
-        fleet,
-        "https://robertsspaceindustries.com/${userInfo.organization.logo}",
-        userInfo.enlisted,
-        userInfo.organization.name,
-        userInfo.organization.logo,
-        userInfo.organization.rank,
-        userInfo.organization.rankName,
-        userInfo.location ?: "",
-        userInfo.fluency
-    )
 }

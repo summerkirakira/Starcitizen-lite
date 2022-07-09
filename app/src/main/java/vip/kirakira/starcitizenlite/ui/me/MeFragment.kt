@@ -14,10 +14,10 @@ import androidx.lifecycle.LiveData
 import io.getstream.avatarview.coil.loadImage
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.activities.WebLoginActivity
-import vip.kirakira.starcitizenlite.activities.saveUserData
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.databinding.MeFragmentBinding
+import vip.kirakira.starcitizenlite.network.saveUserData
 import kotlin.concurrent.thread
 
 class MeFragment : Fragment() {

@@ -38,6 +38,8 @@ import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.network.CirnoApi
 import vip.kirakira.starcitizenlite.network.CirnoProperty.Announcement
+import vip.kirakira.starcitizenlite.network.rsi_device
+import vip.kirakira.starcitizenlite.network.saveUserData
 import vip.kirakira.starcitizenlite.network.setRSICookie
 import vip.kirakira.starcitizenlite.network.shop.getCartSummary
 import vip.kirakira.starcitizenlite.ui.ScreenSlidePagerAdapter
@@ -175,6 +177,7 @@ class MainActivity : AppCompatActivity() {
                 drawerUserHangerValue.text = userHangerValue
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
+                        saveUserData(20085, it.rsi_device, it.rsi_token, "", "")
                         val loginTest = getCartSummary()
                         if(loginTest.data.account.isAnonymous){
                             sharedPreferences.edit().putInt(getString(R.string.primary_user_key), 0).apply()

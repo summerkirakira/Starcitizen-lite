@@ -19,7 +19,7 @@ import vip.kirakira.starcitizenlite.network.rsi_cookie
 
 class CartActivity : AppCompatActivity() {
     lateinit var loginWebView: WebView
-    var recorder = PayloadRecorder()
+    var recorder = WebLoginActivity.PayloadRecorder()
 
     val RSI_URL = "https://robertsspaceindustries.com"
     @SuppressLint("SetJavaScriptEnabled")

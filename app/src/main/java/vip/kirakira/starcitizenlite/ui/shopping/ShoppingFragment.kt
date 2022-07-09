@@ -27,6 +27,7 @@ import vip.kirakira.starcitizenlite.activities.CartActivity
 import vip.kirakira.starcitizenlite.activities.WebLoginActivity
 import vip.kirakira.starcitizenlite.database.ShopItem
 import vip.kirakira.starcitizenlite.databinding.ShoppingFragmentBinding
+import vip.kirakira.starcitizenlite.network.csrf_token
 import vip.kirakira.starcitizenlite.network.shop.*
 import java.util.*
 import kotlin.concurrent.schedule
@@ -108,6 +109,15 @@ class ShoppingFragment : Fragment() {
 
         binding.fab.setOnClickListener {
             if(selectedItem != null) {
+                if (csrf_token == "") {
+                    Alerter.create(activity!!)
+                        .setTitle("添加购物车失败")
+                        .setText("请检查网络连接")
+                        .setIcon(R.drawable.ic_warning)
+                        .setBackgroundColorRes(R.color.alert_dialog_background_failure)
+                        .show()
+                    return@setOnClickListener
+                }
                 val builder = QMUIDialog.CheckBoxMessageDialogBuilder(context)
                 val dialog = builder
                     .setTitle("是否添加${selectedItem!!.name}(${selectedItem!!.price / 100f}USD)\n到购物车？")
