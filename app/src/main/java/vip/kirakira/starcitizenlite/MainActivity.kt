@@ -178,6 +178,10 @@ class MainActivity : AppCompatActivity() {
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
                         saveUserData(20085, it.rsi_device, it.rsi_token, "", "")
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                    try {
                         val loginTest = getCartSummary()
                         if(loginTest.data.account.isAnonymous){
                             sharedPreferences.edit().putInt(getString(R.string.primary_user_key), 0).apply()
@@ -204,7 +208,6 @@ class MainActivity : AppCompatActivity() {
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
-
                     }
                 }
             }

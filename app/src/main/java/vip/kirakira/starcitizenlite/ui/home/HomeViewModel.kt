@@ -126,6 +126,8 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
             Mode.BUYBACK -> {
                 buybackItemFilter.value = filter
             }
+
+            else -> {}
         }
     }
 

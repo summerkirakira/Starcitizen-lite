@@ -21,7 +21,12 @@ class HangerProcess {
             val pledgeList = doc.select(".list-items").select(".row")
             for(pledge in pledgeList) {
                 val pledgeId = pledge.select(".js-pledge-id").attr("value").toInt()
-                val pledgeValue = (pledge.select(".js-pledge-value").attr("value").replace("$", "").replace(" USD", "").replace(",", "").toFloat() * 100).toInt()
+                val pledgeValueString: String = pledge.select(".js-pledge-value").attr("value")
+                var pledgeValue: Int = 0
+                if(!pledgeValueString.contains("UEC")) {
+                    pledgeValue = (pledgeValueString.replace("$", "").replace(" USD", "").replace(",", "").toFloat() * 100).toInt()
+                }
+//                pledgeValue = (pledge.select(".js-pledge-value").attr("value").replace("$", "").replace(" USD", "").replace(",", "").toFloat() * 100).toInt()
                 val pledgeImage = pledge.select("div.image").attr("style").replace("background-image:url('", "").replace("');", "")
                 val pledgeTitle = pledge.select(".title-col")[0].select("h3").text()
                 val pledgeStatus = pledge.select(".availability").text()
