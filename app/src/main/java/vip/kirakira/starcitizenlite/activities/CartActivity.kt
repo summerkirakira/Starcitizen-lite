@@ -60,6 +60,11 @@ class CartActivity : AppCompatActivity() {
                     intent.data = Uri.parse(newUrlList.joinToString("&"))
                     startActivity(intent)
                 }
+                if (url == "https://robertsspaceindustries.com/graphql") {
+                    // go back to last activity
+                    val payload = recorder.getPayload(request.method, "/graphql")
+                    Log.d("payload", "$payload")
+                }
                 return super.shouldInterceptRequest(view, request)
             }
 

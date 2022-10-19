@@ -304,7 +304,7 @@ class WebLoginActivity : AppCompatActivity() {
             csrf: String
         ) {
             payloadMap["$method-$url"] = payload
-            Log.i("PayloadRecorder", "$method-$payload")
+            Log.d("PayloadRecorder", "$method-$payload")
             csrfToken = csrf
         }
 

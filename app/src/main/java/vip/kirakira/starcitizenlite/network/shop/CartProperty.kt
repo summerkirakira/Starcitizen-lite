@@ -2,7 +2,7 @@ package vip.kirakira.starcitizenlite.network.shop
 
 data class Error(val message: String, val extensions: Extensions) {
     data class Extensions(val code: Int?, val details: Details?){
-        data class Details(val amount: String)
+        data class Details(val amount: String?)
     }
 }
 

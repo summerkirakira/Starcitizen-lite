@@ -19,3 +19,12 @@ data class StarUp(
     val title: String,
     val content: String,
 )
+
+data class RecaptchaList(
+    val captcha_list: List<ReCaptcha>? = null,
+    val error: String? = null
+) {
+    data class ReCaptcha(
+        val token: String
+    )
+}

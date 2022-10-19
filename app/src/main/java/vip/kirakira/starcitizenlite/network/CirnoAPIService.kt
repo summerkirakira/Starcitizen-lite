@@ -5,7 +5,9 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Query
 import vip.kirakira.starcitizenlite.network.CirnoProperty.Announcement
+import vip.kirakira.starcitizenlite.network.CirnoProperty.RecaptchaList
 import vip.kirakira.starcitizenlite.network.CirnoProperty.StarUp
 import vip.kirakira.starcitizenlite.network.CirnoProperty.Version
 
@@ -30,6 +32,9 @@ interface CirnoApiService {
 
     @GET("startup")
     suspend fun getStartup(): StarUp
+
+    @GET("reCaptchaV3")
+    suspend fun getReCaptchaV3(@Query("limit") limit: Int): RecaptchaList
 }
 
 object CirnoApi {

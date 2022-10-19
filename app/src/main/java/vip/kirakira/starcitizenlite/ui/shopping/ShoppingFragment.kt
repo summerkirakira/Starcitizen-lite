@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.os.Handler
 import android.text.InputType
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -27,6 +28,8 @@ import vip.kirakira.starcitizenlite.activities.CartActivity
 import vip.kirakira.starcitizenlite.activities.WebLoginActivity
 import vip.kirakira.starcitizenlite.database.ShopItem
 import vip.kirakira.starcitizenlite.databinding.ShoppingFragmentBinding
+import vip.kirakira.starcitizenlite.network.CirnoApi
+import vip.kirakira.starcitizenlite.network.CirnoProperty.RecaptchaList
 import vip.kirakira.starcitizenlite.network.csrf_token
 import vip.kirakira.starcitizenlite.network.shop.*
 import java.util.*
@@ -110,7 +113,7 @@ class ShoppingFragment : Fragment() {
         binding.fab.setOnClickListener {
             if(selectedItem != null) {
                 if (csrf_token == "") {
-                    Alerter.create(activity!!)
+                    Alerter.create(requireActivity())
                         .setTitle("添加购物车失败")
                         .setText("请检查网络连接")
                         .setIcon(R.drawable.ic_warning)
@@ -118,67 +121,154 @@ class ShoppingFragment : Fragment() {
                         .show()
                     return@setOnClickListener
                 }
-                val builder = QMUIDialog.CheckBoxMessageDialogBuilder(context)
-                val dialog = builder
-                    .setTitle("是否添加${selectedItem!!.name}(${selectedItem!!.price / 100f}USD)\n到购物车？")
-                    .setMessage("自动补全信用点")
-                    .setChecked(true)
+                val numberBuilder = QMUIDialog.EditTextDialogBuilder(context)
+                var number = 1
+                val numberEditText = numberBuilder
+                    .setTitle("请输入购买数量")
+                    .setPlaceholder("1")
+                    .setInputType(InputType.TYPE_CLASS_NUMBER)
                     .addAction("取消") { dialog, _ ->
                         dialog.dismiss()
                     }
                     .addAction("确定") { dialog, _ ->
+                        try {
+                            number = numberBuilder.editText.text.toString().toInt()
+                        } catch (e: Exception) {
+                            number = 1
+                        }
                         dialog.dismiss()
-                        scope.launch {
-                            var canNextStep = true;
-                            clearCart()
-                            try {
-                                addToCart(selectedItem!!.id, 1)
-                            } catch (e: Exception) {
-                                Alerter.create(activity!!)
-                                    .setTitle("添加购物车失败")
-                                    .setText("此商品未开放或已不再可用")
-                                    .setIcon(R.drawable.ic_warning)
-                                    .setBackgroundColorRes(R.color.alert_dialog_background_failure)
-                                    .show()
-                                return@launch
+                        val builder = QMUIDialog.CheckBoxMessageDialogBuilder(context)
+                        val dialog = builder
+                            .setTitle("是否添加${number}件${selectedItem!!.name}(${selectedItem!!.price * number / 100f}USD)\n到购物车？")
+                            .setMessage("自动补全信用点")
+                            .setChecked(true)
+                            .addAction("取消") { dialog, _ ->
+                                dialog.dismiss()
                             }
-                            val cartInfo = getCartSummary()
-                            if(cartInfo.data.store.cart.totals.subTotal == 0) {
-                                Alerter.create(activity!!)
-                                    .setTitle("添加购物车失败")
-                                    .setText("此商品未开放或已不再可用")
-                                    .setBackgroundColorRes(R.color.alert_dialog_background_failure)
-                                    .setIcon(R.drawable.ic_warning)
-                                    .setDuration(4000)
-                                    .enableSwipeToDismiss()
-                                    .show()
-                                canNextStep = false
-                            }
-                            if(canNextStep) {
-                                if(builder.isChecked){
-                                    val applicableCredit: Int = cartInfo.data.store.cart.totals.credits.maxApplicable - cartInfo.data.store.cart.totals.credits.amount
-                                    val addCredits = addCredit(applicableCredit / 100f)
-                                    if(addCredits.errors == null) {
-                                        Toast.makeText(context, getString(R.string.credits_add_success), Toast.LENGTH_SHORT).show()
-                                    } else {
-                                        Toast.makeText(context, getString(R.string.credits_add_failed), Toast.LENGTH_SHORT).show()
+                            .addAction("确定") { dialog, _ ->
+                                dialog.dismiss()
+                                scope.launch {
+                                    var canNextStep = true
+                                    var maxCartNumber = 5
+                                    clearCart()
+                                    try {
+                                        var cartTest = addToCart(selectedItem!!.id, number)
+                                        if(cartTest.errors != null) {
+                                            if(cartTest.errors!![0].message == "Invalid cart") {
+                                                if(number < 5) {
+                                                    maxCartNumber = 1
+                                                } else {
+                                                    cartTest = addToCart(selectedItem!!.id, 5)
+                                                    if (cartTest.errors != null) {
+                                                        if (cartTest.errors!![0].message == "Invalid cart") {
+                                                            maxCartNumber = 1
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } catch (e: Exception) {
+                                        Alerter.create(requireActivity())
+                                            .setTitle("添加购物车失败")
+                                            .setText("此商品未开放或已不再可用")
+                                            .setIcon(R.drawable.ic_warning)
+                                            .setBackgroundColorRes(R.color.alert_dialog_background_failure)
+                                            .show()
+                                        return@launch
                                     }
-                                }
-                                nextStep()
+//                                    val cartInfo = getCartSummary()
+                                    val requiredTokenNumber: Int = number / maxCartNumber + 1
+                                    var totalItemNumber = number
+//                                    if(cartInfo.data.store.cart.totals.subTotal == 0) {
+//                                        Alerter.create(requireActivity())
+//                                            .setTitle("添加购物车失败")
+//                                            .setText("此商品未开放或已不再可用")
+//                                            .setBackgroundColorRes(R.color.alert_dialog_background_failure)
+//                                            .setIcon(R.drawable.ic_warning)
+//                                            .setDuration(4000)
+//                                            .enableSwipeToDismiss()
+//                                            .show()
+//                                        canNextStep = false
+//                                    }
+                                    clearCart()
+                                    if(canNextStep) {
+                                        var tokenList: MutableList<RecaptchaList.ReCaptcha> = mutableListOf()
+                                        while (tokenList.size < requiredTokenNumber) {
+                                            val token = CirnoApi.retrofitService.getReCaptchaV3(requiredTokenNumber)
+                                            if(token.captcha_list == null) {
+                                                Alerter.create(requireActivity())
+                                                    .setTitle("获取Token失败")
+                                                    .setText("请检查网络连接")
+                                                    .setIcon(R.drawable.ic_warning)
+                                                    .setBackgroundColorRes(R.color.alert_dialog_background_failure)
+                                                    .show()
+                                                return@launch
+                                            }
+                                            tokenList.addAll(token.captcha_list)
+                                        }
+                                        while (totalItemNumber > 0) {
+                                            if(maxCartNumber < totalItemNumber) {
+                                                addToCart(selectedItem!!.id, maxCartNumber)
+                                            } else {
+                                                addToCart(selectedItem!!.id, totalItemNumber)
+                                            }
+                                            val cartInfo = getCartSummary()
+                                            if(builder.isChecked){
+                                                val applicableCredit: Int = cartInfo.data.store.cart.totals.credits.maxApplicable - cartInfo.data.store.cart.totals.credits.amount
+                                                val addCredits = addCredit(applicableCredit / 100f)
+                                                if(addCredits.errors == null) {
+                                                    Toast.makeText(context, getString(R.string.credits_add_success), Toast.LENGTH_SHORT).show()
+                                                } else {
+                                                    Toast.makeText(context, getString(R.string.credits_add_failed), Toast.LENGTH_SHORT).show()
+                                                }
+                                            }
+                                            nextStep()
+                                            val token = tokenList[0]
+                                            tokenList.removeAt(0)
+                                                cartValidation(token.token)
+                                                val cartStatus = getCartSummary()
+                                                if(cartStatus.data.store.cart.totals.total == 0) {
+                                                    Alerter.create(requireActivity())
+                                                        .setTitle("购买成功")
+                                                        .setText("请在机库中查看")
+                                                        .setBackgroundColorRes(R.color.alerter_default_success_background)
+                                                        .setDuration(4000)
+                                                        .enableSwipeToDismiss()
+                                                        .show()
+                                                } else {
 //                            val address = cartAddressQuery()
 //                            val assignAddress = cartAddressAssign(address.data.store.addressBook.first().id)
 //                            println(cartValidation("03AGdBq27y9ldoo5gKZTkYZ2S_LEDgEI_iw1UUp9nMjsIW_Z0pywtluUGpXyisHFpdGB9sG84Zryqy3woCnhqGOR1mdIF6aGf1GGoGHe9C3QhpBk7S25IfLHbc2ticW4iw1fuUD6RLT-00vkTwZFwULI_p16BLRAHFLOwwFaJViXuXhlYpjc5Ot-CoQkbf2d-0MP9EpNiSWqF2gsZrje58g8AFF3rgRb19DSfDnVKQS0kE-Tl9zvrJwU-pLKIu_CaPiR2L5jVOItBMhCWe5iMInJN1rck-jUoLONhIc1MummaiyGrdVDHLYu2xb7_V2ipDSNqc_IZ30fJN_bT6RUUnFzFBJeea6hwR91VX34IrN1Tu3eok_7M6ZHRyk5IB_fGu2q5e4G0WfkR5QlEAOGwC6_5LCwlHyI5lRtMirIG2hsBjsbuoVzvYrPhalHHXr9zfxk6t-IDYAayQx3yApVLSBbbai0jGdjkqHeWUwJ3vI85MJhM5mYQRpH1bUCeJLY0snFpF5Lnli5GmeQwuxOiGOuw07JKwbXc1iyNWil9OXnBfGI9_1e4ijHJq0GIZQtg6N5cE1D1MMa37QYbUb8fy96NGurih1EezNDX-AmxWZzhsJ74O72CMIitn0BhpctSrcKHy-beFl6c1zz72vpMRVSgsH9Zg5Zb0QlN9zs6LA60ikLscWyyszeeup__oktpHGsjGE8D1N1zgOTjv2rBW8CsxQq7Q3FU2OJwBej5tZ8eW2udlGEWsHugamTGkdh1osrtgHvcwTsacvoxZXKeV_j2vzA2_iYsgAaNOQpzJzKMDApJd20lXMFyzT--CUZgYhfI0OpU5IUjOgUr0TmVGmouDwmlRUWFFu4Ui_9Cur65SgfE-saWHwyXIxHW72Uy6mQ97PslG69sydlIq-d-8v1350ZaZNJoA9kG_9bNJ7fhxGtjQWvraer8FphO5o8cGrA2ODjOesmYJP6VxeNe7TEhwMKwD3IwUdw1HxW6-2an1NYNMFRisX0Z2PyESqVn6hp1pqGufF6zIecYu0K9VR2MPbEJlktgKzT-pej95E857cimHU0OWgchmq5LYaKIkC95cPoZtIpg9llZ1o2lZ0wtZTFqWEzpJizZsX676cWEEvAaNMG-ksH18C1reNJcpq_QG4ICESXOBZHZbaBA252OnDA4p_Sfir-lYLIQOTYNyuw79Ml3hXnaDkvJHs3Tjv-bmHLoFTuZFaKKbfwG3ai9h_GRaKO6A4cTr0dO7osDDqMtmIXrcAWlgBtKwS8a8X-oOj1dYtwk-1JGFyYEqA5sidnLXLVFyvFJbdLfH88y1Ocy-yWoso5QfVimHQyYkQViNa0GitLcuWE3Q1u15nmnpsZ_mvV4-j-7GZPRFJoR-K5kGFHGmwciU-FrTxOWtTnxuBXqTKNLZPLPIV5IR5P8PIhV2Ur2RwWpaNFqGA9epnv-yJoQtfXewWFWrkH77Y29rUvqM1k04asj5xmyzSSbi43_hJnJVRV6Fo3dnzymgfgJ8tbbBSZ0EOdKTJL4KPeDs-_nZYycmnwwzsEWDqdfo9io7v4GgCrDbEY5GIIyb8Ixnc0KG6Gw"))
-                                val bundle = Bundle()
-                                bundle.putString("url", "https://robertsspaceindustries.com/store/pledge/cart")
-                                val intent = Intent(context, CartActivity::class.java)
-                                intent.putExtras(bundle)
-                                startActivity(intent)
+                                                    val bundle = Bundle()
+                                                    bundle.putString(
+                                                        "url",
+                                                        "https://robertsspaceindustries.com/store/pledge/cart"
+                                                    )
+                                                    val intent = Intent(context, CartActivity::class.java)
+                                                    intent.putExtras(bundle)
+                                                    // wait activity result
+                                                    // if result is ok, then do next step
+                                                    // else do nothing
+                                                    startActivity(intent)
+                                                    if (totalItemNumber != maxCartNumber) {
+                                                        Toast.makeText(
+                                                            context,
+                                                            "含现金交易请在完成支付后再次点击购买",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                    }
+                                                    return@launch
+                                                }
+                                            totalItemNumber -= maxCartNumber
+                                        }
+                                    }
+                                }
                             }
-
-                        }
+                            .create()
+                        dialog.show()
                     }
                     .create()
-                dialog.show()
+                numberEditText.show()
             }
         }
         binding.fab.setOnLongClickListener {
@@ -207,7 +297,7 @@ class ShoppingFragment : Fragment() {
                             try {
                                 addToCart(selectedItem!!.id, 1)
                             } catch (e: Exception) {
-                                Alerter.create(activity!!)
+                                Alerter.create(requireActivity())
                                     .setTitle("添加购物车失败")
                                     .setText("此商品未开放或已不再可用")
                                     .setBackgroundColorRes(R.color.alert_dialog_background_failure)
@@ -220,7 +310,7 @@ class ShoppingFragment : Fragment() {
                             }
                             val cartInfo = getCartSummary()
                             if(cartInfo.data.store.cart.totals.subTotal == 0) {
-                                Alerter.create(activity!!)
+                                Alerter.create(requireActivity())
                                     .setTitle("添加购物车失败")
                                     .setText("此商品未开放或已不再可用")
                                     .setBackgroundColorRes(R.color.alert_dialog_background_failure)

@@ -76,7 +76,7 @@
                 style="@style/hanger_tag"
                 android:text="@{hangerItemProperty.status}"
                 android:id="@+id/hanger_item_status"
-                tools:text="Distributed"
+                tools:text="库存中"
                 android:visibility="visible"
                 app:qmui_borderColor="#AED581"
                 android:textColor="#AED581"
