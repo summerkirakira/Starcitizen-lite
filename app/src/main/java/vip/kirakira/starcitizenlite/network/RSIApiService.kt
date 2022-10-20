@@ -1,12 +1,15 @@
 package vip.kirakira.starcitizenlite.network
 
+import com.google.gson.Gson
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.Body
@@ -15,13 +18,12 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 import vip.kirakira.starcitizenlite.network.account.PtuAccountBody
 import vip.kirakira.starcitizenlite.network.account.ResetCharacterBody
-import vip.kirakira.starcitizenlite.network.hanger.BasicResponseBody
-import vip.kirakira.starcitizenlite.network.hanger.CancelPledgeRequestBody
-import vip.kirakira.starcitizenlite.network.hanger.GiftPledgeRequestBody
-import vip.kirakira.starcitizenlite.network.hanger.ReclaimRequestBody
+import vip.kirakira.starcitizenlite.network.hanger.*
 import vip.kirakira.starcitizenlite.network.shop.*
 import vip.kirakira.starcitizenlite.network.upgrades.InitUpgradeProperty
+import vip.kirakira.viewpagertest.network.graphql.ApplyUpgradeBody
 import vip.kirakira.viewpagertest.network.graphql.BaseGraphQLBody
+import vip.kirakira.viewpagertest.network.graphql.ChooseUpgradeTargetBody
 import vip.kirakira.viewpagertest.network.graphql.UpgradeAddToCartQuery
 import java.net.URL
 
@@ -123,7 +125,14 @@ interface RSIApiService {
     @POST("pledge-store/api/upgrade/graphql")
     suspend fun pledgeAddToCart(@Body body: BaseGraphQLBody): AddCartItemProperty
 
+    @POST("api/account/chooseUpgradeTarget")
+    suspend fun chooseUpgradeTarget(@Body body: ChooseUpgradeTargetBody): ChooseUpgradeTargetProperty
+
+    @POST("api/account/applyUpgrade")
+    suspend fun applyUpgrade(@Body body: ApplyUpgradeBody): ApplyUpgradeProperty
+
 }
+
 
 
 object RSIApi {
@@ -200,6 +209,19 @@ object RSIApi {
     suspend fun upgradeAddToCart(from: Int, to: Int): AddCartItemProperty {
         TODO()
         return retrofitService.pledgeAddToCart(UpgradeAddToCartQuery().getRequestBody(from, to))
+    }
+
+    suspend fun chooseUpgradeTarget(upgrade_id: String): List<PledgeUpgradeParser.ChooseUpgradeTargetItem>? {
+        val response = retrofitService.chooseUpgradeTarget(ChooseUpgradeTargetBody(upgrade_id))
+        return if (response.data.rendered != null) {
+            PledgeUpgradeParser().parse(response.data.rendered)
+        } else {
+            null
+        }
+    }
+
+    suspend fun applyUpgrade(upgrade_id: String, target_id: String, password: String): ApplyUpgradeProperty {
+        return retrofitService.applyUpgrade(ApplyUpgradeBody(password, target_id, upgrade_id))
     }
 
 }

@@ -10,8 +10,8 @@
     <string name="can_upgrade">可升级</string>
     <string name="can_reclaim">可回收</string>
     <string name="can_gift">可礼物</string>
-    <string name="items">Items</string>
-    <string name="also_contains">Also Contains</string>
+    <string name="items">内容</string>
+    <string name="also_contains">包含</string>
     <string name="not_login_error_box_title">登陆后才能查看机库哦</string>
     <string name="not_login_error_box_detail">如频繁显示此消息，请确认登陆授权时间</string>
     <string name="credits">信用点</string>
@@ -60,7 +60,9 @@
     <string name="tutorial">教程一览</string>
     <string name="ship_upgrades">舰船升级</string>
     <string name="is_agree_to_reset">确定要重置角色吗？</string>
-    <string name="reset_warning">重置角色后，你的aUEC和舰船将会保留，但是组件装备有概率丢失，且重置操作不可逆，确定要重置吗？</string>
+    <string name="reset_warning">
+        重置角色后，你的aUEC和舰船将会保留，但是组件装备有概率丢失，且重置操作不可逆，确定要重置吗？
+    </string>
     <string name="please_login">请先登录</string>
     <string name="operate_after_login">请先登录后继续操作哦～</string>
     <string name="reset_success">重置成功</string>
@@ -85,4 +87,27 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="FIRST_START_KEY">first_start_key</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="basic_settings">基础设置</string>
+    <string name="auto_add_credits_title">自动添加信用点</string>
+    <string name="auto_add_credits_summary">在购买时尽可能使用信用点</string>
+    <string name="experimental_feature">实验性功能</string>
+    <string name="shop_chinese_localization">商店汉化</string>
+    <string name="shop_localization_chinese_summary">汉化商店内容（实验性）</string>
+    <string name="request_upgrade_failed">升级初始化失败</string>
+    <string name="no_upgrade_target">未找到可升级的舰船</string>
+    <string name="choose_upgrade_target">请选择要升级的舰船</string>
+    <string name="confirm_upgrade">警告</string>
+    <string name="request_upgrade_success">升级成功</string>
+    <string name="upgrade_failed">升级请求失败</string>
 </resources>

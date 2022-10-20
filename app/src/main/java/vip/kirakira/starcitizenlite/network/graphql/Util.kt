@@ -18,3 +18,11 @@ class BaseGraphQLBody(private var query: String, private var variables: Any) {
         this.variables = variables
     }
 }
+
+@JsonClass(generateAdapter = true)
+class ChooseUpgradeTargetBody(private val upgrade_id: String)
+
+@JsonClass(generateAdapter = true)
+class ApplyUpgradeBody(private val current_password: String,
+                       private val pledge_id: String,
+                       private val upgrade_id: String)

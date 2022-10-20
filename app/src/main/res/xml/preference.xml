@@ -1,4 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/basic_settings">
+        <SwitchPreferenceCompat
+                android:key="auto_add_credits"
+                android:title="@string/auto_add_credits_title"
+                android:summary="@string/auto_add_credits_summary"/>
+<!--        <EditTextPreference-->
+<!--                android:key="edittext_preference"-->
+<!--                android:title="Edit text preference"-->
+<!--                android:summary="An example that uses an edit text dialog"/>-->
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/experimental_feature">
+        <SwitchPreferenceCompat
+                android:key="toggle_preference"
+                android:title="@string/shop_chinese_localization"
+                android:summary="@string/shop_localization_chinese_summary"/>
+        <SwitchPreferenceCompat
+                android:key="currency_chinese_yuan"
+                android:title="货币本地化"
+                android:summary="将货币单位转换为人民币"/>
+<!--        <PreferenceScreen-->
+<!--                android:key="intent_preference"-->
+<!--                android:title="Intent preference"-->
+<!--                android:summary="Launches an Activity from an Intent">-->
+<!--            <intent android:action="android.intent.action.VIEW"-->
+<!--                    android:data="http://www.android.com"/>-->
+<!--        </PreferenceScreen>-->
+    </PreferenceCategory>
+<!--    <PreferenceCategory android:title="Launch preferences">-->
+<!--        <PreferenceScreen-->
+<!--                android:key="preference_screen"-->
+<!--                android:title="PreferenceScreen"-->
+<!--                android:summary="Shows a screen of preferences">-->
+<!--            <CheckBoxPreference-->
+<!--                    android:key="parent_checkbox_preference"-->
+<!--                    android:title="Toggle preference"-->
+<!--                    android:summary="Preference that is on the next screen but same hierarchy"/>-->
+<!--        </PreferenceScreen>-->
+<!--        <PreferenceScreen-->
+<!--                android:key="another_screen"-->
+<!--                android:title="Screen with children"-->
+<!--                android:summary="Shows a second screen of preferences">-->
+<!--            <CheckBoxPreference-->
+<!--                    android:key="child_checkbox_preference"-->
+<!--                    android:title="Toggle preference"-->
+<!--                    android:summary="Preference that is on the next screen but same hierarchy"/>-->
+<!--        </PreferenceScreen>-->
+<!--    </PreferenceCategory>-->
+    <PreferenceCategory android:title="关于">
 
+        <Preference
+                android:key="about"
+                android:title="星河避难所"
+                android:summary="星河避难所 (StarRefuge) 与 CIG无任何联系">
+        </Preference>
+        <Preference
+                android:key="about"
+                android:title="作者"
+                android:summary="妖精 &lt;summerkirakira@gmail.com&gt;">
+            <intent android:action="android.intent.action.VIEW"
+                    android:data="https://github.com/summerkirakira"/>
+        </Preference>
+        <Preference
+                android:key="about"
+                android:title="最新版本"
+                android:summary="https://github.com/summerkirakira/Starcitizen-lite/releases/latest">
+            <intent android:action="android.intent.action.VIEW"
+                    android:data="https://github.com/summerkirakira/Starcitizen-lite/releases/latest"/>
+        </Preference>
+        <Preference
+                android:key="current_version"
+                android:title="版本号"
+                android:summary=""/>
+        <Preference
+                android:key="about"
+                android:title="开源协议"
+                android:summary="GNU General Public License v3.0" />
+
+        <PreferenceScreen
+                android:key="about"
+                android:title="源代码"
+                android:summary="https://github.com/summerkirakira/Starcitizen-lite">
+            <intent android:action="android.intent.action.VIEW"
+                    android:data="https://github.com/summerkirakira/Starcitizen-lite"/>
+        </PreferenceScreen>
+    </PreferenceCategory>
 </PreferenceScreen>

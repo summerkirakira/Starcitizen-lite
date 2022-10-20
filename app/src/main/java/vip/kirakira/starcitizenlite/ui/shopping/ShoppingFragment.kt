@@ -16,6 +16,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import androidx.preference.PreferenceManager
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog
 import com.tapadoo.alerter.Alerter
 import kotlinx.coroutines.CoroutineScope
@@ -58,6 +59,7 @@ class ShoppingFragment : Fragment() {
                     item -> viewModel.popUpItemDetail(item)
             }
         )
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity() /* Activity context */)
 
 
         binding.lifecycleOwner = this
@@ -137,11 +139,12 @@ class ShoppingFragment : Fragment() {
                             number = 1
                         }
                         dialog.dismiss()
+                        val isAutoAddCredits = sharedPreferences.getBoolean("auto_add_credits", false)
                         val builder = QMUIDialog.CheckBoxMessageDialogBuilder(context)
                         val dialog = builder
                             .setTitle("是否添加${number}件${selectedItem!!.name}(${selectedItem!!.price * number / 100f}USD)\n到购物车？")
                             .setMessage("自动补全信用点")
-                            .setChecked(true)
+                            .setChecked(isAutoAddCredits)
                             .addAction("取消") { dialog, _ ->
                                 dialog.dismiss()
                             }
@@ -167,6 +170,7 @@ class ShoppingFragment : Fragment() {
                                                 }
                                             }
                                         }
+                                        clearCart()
                                     } catch (e: Exception) {
                                         Alerter.create(requireActivity())
                                             .setTitle("添加购物车失败")
@@ -190,21 +194,30 @@ class ShoppingFragment : Fragment() {
 //                                            .show()
 //                                        canNextStep = false
 //                                    }
-                                    clearCart()
                                     if(canNextStep) {
                                         var tokenList: MutableList<RecaptchaList.ReCaptcha> = mutableListOf()
-                                        while (tokenList.size < requiredTokenNumber) {
-                                            val token = CirnoApi.retrofitService.getReCaptchaV3(requiredTokenNumber)
-                                            if(token.captcha_list == null) {
-                                                Alerter.create(requireActivity())
-                                                    .setTitle("获取Token失败")
-                                                    .setText("请检查网络连接")
-                                                    .setIcon(R.drawable.ic_warning)
-                                                    .setBackgroundColorRes(R.color.alert_dialog_background_failure)
-                                                    .show()
-                                                return@launch
+                                        try {
+                                            while (tokenList.size < requiredTokenNumber) {
+                                                val token = CirnoApi.retrofitService.getReCaptchaV3(requiredTokenNumber)
+                                                if(token.captcha_list == null) {
+                                                    Alerter.create(requireActivity())
+                                                        .setTitle("获取Token失败")
+                                                        .setText("验证服务器过载，请稍后再试")
+                                                        .setIcon(R.drawable.ic_warning)
+                                                        .setBackgroundColorRes(R.color.alert_dialog_background_failure)
+                                                        .show()
+                                                    return@launch
+                                                }
+                                                tokenList.addAll(token.captcha_list)
                                             }
-                                            tokenList.addAll(token.captcha_list)
+                                        } catch (e: Exception) {
+                                            Alerter.create(requireActivity())
+                                                .setTitle("获取Token失败")
+                                                .setText("请检查网络连接")
+                                                .setIcon(R.drawable.ic_warning)
+                                                .setBackgroundColorRes(R.color.alert_dialog_background_failure)
+                                                .show()
+                                            return@launch
                                         }
                                         while (totalItemNumber > 0) {
                                             if(maxCartNumber < totalItemNumber) {

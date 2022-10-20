@@ -1,5 +1,6 @@
 package vip.kirakira.starcitizenlite
 
+import android.app.ActivityOptions
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
@@ -33,6 +34,7 @@ import io.getstream.avatarview.coil.loadImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import vip.kirakira.starcitizenlite.activities.SettingsActivity
 import vip.kirakira.starcitizenlite.activities.WebLoginActivity
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
@@ -51,6 +53,7 @@ import vip.kirakira.starcitizenlite.ui.me.MeFragment
 import vip.kirakira.starcitizenlite.ui.shopping.ShopItemFilter
 import vip.kirakira.viewpagertest.ui.shopping.ShoppingFragment
 import vip.kirakira.viewpagertest.ui.shopping.ShoppingViewModel
+import java.util.*
 import kotlin.concurrent.thread
 
 
@@ -77,6 +80,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var shoppingViewModel: ShoppingViewModel
     private lateinit var feedbackButton: ConstraintLayout
+    private lateinit var settingsButton: ConstraintLayout
 
 
     private var  density: Float = 0f
@@ -139,6 +143,7 @@ class MainActivity : AppCompatActivity() {
         drawerUserHangerValue = findViewById(R.id.drawer_hanger_value) //用户机库价值
         switchAccount = findViewById(R.id.switch_account_layout) //切换账号按钮
         feedbackButton = findViewById(R.id.drawer_feedback_loyout) //反馈按钮
+        settingsButton = findViewById(R.id.drawer_settings_layout) //设置按钮
         val drawerLayout: DrawerLayout = findViewById(R.id.root_drawer) //滑动菜单
         firstLine = findViewById(R.id.avatar_first_line)
         secondLine = findViewById(R.id.avatar_second_line)
@@ -405,6 +410,16 @@ class MainActivity : AppCompatActivity() {
 
         feedbackButton.setOnClickListener {
             joinQQGroup("LzRUVOyetWjRlVyNh24tN2gU8KZZvDcB")
+        }
+
+        settingsButton.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            Timer().schedule(object : TimerTask() {
+                override fun run() {
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                }
+            }, 1000)
+            startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle())
         }
 
         if(sharedPreferences.getBoolean(getString(R.string.CHECK_UPDATE_KEY), true)) {

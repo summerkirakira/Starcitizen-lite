@@ -146,7 +146,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 style="@style/drawer_option_layout"
-                android:id="@+id/setting_layout"
+                android:id="@+id/drawer_settings_layout"
                 android:clickable="true"
                 app:layout_constraintTop_toBottomOf="@+id/switch_account_layout">
             <ImageView style="@style/drawer_option_content_img"
@@ -168,7 +168,7 @@
                 style="@style/drawer_option_layout"
                 android:id="@+id/drawer_feedback_loyout"
                 android:clickable="true"
-                app:layout_constraintTop_toBottomOf="@+id/setting_layout">
+                app:layout_constraintTop_toBottomOf="@+id/drawer_settings_layout">
             <ImageView style="@style/drawer_option_content_img"
                        app:tint="@color/drawer_options_color"
                        app:layout_constraintBottom_toBottomOf="parent"

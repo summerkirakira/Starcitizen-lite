@@ -5,12 +5,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat.getColor
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -24,6 +26,7 @@ import kotlinx.coroutines.launch
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.activities.WebLoginActivity
 import vip.kirakira.starcitizenlite.databinding.HomeFragmentBinding
+import vip.kirakira.starcitizenlite.network.RSIApi
 import vip.kirakira.starcitizenlite.network.hanger.HangerService
 import vip.kirakira.starcitizenlite.ui.loadImage
 
@@ -50,10 +53,12 @@ class HomeFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.home_fragment, container, false)
         binding.lifecycleOwner = this
 
-        binding.contentContainer.setOnClickListener(View.OnClickListener {
-            binding.popupLayout.visibility = View.GONE
-            viewModel.isDetailShowing.value = false
-        })
+//        binding.contentContainer.setOnClickListener(View.OnClickListener {
+//            binding.popupLayout.visibility = View.GONE
+//            viewModel.isDetailShowing.value = false
+//        })
+
+        binding.popupLayout.maxHeight = (resources.displayMetrics.heightPixels * 0.6).toInt()
 
         viewModel.currentUser.observe(viewLifecycleOwner) {
             if (it == null) {
@@ -80,6 +85,7 @@ class HomeFragment : Fragment() {
                 binding.popupLayout.visibility = View.GONE
             }
         }
+
 
         val adapter = HangerViewAdapter(
             HangerViewAdapter.OnClickListener {
@@ -123,6 +129,8 @@ class HomeFragment : Fragment() {
                     alsoContainsView.setPadding(15, 4, 0, 4)
                     binding.alsoContainsLinearLayout.addView(alsoContainsView)
                 }
+                // set max height
+
                 binding.popupLayout.visibility = View.VISIBLE
                 viewModel.isDetailShowing.value = true
             },
@@ -240,11 +248,105 @@ class HomeFragment : Fragment() {
                     }
 
                 } else if(tag == "can_upgrade") {
-                    Alerter.create(activity!!)
-                        .setTitle(getString(R.string.unsupport_now))
-                        .setText(getString(R.string.please_go_to_site))
-                        .setBackgroundColorInt(getColor(context!!, R.color.shop_fab))
-                        .show()
+                    scope.launch {
+                        try {
+                            val upgradeTarget = RSIApi.chooseUpgradeTarget(item.id.toString())
+                            Log.d("upgrade", upgradeTarget.toString())
+                            if (upgradeTarget == null) {
+                                Alerter.create(requireActivity())
+                                    .setTitle(getString(R.string.request_upgrade_failed))
+                                    .setText(getString(R.string.network_error))
+                                    .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
+                                    .show()
+                                return@launch
+                            }
+                            if (upgradeTarget.size == 0) {
+                                Alerter.create(requireActivity())
+                                    .setTitle(getString(R.string.request_upgrade_failed))
+                                    .setText(getString(R.string.no_upgrade_target))
+                                    .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
+                                    .show()
+                                return@launch
+                            }
+                            val builder = QMUIDialog.MenuDialogBuilder(activity)
+                            builder.setTitle(getString(R.string.choose_upgrade_target))
+                            val items = mutableListOf<String>()
+                            for (i in upgradeTarget) {
+                                items.add(
+                                    i.name.split("(#")[0]
+                                        .replace("Standalone Ship", "单船")
+                                        .replace("Package", "船包中")
+                                )
+                            }
+                            builder.addItems(items.toTypedArray()) { dialog, which ->
+                                dialog.dismiss()
+                                scope.launch {
+                                    val doubleCheckBuilder = QMUIDialog.MessageDialogBuilder(activity)
+                                    doubleCheckBuilder.setTitle(getString(R.string.confirm_upgrade))
+                                        .setMessage("你确定要使用:\n${item.name}\n升级:\n${upgradeTarget[which].name} 吗？\n注意，此操作不可逆！")
+                                        .addAction(getString(R.string.cancel)) { dialog, _ -> dialog.dismiss() }
+                                        .addAction(getString(R.string.confirm)) { dialog, _ ->
+                                            dialog.dismiss()
+                                            scope.launch {
+                                                val message = RSIApi.applyUpgrade(
+                                                    item.id.toString(),
+                                                    upgradeTarget[which].pledge_id,
+                                                    viewModel.currentUser.value!!.password
+                                                )
+                                                if (message.code == "OK") {
+                                                    Alerter.create(activity!!)
+                                                        .setTitle(getString(R.string.request_upgrade_success))
+                                                        .setText("舰船已升级")
+                                                        .setBackgroundColorInt(
+                                                            getColor(
+                                                                context!!,
+                                                                R.color.alert_dialog_background
+                                                            )
+                                                        )
+                                                        .show()
+                                                    viewModel.refresh()
+                                                } else {
+                                                    Alerter.create(activity!!)
+                                                        .setTitle(getString(R.string.upgrade_failed))
+                                                        .setText(message.msg)
+                                                        .setBackgroundColorInt(
+                                                            getColor(
+                                                                context!!,
+                                                                R.color.alert_dialog_background_failure
+                                                            )
+                                                        )
+                                                        .show()
+                                                }
+//                                            val message = RSIApi.upgradeShip(item.id.toString(), upgradeTarget[which].id.toString())
+//                                            if (message.code == "OK") {
+//                                                Alerter.create(activity!!)
+//                                                    .setTitle(getString(R.string.upgrade_success))
+//                                                    .setText("已升级为${upgradeTarget[which].name}")
+//                                                    .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background))
+//                                                    .show()
+//                                                viewModel.refresh()
+//                                            } else {
+//                                                Alerter.create(activity!!)
+//                                                    .setTitle(getString(R.string.upgrade_failed))
+//                                                    .setText(message.msg)
+//                                                    .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
+//                                                    .show()
+                                                Toast.makeText(getActivity(), "升级成功", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                        .show()
+                                    dialog.dismiss()
+                                }
+                            }.show()
+
+                        } catch (e: Exception) {
+                            Alerter.create(requireActivity())
+                                .setTitle(getString(R.string.request_upgrade_failed))
+                                .setText(getString(R.string.network_error))
+                                .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
+                                .show()
+                        }
+                    }
                 }
             }
         )

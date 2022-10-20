@@ -86,3 +86,9 @@ data class CartAddressProperty(val errors: List<Error>?, val data: Data) {
             }
         }
 }
+
+data class ChooseUpgradeTargetProperty(val code: String, val msg: String, val data: Data) {
+    data class Data(val rendered: String?, val upgrade_id: String?)
+}
+
+data class ApplyUpgradeProperty(val code: String, val msg: String)
