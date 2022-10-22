@@ -62,13 +62,33 @@ class HangerProcess {
             val time = convertDateToLong(timeString)
             val contains = pledge.select("dl").select("dd")[2].text()
             var pledgeId = 0
+            var isUpgrade = false
+            var fromShipId = 0
+            var toShipId = 0
+            var toSkuId = 0
             try {
                 pledgeId = pledge.select(".holosmallbtn").attr("href").split("/").last().toInt()
             }
             catch (e: Exception) {
                 pledgeId = pledge.select(".holosmallbtn").attr("data-pledgeid").toInt()
+                isUpgrade = true
+                fromShipId = pledge.select(".holosmallbtn").attr("data-fromshipid").toInt()
+                toShipId = pledge.select(".holosmallbtn").attr("data-toshipid").toInt()
+                toSkuId = pledge.select(".holosmallbtn").attr("data-toskuid").toInt()
             }
-            buybackItems.add(BuybackItem(pledgeId, title, image, time, contains, "回购此物品将会消耗一次回购机会", System.currentTimeMillis()))
+            buybackItems.add(BuybackItem(
+                pledgeId,
+                title,
+                image,
+                time,
+                contains,
+                "回购此物品将会消耗一次回购机会",
+                System.currentTimeMillis(),
+                isUpgrade,
+                fromShipId,
+                toShipId,
+                toSkuId
+            ))
         }
         return buybackItems
     }

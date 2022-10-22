@@ -1,5 +1,6 @@
 package vip.kirakira.viewpagertest.repositories
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -9,11 +10,12 @@ import kotlinx.coroutines.withContext
 import vip.kirakira.starcitizenlite.database.ShopItem
 import vip.kirakira.starcitizenlite.database.ShopItemDatabase
 import vip.kirakira.starcitizenlite.database.toShopItem
+import vip.kirakira.starcitizenlite.database.toUpgradeShopItem
 import vip.kirakira.starcitizenlite.network.RSIApi
-import vip.kirakira.starcitizenlite.network.shop.getCartSummary
-import vip.kirakira.starcitizenlite.network.shop.nextStep
-import vip.kirakira.viewpagertest.network.graphql.CartSummaryViewMutation
+import vip.kirakira.starcitizenlite.network.shop.InitShipUpgradeProperty
+import vip.kirakira.viewpagertest.network.graphql.FilterShipsQuery
 import vip.kirakira.viewpagertest.network.graphql.UpdateCatalogMutation
+import vip.kirakira.viewpagertest.network.graphql.initShipUpgradeQuery
 
 
 class ShopItemRepository(private val database: ShopItemDatabase) {
@@ -37,15 +39,37 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
                     if (data.isEmpty()) {
                         break
                     }
-                    val test = data
                     database.shopItemDao.insertAll(data.toShopItem())
                     page++
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-
             isRefreshing.postValue(false)
+        }
+    }
+
+    suspend fun initShipUpgrades() {
+        withContext(Dispatchers.IO) {
+            try {
+                isRefreshing.postValue(true)
+                RSIApi.setAuthToken()
+                RSIApi.setUpgradeToken()
+                val data: InitShipUpgradeProperty = RSIApi.retrofitService.initShipUpgrade(initShipUpgradeQuery().getRequestBody())
+                val shopUpgradeItems = data.data.ships.toUpgradeShopItem()
+                val canUpgrade = RSIApi.retrofitService.filterShips(FilterShipsQuery().getRequestBody())
+                val canUpgradeItemIds = canUpgrade.data.to.ships.map { it.id }
+                shopUpgradeItems.forEach {
+                    if (canUpgradeItemIds.contains(it.id - 100000)) {
+                        it.isUpgradeAvailable = true
+                    }
+                }
+                database.shopItemDao.insertAll(shopUpgradeItems)
+                isRefreshing.postValue(false)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
         }
     }
 

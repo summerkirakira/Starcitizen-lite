@@ -14,7 +14,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog
-import com.tapadoo.alerter.Alerter
 import com.youth.banner.adapter.BannerImageAdapter
 import com.youth.banner.holder.BannerImageHolder
 import com.youth.banner.indicator.CircleIndicator
@@ -25,11 +24,12 @@ import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.activities.CartActivity
 import vip.kirakira.starcitizenlite.activities.PlayerSearch
 import vip.kirakira.starcitizenlite.activities.ThreePartySiteActivity
+import vip.kirakira.starcitizenlite.createSuccessAlerter
+import vip.kirakira.starcitizenlite.createWarningAlerter
 import vip.kirakira.starcitizenlite.database.BannerImage
 import vip.kirakira.starcitizenlite.database.ShopItemDatabase
 import vip.kirakira.starcitizenlite.databinding.MainFragmentBinding
 import vip.kirakira.starcitizenlite.network.RSIApi
-import kotlin.concurrent.thread
 
 
 class MainFragment : Fragment() {
@@ -37,7 +37,6 @@ class MainFragment : Fragment() {
     companion object {
         fun newInstance() = MainFragment()
     }
-
 
     private lateinit var binding: MainFragmentBinding
 
@@ -74,12 +73,7 @@ class MainFragment : Fragment() {
 
         binding.organizationSearchLayout.setOnClickListener {
             if (viewModel.currentUser.value == null){
-                Alerter.create(requireActivity())
-                    .setTitle(getString(R.string.please_login))
-                    .setText(getString(R.string.operate_after_login))
-                    .setBackgroundColorRes(R.color.alert_dialog_background_failure)
-                    .setDuration(3000)
-                    .show()
+                createWarningAlerter(requireActivity(), getString(R.string.please_login), getString(R.string.operate_after_login)).show()
                 return@setOnClickListener
             }
             if (viewModel.currentUser.value!!.organization.isEmpty()) {
@@ -112,12 +106,7 @@ class MainFragment : Fragment() {
 
         binding.resetCharacterIcon.setOnClickListener {
             if (viewModel.currentUser.value == null){
-                Alerter.create(requireActivity())
-                    .setTitle(getString(R.string.please_login))
-                    .setText(getString(R.string.operate_after_login))
-                    .setBackgroundColorRes(R.color.alert_dialog_background_failure)
-                    .setDuration(3000)
-                    .show()
+                createWarningAlerter(requireActivity(),getString(R.string.please_login),getString(R.string.operate_after_login)).show()
                 return@setOnClickListener
             }
             QMUIDialog.MessageDialogBuilder(activity)
@@ -129,19 +118,9 @@ class MainFragment : Fragment() {
                     CoroutineScope(Dispatchers.IO).launch {
                         val message = RSIApi.resetCharacter(viewModel.currentUser.value!!.password, issue_council = viewModel.currentUser.value!!.email)
                         if (message.code == "OK") {
-                            Alerter.create(requireActivity())
-                                .setTitle(getString(R.string.reset_success))
-                                .setText(getString(R.string.please_login_after_15_mins))
-                                .setBackgroundColorRes(R.color.alerter_default_success_background)
-                                .setDuration(3000)
-                                .show()
+                            createSuccessAlerter(requireActivity(),getString(R.string.reset_success),getString(R.string.please_login_after_15_mins)).show()
                         } else {
-                            Alerter.create(requireActivity())
-                                .setTitle(getString(R.string.reset_failed))
-                                .setText(message.msg)
-                                .setBackgroundColorRes(R.color.alert_dialog_background_failure)
-                                .setDuration(3000)
-                                .show()
+                            createWarningAlerter(requireActivity(),getString(R.string.reset_failed),message.msg).show()
                         }
                     }
                 }.show()
@@ -149,12 +128,7 @@ class MainFragment : Fragment() {
 
         binding.ptuLayout.setOnClickListener {
             if (viewModel.currentUser.value == null){
-                Alerter.create(requireActivity())
-                    .setTitle(getString(R.string.please_login))
-                    .setText(getString(R.string.operate_after_login))
-                    .setBackgroundColorRes(R.color.alert_dialog_background_failure)
-                    .setDuration(3000)
-                    .show()
+                createWarningAlerter(requireActivity(),getString(R.string.please_login),getString(R.string.operate_after_login)).show()
                 return@setOnClickListener
             }
             val items = arrayOf("将账号拷贝到PTU", "重置PTU账号")
@@ -168,19 +142,9 @@ class MainFragment : Fragment() {
                                 CoroutineScope(Dispatchers.IO).launch {
                                     val message = RSIApi.copyAccount()
                                     if (message.code == "OK") {
-                                        Alerter.create(requireActivity())
-                                            .setTitle(getString(R.string.copy_success))
-                                            .setText(getString(R.string.please_login_ptu))
-                                            .setBackgroundColorRes(R.color.alerter_default_success_background)
-                                            .setDuration(3000)
-                                            .show()
+                                        createSuccessAlerter(requireActivity(),getString(R.string.copy_success),getString(R.string.please_login_ptu)).show()
                                     } else {
-                                        Alerter.create(requireActivity())
-                                            .setTitle(getString(R.string.copy_failed))
-                                            .setText(message.msg)
-                                            .setBackgroundColorRes(R.color.alert_dialog_background_failure)
-                                            .setDuration(3000)
-                                            .show()
+                                        createWarningAlerter(requireActivity(),getString(R.string.copy_failed),message.msg).show()
                                     }
                                 }
                             }
@@ -189,19 +153,9 @@ class MainFragment : Fragment() {
                                 CoroutineScope(Dispatchers.IO).launch {
                                     val message = RSIApi.eraseCopyAccount()
                                     if (message.code == "OK") {
-                                        Alerter.create(requireActivity())
-                                            .setTitle(getString(R.string.reset_success))
-                                            .setText(getString(R.string.please_login_ptu_again))
-                                            .setBackgroundColorRes(R.color.alerter_default_success_background)
-                                            .setDuration(3000)
-                                            .show()
+                                        createSuccessAlerter(requireActivity(),getString(R.string.reset_success),getString(R.string.please_login_ptu)).show()
                                     } else {
-                                        Alerter.create(requireActivity())
-                                            .setTitle(getString(R.string.reset_failed))
-                                            .setText(message.msg)
-                                            .setBackgroundColorRes(R.color.alert_dialog_background_failure)
-                                            .setDuration(3000)
-                                            .show()
+                                        createWarningAlerter(requireActivity(),getString(R.string.reset_failed),message.msg).show()
                                     }
 
                                 }
@@ -212,12 +166,7 @@ class MainFragment : Fragment() {
 
         binding.referralCodeLayout.setOnClickListener {
             if (viewModel.currentUser.value == null){
-                Alerter.create(requireActivity())
-                    .setTitle(getString(R.string.please_login))
-                    .setText(getString(R.string.operate_after_login))
-                    .setBackgroundColorRes(R.color.alert_dialog_background_failure)
-                    .setDuration(3000)
-                    .show()
+                createWarningAlerter(requireActivity(),getString(R.string.please_login),getString(R.string.operate_after_login)).show()
                 return@setOnClickListener
             }
             val intent: Intent = Intent(activity, CartActivity::class.java)

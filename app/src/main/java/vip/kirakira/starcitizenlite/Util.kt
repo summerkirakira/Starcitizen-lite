@@ -1,10 +1,14 @@
 package vip.kirakira.starcitizenlite
 
+import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
 import android.util.DisplayMetrics
 import android.view.WindowManager
 import androidx.core.content.ContextCompat.startActivity
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog
+import com.tapadoo.alerter.Alert
+import com.tapadoo.alerter.Alerter
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
@@ -23,6 +27,7 @@ enum class ShopItemType(val itemName: String) {
     GIFT("Gift Cards"),
     PACKAGE("Package"),
     PACKS("Packs"),
+    SHIP_UPGRADE("Upgrade"),
 }
 
 fun checkDeviceHasNavigationBar(context: Context): Boolean {
@@ -77,4 +82,28 @@ fun compareVersion(currentVersion: String, newVersion: String): Boolean {
         return false
     }
     return true
+}
+
+fun createWarningAlerter(activity: Activity, title: String, message: String, duration: Long = 5000): Alerter {
+    return Alerter.create(activity)
+        .setTitle(title)
+        .setText(message)
+        .setBackgroundColorRes(R.color.alert_dialog_background_failure)
+        .setIcon(R.drawable.ic_warning)
+        .setDuration(duration)
+}
+
+fun createSuccessAlerter(activity: Activity, title: String, message: String, duration: Long = 5000): Alerter {
+    return Alerter.create(activity)
+        .setTitle(title)
+        .setText(message)
+        .setBackgroundColorRes(R.color.alerter_default_success_background)
+        .enableSwipeToDismiss()
+        .setDuration(duration)
+}
+
+fun createMessageDialog(context: Context, title: String, message: String): QMUIDialog.MessageDialogBuilder {
+    return QMUIDialog.MessageDialogBuilder(context)
+        .setTitle(title)
+        .setMessage(message)
 }

@@ -74,7 +74,7 @@
     <string name="copy_failed">拷贝失败</string>
     <string name="please_login_ptu_again">请重新登录PTU账号</string>
     <string name="credits_add_success">信用点添加成功</string>
-    <string name="credits_add_failed">信用点不足...添加失败</string>
+    <string name="credits_add_failed">信用点不足…添加失败</string>
     <string name="switch_account">切换账号</string>
     <string name="my_buyback">我的回购</string>
     <string name="my_hanger">我的机库</string>
@@ -89,14 +89,6 @@
     <string name="FIRST_START_KEY">first_start_key</string>
     <string name="title_activity_settings">SettingsActivity</string>
 
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
-
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
-
     <!-- Sync Preferences -->
     <string name="basic_settings">基础设置</string>
     <string name="auto_add_credits_title">自动添加信用点</string>
@@ -110,4 +102,9 @@
     <string name="confirm_upgrade">警告</string>
     <string name="request_upgrade_success">升级成功</string>
     <string name="upgrade_failed">升级请求失败</string>
+    <string name="click_arrow_to_choose_upgraded_ship">点击箭头来选择要升级的舰船</string>
+    <string name="ship_upgrade">舰船升级</string>
+    <string name="buy_upgrade_warning">注意，此商品为舰船升级包，购买后，需在机库中手动应用升级。</string>
+    <string name="buy_back_success">回购添加成功</string>
+    <string name="buy_back_failed">回购添加失败</string>
 </resources>

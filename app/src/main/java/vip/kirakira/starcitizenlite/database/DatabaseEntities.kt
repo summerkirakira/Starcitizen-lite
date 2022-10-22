@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import vip.kirakira.starcitizenlite.network.shop.CatalogProperty
-import java.sql.Date
+import vip.kirakira.starcitizenlite.network.shop.InitShipUpgradeProperty
 
 @Entity(tableName = "user")
 data class User constructor(
@@ -53,6 +53,9 @@ data class ShopItem constructor(
     @PrimaryKey
     val id: Int,
     val name: String,
+    val chineseName: String? = null,
+    val chineseDescription: String? = null,
+    val chineseSubtitle: String? = null,
     val title: String,
     val subtitle: String,
     val url: String,
@@ -62,7 +65,11 @@ data class ShopItem constructor(
     val excerpt: String,
     val price: Int,
     val type: String,
-    val insert_time: Long
+    val insert_time: Long,
+    val isTranslated: Boolean = false,
+    val isUpgrade: Boolean = true,
+    val skus: String? = null,
+    var isUpgradeAvailable: Boolean = false,
 )
 
 
@@ -92,7 +99,7 @@ data class HangerPackage constructor(
     val also_contains: String,
     val can_gift: Boolean,
     val exchangeable: Boolean,
-    val insert_time: Long
+    val insert_time: Long,
 )
 
 @Entity(tableName = "buyback")
@@ -103,7 +110,11 @@ data class BuybackItem constructor(
     val date: Long,
     val contains: String,
     val also_contains: String,
-    val insert_time: Long
+    val insert_time: Long,
+    val isUpgrade: Boolean = false,
+    val formShipId: Int = 0,
+    val toShipId: Int = 0,
+    val toSkuId: Int = 0
 )
 
 data class HangerPackageWithItems constructor(
@@ -158,4 +169,28 @@ fun List<CatalogProperty>.toShopItem(): List<ShopItem> {
             insert_time = System.currentTimeMillis()
         )
     }
+}
+
+fun List<InitShipUpgradeProperty.Data.Ship>.toUpgradeShopItem(): List<ShopItem> {
+    return map {
+        ShopItem(
+            id = it.id + 100000, // 100000 is the offset, avoid conflict with catalog
+            name = it.name,
+            isUpgrade = true,
+            title = it.name,
+            subtitle = "Upgrade",
+            url = it.link,
+            slideshow = it.medias.slideShow,
+            storeSmall = it.medias.productThumbMediumAndSmall,
+            NativePrice = it.msrp,
+            excerpt = it.focus?: "",
+            price = it.msrp,
+            type = it.type,
+            insert_time = System.currentTimeMillis(),
+            skus = it.skus?.extractToString()
+        )
+    }
+}
+fun List<InitShipUpgradeProperty.Data.Ship.Sku>.extractToString(): String {
+    return this.joinToString(separator = ",") { it.extract() }
 }

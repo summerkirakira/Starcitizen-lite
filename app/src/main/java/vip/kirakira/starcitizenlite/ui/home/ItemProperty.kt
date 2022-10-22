@@ -9,6 +9,7 @@ import vip.kirakira.starcitizenlite.network.hanger.HangerProcess
 
 data class HangerItemProperty(
     val id: Int,
+    var idList: String = "",
     val name: String,
     val image: String,
     var number: Int,
@@ -17,9 +18,13 @@ data class HangerItemProperty(
     val date: String,
     val contains: String,
     val price: Int,
-    val insurance: String,
+    var insurance: String,
     val alsoContains: String,
-    val items: List<HangerItem>
+    val items: List<HangerItem>,
+    val isUpgrade: Boolean = false,
+    val formShipId: Int = 0,
+    val toShipId: Int = 0,
+    val toSkuId: Int = 0
 ) {
     data class Tag(
         val name: String,
@@ -43,10 +48,16 @@ fun List<BuybackItem>.toItemProperty(): List<HangerItemProperty> {
                 price = -1,
                 insurance = "",
                 alsoContains = item.contains,
-                items = listOf()
+                items = listOf(),
+                isUpgrade = item.isUpgrade,
+                formShipId = item.formShipId,
+                toShipId = item.toShipId,
+                toSkuId = item.toSkuId,
+                idList = item.id.toString()
             )
         } else {
             map[item.title]!!.number++
+            map[item.title]!!.idList += ",${item.id}"
         }
     }
     return map.values.toList()
@@ -100,6 +111,7 @@ fun List<HangerPackageWithItems>.toItemPropertyList(): List<HangerItemProperty> 
             }
             map[packageWithItems.hangerPackage.title + packageWithItems.hangerPackage.status] = HangerItemProperty(
                 packageWithItems.hangerPackage.id,
+                packageWithItems.hangerPackage.id.toString(),
                 packageWithItems.hangerPackage.title,
                 packageWithItems.hangerPackage.image,
                 1,
@@ -114,6 +126,7 @@ fun List<HangerPackageWithItems>.toItemPropertyList(): List<HangerItemProperty> 
             )
         } else {
             map[packageWithItems.hangerPackage.title + packageWithItems.hangerPackage.status]!!.number++
+            map[packageWithItems.hangerPackage.title + packageWithItems.hangerPackage.status]!!.idList += ",${packageWithItems.hangerPackage.id}"
         }
     }
     return map.values.toList()

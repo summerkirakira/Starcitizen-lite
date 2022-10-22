@@ -1404,7 +1404,7 @@ class initShipUpgradeQuery {
     }
 }
 
-class filterShipsQuery {
+class FilterShipsQuery {
     val query = """query filterShips(${"$"}fromId: Int, ${"$"}toId: Int, ${"$"}fromFilters: [FilterConstraintValues], ${"$"}toFilters: [FilterConstraintValues]) {
   from(to: ${"$"}toId, filters: ${"$"}fromFilters) {
     ships {
@@ -1442,6 +1442,48 @@ class filterShipsQuery {
 
     fun getRequestBody(fromFilters: List<String> = listOf(), toFilters: List<String> = listOf()): BaseGraphQLBody {
         return BaseGraphQLBody(query, Variables(fromFilters = fromFilters, toFilters = toFilters))
+    }
+}
+
+class SearchFromShipQuery {
+    val query = """query filterShips(${"$"}fromId: Int, ${"$"}toId: Int, ${"$"}fromFilters: [FilterConstraintValues], ${"$"}toFilters: [FilterConstraintValues]) {
+  from(to: ${"$"}toId, filters: ${"$"}fromFilters) {
+    ships {
+      id
+    }
+  }
+  to(from: ${"$"}fromId, filters: ${"$"}toFilters) {
+    featured {
+      reason
+      style
+      tagLabel
+      tagStyle
+      footNotes
+      shipId
+    }
+    ships {
+      id
+      skus {
+        id
+        price
+        upgradePrice
+        unlimitedStock
+        showStock
+        available
+        availableStock
+      }
+    }
+  }
+}
+"""
+    class Variables(
+        val fromFilters: List<String> = listOf(),
+        val toFilters: List<String> = listOf(),
+        val toId: Int
+    )
+
+    fun getRequestBody(fromFilters: List<String> = listOf(), toFilters: List<String> = listOf(), toId: Int): BaseGraphQLBody {
+        return BaseGraphQLBody(query, Variables(fromFilters = fromFilters, toFilters = toFilters, toId = toId))
     }
 }
 

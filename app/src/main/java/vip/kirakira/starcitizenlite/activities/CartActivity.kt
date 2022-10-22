@@ -1,6 +1,7 @@
 package vip.kirakira.starcitizenlite.activities
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -22,6 +23,17 @@ class CartActivity : AppCompatActivity() {
     var recorder = WebLoginActivity.PayloadRecorder()
 
     val RSI_URL = "https://robertsspaceindustries.com"
+
+    fun jumpToCartActivity(context: Context) {
+        val bundle = Bundle()
+        bundle.putString(
+            "url",
+            "https://robertsspaceindustries.com/store/pledge/cart"
+        )
+        val intent = Intent(context, CartActivity::class.java)
+        intent.putExtras(bundle)
+        startActivity(intent)
+    }
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -26,3 +26,20 @@ class ChooseUpgradeTargetBody(private val upgrade_id: String)
 class ApplyUpgradeBody(private val current_password: String,
                        private val pledge_id: String,
                        private val upgrade_id: String)
+
+@JsonClass(generateAdapter = true)
+class SetAuthTokenBody()
+
+@JsonClass(generateAdapter = true)
+class SetContextTokenBody(
+        private val fromShipId: Int? = null,
+        private val pledgeId:Int? = null,
+        private val toShipId:Int? = null,
+        private val toSkuId: Int? = null
+)
+
+@JsonClass(generateAdapter = true)
+class ApplyTokenBody(private val jwt: String)
+
+@JsonClass(generateAdapter = true)
+class BuyBackPledgeBody(private val id: Int)

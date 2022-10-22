@@ -92,3 +92,64 @@ data class ChooseUpgradeTargetProperty(val code: String, val msg: String, val da
 }
 
 data class ApplyUpgradeProperty(val code: String, val msg: String)
+
+data class InitShipUpgradeProperty(val data: Data) {
+    data class Data(val app: App, val manufacturers: List<Manufacturer>, val ships: List<Ship>) {
+        data class App(val buyback: Buyback?, val isAnonymous: Boolean, val mode: String, val version: String) {
+            data class Buyback(val credit: Int)
+        }
+        data class Manufacturer(val id: Int, val name: String)
+        data class Ship(
+            val flyableStatus: String,
+            val focus: String?,
+            val id: Int,
+            val manufacturer: Manufacturer,
+            val medias: Medias,
+            val msrp: Int,
+            val name: String,
+            val owned: Boolean,
+            val type: String,
+            val skus: List<Sku>?,
+            val link: String
+        ) {
+            data class Medias(val productThumbMediumAndSmall: String, val slideShow: String)
+            data class Sku(
+                val available: Boolean,
+                val availableStock: Int?,
+                val id: Int,
+                val price: Int,
+                val title: String,
+                val unlimitedStock: Boolean
+            ) {
+                fun extract(): String {
+                    return "$title#&$price#&$id"
+                }
+            }
+        }
+    }
+}
+
+data class FilterShipsProperty(val data: Data, val errors: List<Error>?) {
+    data class Data(val from: From?, val to: To) {
+        data class From(val ships: List<Ship>) {
+            data class Ship(val id: Int)
+        }
+
+        data class To(val ships: List<Ship>) {
+            data class Ship(val id: Int, val skus: List<Sku>) {
+                data class Sku(val id: Int, val price: Int, val upgradePrice: Int?)
+            }
+        }
+    }
+    data class Error(val message: String)
+}
+
+data class AddUpgradeToCartProperty(val data: Data) {
+    data class Data(val addToCart: AddToCart?) {
+        data class AddToCart(val jwt: String)
+    }
+}
+
+data class ApplyTokenProperty(val success: Int, val msg: String)
+
+data class BuyBackPledgeProperty(val success: Int, val msg: String)

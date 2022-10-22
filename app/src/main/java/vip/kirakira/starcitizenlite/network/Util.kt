@@ -1,9 +1,13 @@
 package vip.kirakira.starcitizenlite.network
 
 import android.app.Application
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
+import vip.kirakira.starcitizenlite.activities.CartActivity
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.network.search.getPlayerSearchResult
 import vip.kirakira.starcitizenlite.repositories.UserRepository
@@ -16,12 +20,26 @@ var rsi_cookie = RSI_COOKIE_CONSTENT
 var rsi_device = ""
 var rsi_token = ""
 var csrf_token = ""
+var rsi_account_auth = ""
+var rsi_ship_upgrades_context = ""
 
 
 fun setRSICookie(rsiToken: String, rsiDevice: String) {
     rsi_device = rsiDevice
     rsi_token = rsiToken
     rsi_cookie = "CookieConsent=$RSI_COOKIE_CONSTENT;_rsi_device=$rsi_device;Rsi-Token=$rsi_token"
+}
+
+fun setRSIAccountAuth(token: String) {
+    rsi_account_auth = token
+}
+
+fun setRSIShipUpgradesContext(context: String) {
+    rsi_ship_upgrades_context = context
+}
+
+fun getShipUpgradesCookie(): String {
+    return "Rsi-Ship-Upgrades-Context=$rsi_ship_upgrades_context;Rsi-Account-Auth=$rsi_account_auth; rsi_cookie"
 }
 
 fun convertDateToLong(date: String): Long {

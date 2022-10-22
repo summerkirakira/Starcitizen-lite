@@ -1,6 +1,7 @@
 package vip.kirakira.starcitizenlite
 
 import android.app.ActivityOptions
+import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
@@ -191,12 +192,8 @@ class MainActivity : AppCompatActivity() {
                         if(loginTest.data.account.isAnonymous){
                             sharedPreferences.edit().putInt(getString(R.string.primary_user_key), 0).apply()
                             database.userDao.delete(primaryUserId)
-                            Alerter.create(this@MainActivity)
-                                .setTitle("警告")
-                                .setText("RSI账号登录失效，点击此处重新登录")
-                                .setBackgroundColorRes(R.color.alert_dialog_background_failure)
-                                .setIcon(R.drawable.ic_warning)
-                                .setDuration(10000)
+                            val alerter = createWarningAlerter(this@MainActivity, "警告", "RSI账号登录失效，点击此处重新登录")
+                            alerter
                                 .enableSwipeToDismiss()
                                 .setOnClickListener {
                                     val intent = Intent(this@MainActivity, WebLoginActivity::class.java)
@@ -330,14 +327,10 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-
-
-
-
         filterButton.setOnClickListener {
             when(mPager.currentItem) {
                 FragmentType.SHOPPING.value -> {
-                    val itemTypes = listOf("单船", "涂装", "装备", "附加包", "UEC", "礼品卡", "资格包", "组合包")
+                    val itemTypes = listOf("单船", "涂装", "装备", "附加包", "UEC", "礼品卡", "资格包", "组合包", "升级")
                     val builder = QMUIDialog.MultiCheckableDialogBuilder(this)
                     builder.setTitle("请选择商品种类")
                         .setCheckedItems(arrayOf(0).toIntArray())
@@ -355,6 +348,7 @@ class MainActivity : AppCompatActivity() {
                                     5 -> filterList.add(ShopItemType.GIFT.itemName)
                                     6 -> filterList.add(ShopItemType.PACKAGE.itemName)
                                     7 -> filterList.add(ShopItemType.PACKS.itemName)
+                                    8 -> filterList.add(ShopItemType.SHIP_UPGRADE.itemName)
                                 }
                                 shoppingViewModel.setFilter(ShopItemFilter("", filterList))
                             }
@@ -409,7 +403,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         feedbackButton.setOnClickListener {
-            joinQQGroup("LzRUVOyetWjRlVyNh24tN2gU8KZZvDcB")
+            joinQQGroup()
         }
 
         settingsButton.setOnClickListener {
@@ -458,15 +452,6 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun checkAnnouncement(currentAnnouncementId: Int = 0) {
         val latestAnnouncement = CirnoApi.retrofitService.getAnnouncement()
-//        this.runOnUiThread {
-//            val builder = QMUIDialog.MessageDialogBuilder(this)
-//            builder.setTitle("汉化启动公告")
-//                .setMessage("登登登登～星河避难所汉化行动正式开始啦，目标是对商店/个人机库/回购等进行彻底汉化，鉴于文本量比较大，所以需要小伙伴的协助...\n有兴趣参加的小伙伴请点击侧边栏中的问题反馈加入我们！\n\nBy: 妖精")
-//                .addAction("确定") { dialog, index ->
-//                    dialog.dismiss()
-//                }
-//                .show()
-//        }
         if(latestAnnouncement != null && latestAnnouncement.id > currentAnnouncementId) {
             this.runOnUiThread {
                 val builder = QMUIDialog.MessageDialogBuilder(this)
@@ -557,8 +542,9 @@ class MainActivity : AppCompatActivity() {
      * @param key 由官网生成的key
      * @return 返回true表示呼起手Q成功，返回false表示呼起失败
      */
-    fun joinQQGroup(key: String): Boolean {
+    fun joinQQGroup(): Boolean {
         val intent = Intent()
+        val key = "LzRUVOyetWjRlVyNh24tN2gU8KZZvDcB"
         intent.data =
             Uri.parse("mqqopensdkapi://bizAgent/qm/qr?url=http%3A%2F%2Fqm.qq.com%2Fcgi-bin%2Fqm%2Fqr%3Ffrom%3Dapp%26p%3Dandroid%26jump_from%3Dwebapi%26k%3D$key")
         // 此Flag可根据具体产品需要自定义，如设置，则在加群界面按返回，返回手Q主界面，不设置，按返回会返回到呼起产品界面    //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

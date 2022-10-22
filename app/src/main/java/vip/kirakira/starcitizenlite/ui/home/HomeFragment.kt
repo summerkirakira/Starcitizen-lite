@@ -24,11 +24,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import vip.kirakira.starcitizenlite.R
+import vip.kirakira.starcitizenlite.activities.CartActivity
 import vip.kirakira.starcitizenlite.activities.WebLoginActivity
+import vip.kirakira.starcitizenlite.createSuccessAlerter
+import vip.kirakira.starcitizenlite.createWarningAlerter
 import vip.kirakira.starcitizenlite.databinding.HomeFragmentBinding
 import vip.kirakira.starcitizenlite.network.RSIApi
 import vip.kirakira.starcitizenlite.network.hanger.HangerService
+import vip.kirakira.starcitizenlite.network.shop.clearCart
 import vip.kirakira.starcitizenlite.ui.loadImage
+import vip.kirakira.viewpagertest.network.graphql.ApplyTokenBody
+import vip.kirakira.viewpagertest.network.graphql.BuyBackPledgeBody
+import vip.kirakira.viewpagertest.network.graphql.UpgradeAddToCartQuery
 
 
 class HomeFragment : Fragment() {
@@ -240,11 +247,49 @@ class HomeFragment : Fragment() {
                                 }.show()
                         }
                     } catch (e: Exception) {
-                        Alerter.create(activity!!)
-                            .setTitle(getString(R.string.cancel_gift_failed))
-                            .setText(getString(R.string.network_error))
-                            .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
-                            .show()
+                        createWarningAlerter(activity!!, getString(R.string.cancel_gift_failed), getString(R.string.network_error)).show()
+                    }
+                    if (item.status == "回购中") {
+                        val builder = QMUIDialog.MessageDialogBuilder(activity)
+                        builder
+                            .setTitle("回购舰船")
+                            .setMessage("要回购${item.name}吗？")
+                            .addAction(getString(R.string.cancel)) { dialog, _ -> dialog.dismiss() }
+                            .addAction(getString(R.string.confirm)) { dialog, _ ->
+                                dialog.dismiss()
+                                try {
+                                    scope.launch {
+                                        try {
+                                            clearCart()
+                                            if (!item.isUpgrade) {
+                                                val message = RSIApi.retrofitService.buyBackPledge(BuyBackPledgeBody(item.id))
+                                                if (message.success == 1) {
+                                                    createSuccessAlerter(requireActivity(), getString(R.string.buy_back_success), "已添加回购${item.name}")
+                                                    jumpToCartActivity(requireContext())
+                                                } else {
+                                                    createWarningAlerter(requireActivity(), getString(R.string.buy_back_failed), message.msg).show()
+                                                }
+                                            } else {
+                                                RSIApi.setAuthToken()
+                                                RSIApi.setUpgradeToken()
+                                                val token = RSIApi.retrofitService.addUpgradeToCart(
+                                                    UpgradeAddToCartQuery().getRequestBody(
+                                                        item.formShipId,
+                                                        item.toSkuId
+                                                    )
+                                                )
+                                                RSIApi.retrofitService.applyToken(ApplyTokenBody(token.data.addToCart!!.jwt))
+                                                jumpToCartActivity(requireContext())
+                                            }
+                                        } catch (e: Exception) {
+                                            createWarningAlerter(activity!!, getString(R.string.buy_back_failed), getString(R.string.network_error)).show()
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    createWarningAlerter(activity!!, getString(R.string.buy_back_failed), getString(R.string.network_error)).show()
+                                }
+                            }.show()
+
                     }
 
                 } else if(tag == "can_upgrade") {
@@ -253,11 +298,7 @@ class HomeFragment : Fragment() {
                             val upgradeTarget = RSIApi.chooseUpgradeTarget(item.id.toString())
                             Log.d("upgrade", upgradeTarget.toString())
                             if (upgradeTarget == null) {
-                                Alerter.create(requireActivity())
-                                    .setTitle(getString(R.string.request_upgrade_failed))
-                                    .setText(getString(R.string.network_error))
-                                    .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
-                                    .show()
+                                createWarningAlerter(requireActivity(), getString(R.string.request_upgrade_failed), getString(R.string.network_error)).show()
                                 return@launch
                             }
                             if (upgradeTarget.size == 0) {
@@ -396,25 +437,35 @@ class HomeFragment : Fragment() {
 
         viewModel.refreshBuybackError.observe(viewLifecycleOwner) {
             if (it == true) {
-                Alerter.create(activity!!)
-                    .setTitle(getString(R.string.buyback_refresh_failed))
-                    .setText(getString(R.string.network_error))
-                    .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
-                    .show()
+                createWarningAlerter(
+                    requireActivity(),
+                    getString(R.string.buyback_refresh_failed),
+                    getString(R.string.network_error)
+                ).show()
             }
         }
 
         viewModel.refreshHangerError.observe(viewLifecycleOwner) {
             if (it == true) {
-                Alerter.create(activity!!)
-                    .setTitle(getString(R.string.hanger_refresh_failed))
-                    .setText(getString(R.string.network_error))
-                    .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
-                    .show()
+                createWarningAlerter(
+                    requireActivity(),
+                    getString(R.string.hanger_refresh_failed),
+                    getString(R.string.network_error)
+                ).show()
             }
         }
 
 
         return binding.root
+    }
+    fun jumpToCartActivity(context: Context) {
+        val bundle = Bundle()
+        bundle.putString(
+            "url",
+            "https://robertsspaceindustries.com/store/pledge/cart"
+        )
+        val intent = Intent(context, CartActivity::class.java)
+        intent.putExtras(bundle)
+        startActivity(intent)
     }
 }

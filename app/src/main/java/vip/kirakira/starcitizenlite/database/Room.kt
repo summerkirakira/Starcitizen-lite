@@ -100,7 +100,7 @@ interface BannerDao {
     fun getAll(): LiveData<List<BannerImage>>
 }
 
-@Database(entities = [ShopItem::class, HangerItem::class, HangerPackage::class, BuybackItem::class, User::class, BannerImage::class], version = 1)
+@Database(entities = [ShopItem::class, HangerItem::class, HangerPackage::class, BuybackItem::class, User::class, BannerImage::class], version = 2)
 abstract class ShopItemDatabase: RoomDatabase() {
     abstract val shopItemDao: ShopItemDao
     abstract val hangerItemDao: HangerItemDao
@@ -116,7 +116,9 @@ fun getDatabase(context: Context): ShopItemDatabase {
         if (!::INSTANCE.isInitialized) {
             INSTANCE = Room.databaseBuilder(context.applicationContext,
                 ShopItemDatabase::class.java,
-                "shops").build()
+                "shops")
+                .fallbackToDestructiveMigration()
+                .build()
         }
     }
     return INSTANCE

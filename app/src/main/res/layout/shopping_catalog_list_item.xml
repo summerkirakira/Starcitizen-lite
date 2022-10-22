@@ -15,47 +15,46 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-        >
-                <ImageView
-                        android:id="@+id/ship_image"
-                        tools:layout_width="177dp"
-                        android:layout_height="100dp"
-                        tools:layout_height="100dp"
-                        android:layout_width="177dp"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="16dp"
-                        android:adjustViewBounds="true"
-                        android:scaleType="fitXY"
-                        android:elevation="20dp"
-                        android:background="@color/white"
-                        android:imageUrl="@{property.slideshow}" />
-                <TextView android:layout_width="0dp"
-                          app:layout_constraintHorizontal_weight="1"
-                          app:layout_constraintEnd_toEndOf="parent"
-                          android:layout_height="wrap_content"
-                          android:layout_marginTop="5dp"
-                          android:id="@+id/ship_name"
-                          android:layout_marginStart="16dp"
-                          android:ellipsize="end"
-                          android:singleLine="false"
-                          android:maxLines="2"
-                          tools:text="HAMMERHEAD - STORMBRINGER PAINT "
-                          android:text="@{property.title}"
-                          android:textSize="16sp"
-                          android:textStyle="bold"
-                          app:layout_constraintStart_toEndOf="@+id/ship_image"
-                          app:layout_constraintTop_toTopOf="@+id/ship_image" />
-                <TextView android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"
-                          android:id="@+id/series_name"
-                          app:layout_constraintTop_toBottomOf="@id/ship_name"
-                          app:layout_constraintStart_toStartOf="@id/ship_name"
-                          android:layout_marginTop="8dp"
-                          tools:text="Paints"
-                          android:textStyle="bold"
-                          android:text="@{property.subtitle}"
-                />
+                android:layout_marginBottom="4dp">
+            <ImageView
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:id="@+id/ship_image"
+                    tools:layout_width="177dp"
+                    android:layout_height="100dp"
+                    tools:layout_height="100dp"
+                    android:layout_width="177dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitXY"
+                    android:elevation="20dp"
+                    android:background="@color/white"
+                    android:imageUrl="@{property.slideshow}" />
+            <TextView android:layout_width="0dp"
+                      app:layout_constraintHorizontal_weight="1"
+                      app:layout_constraintEnd_toEndOf="parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="5dp"
+                      android:id="@+id/ship_name"
+                      android:layout_marginStart="16dp"
+                      android:layout_marginEnd="40dp"
+                      android:ellipsize="end"
+                      android:singleLine="false"
+                      android:maxLines="2"
+                      tools:text="HAMMERHEAD - STORMBRINGER PAINT "
+                      android:text="@{property.title}"
+                      android:textSize="16sp"
+                      android:textStyle="bold"
+                      app:layout_constraintStart_toEndOf="@+id/ship_image"
+                      app:layout_constraintTop_toTopOf="@+id/ship_image" />
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:id="@+id/series_name"
+                      app:layout_constraintTop_toBottomOf="@id/ship_name"
+                      app:layout_constraintStart_toStartOf="@id/ship_name"
+                      android:layout_marginTop="8dp"
+                      tools:text="Paints"
+                      android:textStyle="bold"
+                      android:text="@{property.subtitle}"/>
             <TextView
                     android:id="@+id/currency_icon"
                     app:layout_constraintStart_toStartOf="@id/ship_name"
@@ -76,10 +75,26 @@
                        android:src="@drawable/ic_double_check"
                        app:layout_constraintEnd_toEndOf="parent"
                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-
-
-
+<!--            <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:id="@+id/product_type_button"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintTop_toTopOf="parent"-->
+<!--                    app:qmui_backgroundColor="#0000BCD4"-->
+<!--                    android:visibility="visible"-->
+<!--                    android:layout_marginEnd="2dp"-->
+<!--                    tools:visibility="visible"-->
+<!--                    tools:text="升级"-->
+<!--                    android:text="升级"-->
+<!--                    android:padding="2dp"-->
+<!--                    android:textColor="#00BCD4"-->
+<!--                    app:qmui_borderColor="#00BCD4"-->
+<!--                    app:qmui_radiusTopLeft="4dp"-->
+<!--                    app:qmui_radiusTopRight="2dp"-->
+<!--                    app:qmui_radiusBottomLeft="4dp"-->
+<!--                    app:qmui_radiusBottomRight="4dp"-->
+<!--            />-->
         </androidx.constraintlayout.widget.ConstraintLayout>
 <!--        <View-->
 <!--                android:layout_width="match_parent"-->

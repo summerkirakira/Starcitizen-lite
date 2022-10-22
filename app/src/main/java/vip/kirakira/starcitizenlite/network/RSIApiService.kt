@@ -1,15 +1,14 @@
 package vip.kirakira.starcitizenlite.network
 
+import android.util.Log
 import com.google.gson.Gson
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import okhttp3.MediaType
+import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.Body
@@ -21,10 +20,7 @@ import vip.kirakira.starcitizenlite.network.account.ResetCharacterBody
 import vip.kirakira.starcitizenlite.network.hanger.*
 import vip.kirakira.starcitizenlite.network.shop.*
 import vip.kirakira.starcitizenlite.network.upgrades.InitUpgradeProperty
-import vip.kirakira.viewpagertest.network.graphql.ApplyUpgradeBody
-import vip.kirakira.viewpagertest.network.graphql.BaseGraphQLBody
-import vip.kirakira.viewpagertest.network.graphql.ChooseUpgradeTargetBody
-import vip.kirakira.viewpagertest.network.graphql.UpgradeAddToCartQuery
+import vip.kirakira.viewpagertest.network.graphql.*
 import java.net.URL
 
 //private const val BASE_URL = "http://100.70.59.3:6000"
@@ -53,6 +49,34 @@ val client: OkHttpClient = OkHttpClient
                 .addHeader("cookie", rsi_cookie)
                 .addHeader("x-rsi-token", rsi_token)
                 .addHeader("referer", "https://robertsspaceindustries.com/account/pledges?page=1&pagesize=10")
+                .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
+                .build()
+            return@addInterceptor chain.proceed(newRequest)
+        } else if (request.url.toString().startsWith("https://robertsspaceindustries.com/api/ship-upgrades/setContextToken")) {
+            val newRequest = request.newBuilder()
+                .addHeader("cookie", rsi_cookie)
+                .addHeader("x-rsi-token", rsi_token)
+                .addHeader("referer", "https://robertsspaceindustries.com/account/pledges")
+                .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
+                .build()
+            return@addInterceptor chain.proceed(newRequest)
+        } else if (request.url.toString().startsWith("https://robertsspaceindustries.com/pledge-store/api/upgrade/graphql")) {
+            val newRequest = request.newBuilder()
+                .addHeader("cookie", getShipUpgradesCookie())
+                .addHeader("x-rsi-token", rsi_token)
+                .addHeader("referer", "https://robertsspaceindustries.com/account/pledges")
+                .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
+                .build()
+            return@addInterceptor chain.proceed(newRequest)
+        } else if (
+            request.url.toString() == "https://robertsspaceindustries.com/api/store/v2/cart/token" ||
+                    request.url.toString() == "https://robertsspaceindustries.com/api/store/buyBackPledge"
+        ) {
+            val newRequest = request.newBuilder()
+                .addHeader("cookie", rsi_cookie)
+                .addHeader("x-rsi-token", rsi_token)
+                .addHeader("referer", "https://robertsspaceindustries.com/pledge")
+                .addHeader("origin", "https://robertsspaceindustries.com")
                 .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
                 .build()
             return@addInterceptor chain.proceed(newRequest)
@@ -131,6 +155,26 @@ interface RSIApiService {
     @POST("api/account/applyUpgrade")
     suspend fun applyUpgrade(@Body body: ApplyUpgradeBody): ApplyUpgradeProperty
 
+    @POST("api/account/v2/setAuthToken")
+    suspend fun  setAuthToken(@Body body: SetAuthTokenBody): Response<ResponseBody>
+
+    @POST("api/ship-upgrades/setContextToken")
+    suspend fun  setContextToken(@Body body: SetContextTokenBody): Response<ResponseBody>
+
+    @POST("pledge-store/api/upgrade/graphql")
+    suspend fun  initShipUpgrade(@Body body: BaseGraphQLBody): InitShipUpgradeProperty
+
+    @POST("pledge-store/api/upgrade/graphql")
+    suspend fun  filterShips(@Body body: BaseGraphQLBody): FilterShipsProperty
+
+    @POST("pledge-store/api/upgrade/graphql")
+    suspend fun addUpgradeToCart(@Body body: BaseGraphQLBody): AddUpgradeToCartProperty
+
+    @POST("api/store/v2/cart/token")
+    suspend fun applyToken(@Body body: ApplyTokenBody): ApplyTokenProperty
+
+    @POST("api/store/buyBackPledge")
+    suspend fun buyBackPledge(@Body body: BuyBackPledgeBody): BuyBackPledgeProperty
 }
 
 
@@ -184,31 +228,20 @@ object RSIApi {
         return retrofitService.eraseCopyAccount(PtuAccountBody("ptu"))
     }
 
-    suspend fun setAuthToken(headers: Map<String, String> = mapOf("cookie" to rsi_cookie)): String {
-        val request = Request.Builder().url(URL("https://robertsspaceindustries.com/api/account/v2/setAuthToken"))
-            .post(RequestBody.create("application/json".toMediaTypeOrNull(), "{}"))
-            .addHeader("cookie", headers["cookie"]!!)
-            .addHeader("x-rsi-token", rsi_token)
-            .build()
-        val response = client.newCall(request).execute()
-        val setCookie = response.header("set-cookie")!!
-        return setCookie.split(";")[0].split("=")[1]
+    suspend fun setAuthToken(): String {
+        val response = retrofitService.setAuthToken(SetAuthTokenBody())
+        val setCookie = response.headers()["set-cookie"]!!
+        val authToken = setCookie.substringAfter("Rsi-Account-Auth=").substringBefore(";")
+        setRSIAccountAuth(authToken)
+        return authToken
     }
 
-    suspend fun setUpgradeToken(rsi_auth_token: String): String {
-        val request = Request.Builder().url(URL("https://robertsspaceindustries.com/api/ship-upgrades/setContextToken"))
-            .post(RequestBody.create("application/json".toMediaTypeOrNull(), "{}"))
-            .addHeader("cookie", "$rsi_cookie; Rsi-Account-Auth=$rsi_auth_token")
-            .addHeader("x-rsi-token", rsi_token)
-            .build()
-        val response = client.newCall(request).execute()
-        val setCookie = response.header("set-cookie")!!
-        return setCookie.split(";")[0].split("=")[1]
-    }
-
-    suspend fun upgradeAddToCart(from: Int, to: Int): AddCartItemProperty {
-        TODO()
-        return retrofitService.pledgeAddToCart(UpgradeAddToCartQuery().getRequestBody(from, to))
+    suspend fun setUpgradeToken(): String {
+        val response = retrofitService.setContextToken(SetContextTokenBody())
+        val setCookie = response.headers()["set-cookie"]!!
+        val authToken = setCookie.substringAfter("Rsi-ShipUpgrades-Context=").substringBefore(";")
+        setRSIShipUpgradesContext(authToken)
+        return authToken
     }
 
     suspend fun chooseUpgradeTarget(upgrade_id: String): List<PledgeUpgradeParser.ChooseUpgradeTargetItem>? {

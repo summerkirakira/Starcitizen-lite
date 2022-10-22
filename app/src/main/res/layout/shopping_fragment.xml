@@ -57,6 +57,21 @@
             android:tint="@color/white"
             android:src="@drawable/ic_fab_add_long"
             android:layout_margin="16dp" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/left_fab"
+            android:clickable="true"
+            app:backgroundTint="@color/alert_dialog_background_failure"
+            app:layout_constraintBottom_toTopOf="@+id/popupLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:elevation="5dp"
+            tools:visibility="visible"
+            android:visibility="invisible"
+            android:tint="@color/white"
+            android:src="@drawable/ic_fab_add_long"
+            android:layout_margin="16dp" />
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:id="@+id/popupLayout"
