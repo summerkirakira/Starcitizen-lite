@@ -53,11 +53,8 @@ data class ShopItem constructor(
     @PrimaryKey
     val id: Int,
     val name: String,
-    val chineseName: String? = null,
-    val chineseDescription: String? = null,
-    val chineseSubtitle: String? = null,
     val title: String,
-    val subtitle: String,
+    var subtitle: String,
     val url: String,
     val slideshow: String,
     val storeSmall: String,
@@ -70,6 +67,9 @@ data class ShopItem constructor(
     val isUpgrade: Boolean = true,
     val skus: String? = null,
     var isUpgradeAvailable: Boolean = false,
+    var chineseName: String? = null,
+    var chineseDescription: String? = null,
+    var chineseSubtitle: String? = null,
 )
 
 
@@ -100,6 +100,9 @@ data class HangerPackage constructor(
     val can_gift: Boolean,
     val exchangeable: Boolean,
     val insert_time: Long,
+    val chineseTitle: String? = null,
+    val chineseContains: String? = null,
+    val chineseAlsoContains: String? = null,
 )
 
 @Entity(tableName = "buyback")
@@ -114,7 +117,10 @@ data class BuybackItem constructor(
     val isUpgrade: Boolean = false,
     val formShipId: Int = 0,
     val toShipId: Int = 0,
-    val toSkuId: Int = 0
+    val toSkuId: Int = 0,
+    val chinesName: String? = null,
+    val chinese_contains: String? = null,
+    val chineseAlsoContains: String? = null,
 )
 
 @Entity(tableName = "translation")
@@ -129,6 +135,7 @@ data class Translation constructor(
     val contains: String,
     val from_ship: Int,
     val to_ship: Int,
+    val title: String,
     val insert_time: Long,
 )
 
@@ -151,7 +158,8 @@ data class HangerPackageWithItems constructor(
 @Entity(tableName = "banner_image")
 data class BannerImage constructor(
    @PrimaryKey
-   val image: String
+   val id: Int,
+   val url: String
 )
 
 fun List<ShopItem>.toCatalogProperty(): List<CatalogProperty> {

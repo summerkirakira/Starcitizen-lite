@@ -19,7 +19,7 @@ class BannerRepository(private val database: ShopItemDatabase) {
             try {
                 val items = getRandomBannerURL()
                 for (item in items) {
-                    Glide.with(RefugeApplication.getInstance()).downloadOnly().load(item.image).submit()
+                    Glide.with(RefugeApplication.getInstance()).downloadOnly().load(item.url).submit()
                     database.bannerDao.insert(item)
                 }
 //                database.bannerDao.insertAll(items)

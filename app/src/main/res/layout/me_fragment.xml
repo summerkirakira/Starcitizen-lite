@@ -43,6 +43,7 @@
                             <io.getstream.avatarview.AvatarView
                                     android:layout_width="50dp"
                                     android:layout_height="50dp"
+                                    android:visibility="invisible"
                                     android:id="@+id/organization_image"
                                     app:layout_constraintEnd_toEndOf="@+id/avatar"
                                     app:avatarViewInitialsBackgroundColor="@color/black"

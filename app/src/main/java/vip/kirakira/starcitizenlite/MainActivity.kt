@@ -410,7 +410,7 @@ class MainActivity : AppCompatActivity() {
         switchAccount.setOnClickListener {
             if (allUsers.value != null) {
                 var items = allUsers.value!!.map { it.handle }.toTypedArray()
-                items += "登陆新账号"
+                items += "登陆/注册新账号"
                 val builder = QMUIDialog.CheckableDialogBuilder(this)
                 builder.setTitle("请选择操作")
                     .setCheckedIndex(items.size - 1)

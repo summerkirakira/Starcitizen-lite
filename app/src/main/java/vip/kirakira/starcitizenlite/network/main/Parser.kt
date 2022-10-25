@@ -16,13 +16,18 @@ fun parseImageURL(page: String): List<String> {
     return imgs.shuffled().take(6)
 }
 
-fun List<String>.toBannerImage(): List<BannerImage> {
-    return this.map { BannerImage(it) }
+fun parseCirnoImageURL(page: String): List<BannerImage> {
+    val listMyData = Types.newParameterizedType(MutableList::class.java, CirnoImage::class.java)
+    val jsonAdapter: JsonAdapter<List<CirnoImage>> = Moshi.Builder().add(KotlinJsonAdapterFactory()).build().adapter(listMyData)
+    val imgs = jsonAdapter.fromJson(page)!!.map { BannerImage(it.id, it.url) }
+    return imgs
 }
 
 fun getRandomBannerURL(): List<BannerImage> {
     val page = RSIApi.getFleetYardsShipsPage()
-    return parseImageURL(page).toBannerImage()
+    return parseCirnoImageURL(page)
 }
 
 data class Ship(val slug: String, val storeImageLarge: String)
+
+data class CirnoImage(val id: Int, val url: String)

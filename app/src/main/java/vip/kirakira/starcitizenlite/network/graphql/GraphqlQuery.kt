@@ -1578,3 +1578,28 @@ data class RegisterBody(
         val referralCode: String
     )
 }
+
+data class LoginBody(
+    @Json(name = "query")
+    val query: String = """mutation signin(${"$"}email: String!, ${"$"}password: String!, ${"$"}captcha: String, ${"$"}remember: Boolean) {
+  account_signin(email: ${"$"}email, password: ${"$"}password, captcha: ${"$"}captcha, remember: ${"$"}remember) {
+    displayname
+    id
+    __typename
+  }
+}
+""",
+    @Json(name = "variables")
+    val variables: Variables
+) {
+    data class Variables(
+        @Json(name = "captcha")
+        val captcha: String,
+        @Json(name = "email")
+        val email: String,
+        @Json(name = "password")
+        val password: String,
+        @Json(name = "remember")
+        val remember: Boolean = true
+    )
+}

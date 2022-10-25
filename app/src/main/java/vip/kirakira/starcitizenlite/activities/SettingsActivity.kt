@@ -1,15 +1,22 @@
 package vip.kirakira.starcitizenlite.activities
 
+import android.app.Application
+import android.content.Context
 import android.os.Bundle
 import android.transition.Explode
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.gyf.immersionbar.ImmersionBar
 import vip.kirakira.starcitizenlite.BuildConfig
 import vip.kirakira.starcitizenlite.R
+import vip.kirakira.starcitizenlite.database.getDatabase
+import vip.kirakira.starcitizenlite.repositories.TranslationRepository
+import vip.kirakira.viewpagertest.repositories.ShopItemRepository
 
 class SettingsActivity : AppCompatActivity() {
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,7 +25,7 @@ class SettingsActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.settings, SettingsFragment())
+                .replace(R.id.settings, SettingsFragment(application))
                 .commit()
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -29,12 +36,45 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    class SettingsFragment : PreferenceFragmentCompat() {
+    class SettingsFragment(application: Application) : PreferenceFragmentCompat() {
+        private val translationRepository = TranslationRepository(getDatabase(application))
+        private val shopItemRepository = ShopItemRepository(getDatabase(application))
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.preference, rootKey)
+            val application = requireActivity().application
+
+            val pref = application.getSharedPreferences(
+                application.getString(R.string.preference_file_key),
+                Context.MODE_PRIVATE)
+
             val currentVersion: Preference? = findPreference("current_version")
             if(currentVersion != null){
                 currentVersion.summary = BuildConfig.VERSION_NAME
+            }
+            val localization: Preference? = findPreference("enable_localization")
+            localization?.setOnPreferenceChangeListener { _, newValue ->
+                val enableLocalization = newValue as Boolean
+                if (enableLocalization) {
+                    lifecycleScope.launchWhenCreated {
+                        pref.edit().apply {
+                            putBoolean(getString(R.string.enable_localization_key), true)
+                            putString(getString(R.string.translation_version_key), "0.0")
+                            apply()
+                        }
+                        translationRepository.refreshTranslation(requireActivity().application)
+                        shopItemRepository.refreshItems(requireActivity().application)
+                    }
+                } else {
+                    lifecycleScope.launchWhenCreated {
+                        translationRepository.deleteAll()
+                        pref.edit().apply {
+                            putBoolean(getString(R.string.enable_localization_key), false)
+                            putString(getString(R.string.translation_version_key), "0.0")
+                            apply()
+                        }
+                    }
+                }
+                true
             }
         }
     }

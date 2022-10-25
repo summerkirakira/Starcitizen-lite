@@ -30,6 +30,7 @@ import vip.kirakira.starcitizenlite.network.*
 import vip.kirakira.starcitizenlite.network.CirnoProperty.RecaptchaList
 import vip.kirakira.starcitizenlite.network.shop.LoginProperty
 import vip.kirakira.starcitizenlite.repositories.UserRepository
+import vip.kirakira.viewpagertest.network.graphql.LoginBody
 import vip.kirakira.viewpagertest.network.graphql.LoginQuery
 import vip.kirakira.viewpagertest.network.graphql.MultiStepLoginQuery
 import vip.kirakira.viewpagertest.network.graphql.RegisterBody
@@ -47,6 +48,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var handleEditText: EditText
     private lateinit var loadingLayout: ConstraintLayout
     private lateinit var loadingView: SpinKitView
+    var isPrepared = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,6 +79,10 @@ class LoginActivity : AppCompatActivity() {
                 passwordEditText.hint = getString(R.string.password)
                 return@setOnClickListener
             }
+            if (!isPrepared) {
+                createWarningAlerter(this, getString(R.string.error), getString(R.string.please_wait_init))
+                return@setOnClickListener
+            }
             if (emailEditText.text.toString().isNotEmpty() && passwordEditText.text.toString().isNotEmpty()) {
                 val email = emailEditText.text.toString()
                 val password = passwordEditText.text.toString()
@@ -90,7 +96,11 @@ class LoginActivity : AppCompatActivity() {
                         createWarningAlerter(this@LoginActivity, getString(R.string.network_error), getString(R.string.token_server_error)).show()
                         return@launchWhenCreated
                     }
-                    if (token.captcha_list!!.isEmpty()) {
+                    if (token.captcha_list == null) {
+                        createWarningAlerter(this@LoginActivity, getString(R.string.network_error), getString(R.string.token_server_error)).show()
+                        return@launchWhenCreated
+                    }
+                    if (token.captcha_list.isEmpty()) {
                         startLoading()
                         createWarningAlerter(
                             this@LoginActivity,
@@ -100,11 +110,20 @@ class LoginActivity : AppCompatActivity() {
                     }
                     val loginDetail: LoginProperty
                     try {
+//                        loginDetail = RSIApi.retrofitService.login(
+//                            LoginQuery().getRequestBody(
+//                                emailEditText.text.toString(),
+//                                passwordEditText.text.toString(),
+//                                token.captcha_list[0].token
+//                            )
+//                        )
                         loginDetail = RSIApi.retrofitService.login(
-                            LoginQuery().getRequestBody(
-                                emailEditText.text.toString(),
-                                passwordEditText.text.toString(),
-                                token.captcha_list[0].token
+                            LoginBody(
+                                variables = LoginBody.Variables(
+                                    email = email,
+                                    password = password,
+                                    captcha = token.captcha_list[0].token
+                                )
                             )
                         )
                     } catch (e: Exception) {
@@ -112,8 +131,9 @@ class LoginActivity : AppCompatActivity() {
                         createWarningAlerter(
                             this@LoginActivity,
                             getString(R.string.error),
-                            getString(R.string.network_error)
+                            getString(R.string.invalid_password)
                         ).show()
+                        Log.d("LoginActivity", e.toString())
                         return@launchWhenCreated
                     }
 //                    Log.d("LoginActivity", loginDetail.toString())
@@ -186,7 +206,7 @@ class LoginActivity : AppCompatActivity() {
                                             getString(R.string.error),
                                             getString(R.string.network_error)
                                         ).show()
-//                                        Log.d("LoginActivity", e.toString())
+                                        Log.d("LoginActivity", e.toString())
                                     }
                                 }
                             }
@@ -226,6 +246,10 @@ class LoginActivity : AppCompatActivity() {
             }
             if (passwordEditText.text.toString() != reEnterPassWordEditText.text.toString()) {
                 createWarningAlerter(this, getString(R.string.error), getString(R.string.password_not_match)).show()
+                return@setOnClickListener
+            }
+            if (!isPrepared) {
+                createWarningAlerter(this, getString(R.string.error), getString(R.string.please_wait_init))
                 return@setOnClickListener
             }
             startLoading()
@@ -343,6 +367,7 @@ class LoginActivity : AppCompatActivity() {
                     }
                     override fun onResponse(call: Call, response: Response) {
                         csrf_token = response.body!!.string().split("csrf-token\" content=\"")?.get(1)?.split("\"")?.get(0) ?: ""
+                        isPrepared = true
                     }
                 })
             }

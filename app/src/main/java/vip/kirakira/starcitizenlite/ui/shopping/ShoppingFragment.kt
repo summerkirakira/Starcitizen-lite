@@ -136,13 +136,13 @@ class ShoppingFragment : Fragment() {
             }
 
         viewModel.popUpItem.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
-            binding.textViewShopItemDetailTitle.text = it.name
-            binding.textViewShopItemDetailSubtitle.text = it.subtitle
+            binding.textViewShopItemDetailTitle.text = it.chineseName?:it.name
+            binding.textViewShopItemDetailSubtitle.text = it.chineseSubtitle?:it.subtitle
             viewModel.isDetailShowing.value = binding.popupLayout.visibility == View.INVISIBLE
             selectedItem = it
             when(viewModel.currentUpgradeStage.value) {
                 ShoppingViewModel.UpgradeStage.UNDEFINED -> {
-                    binding.textViewShopItemDetailDescription.text = it.excerpt
+                    binding.textViewShopItemDetailDescription.text = it.chineseDescription?:it.excerpt
                 }
                 ShoppingViewModel.UpgradeStage.CHOOSE_TO_SHIP -> {
                     binding.textViewShopItemDetailSubtitle.text = getString(R.string.ship_upgrade)

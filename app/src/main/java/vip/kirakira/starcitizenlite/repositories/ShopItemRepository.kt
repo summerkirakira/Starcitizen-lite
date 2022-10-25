@@ -1,5 +1,6 @@
 package vip.kirakira.viewpagertest.repositories
 
+import android.app.Application
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
@@ -17,6 +18,7 @@ import vip.kirakira.starcitizenlite.network.CirnoApi
 import vip.kirakira.starcitizenlite.network.CirnoProperty.AddNotTranslationBody
 import vip.kirakira.starcitizenlite.network.RSIApi
 import vip.kirakira.starcitizenlite.network.shop.InitShipUpgradeProperty
+import vip.kirakira.starcitizenlite.util.Translation
 import vip.kirakira.viewpagertest.network.graphql.FilterShipsQuery
 import vip.kirakira.viewpagertest.network.graphql.UpdateCatalogMutation
 import vip.kirakira.viewpagertest.network.graphql.initShipUpgradeQuery
@@ -31,7 +33,11 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
 //    suspend fun getShopItem(id: Int) = database.shopItemDao.getById(id)
 //    suspend fun insertShopItems(shopItems: List<ShopItem>) = database.shopItemDao.insertAll(shopItems)
 
-    suspend fun refreshItems() {
+    suspend fun refreshItems(application: Application) {
+        val pref = application.getSharedPreferences(
+            application.getString(R.string.preference_file_key),
+            AppCompatActivity.MODE_PRIVATE
+        )
         withContext(Dispatchers.IO) {
             var page = 1;
             isRefreshing.postValue(true)
@@ -45,20 +51,31 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
                         break
                     }
                     val shopItems = data.toShopItem()
-                    for (shopItem in shopItems) {
-                        if (!database.translationDao.isProductExist(shopItem.id)) {
-                            notTranslatedItems.add(
-                                AddNotTranslationBody(
-                                    product_id = shopItem.id,
-                                    type = "product",
-                                    english_title = shopItem.name,
-                                    content = listOf(),
-                                    excerpt = shopItem.excerpt,
-                                    contains = listOf(),
-                                    from_ship = 0,
-                                    to_ship = 0
+                    val isTranslationEnabled = pref.getBoolean(
+                        application.getString(R.string.enable_localization_key),
+                        false
+                    )
+                    if (isTranslationEnabled) {
+                        for (shopItem in shopItems) {
+                            if (!database.translationDao.isProductExist(shopItem.id)) {
+                                notTranslatedItems.add(
+                                    AddNotTranslationBody(
+                                        product_id = shopItem.id,
+                                        type = "product",
+                                        english_title = shopItem.name,
+                                        content = listOf(),
+                                        excerpt = shopItem.excerpt,
+                                        contains = listOf(),
+                                        from_ship = 0,
+                                        to_ship = 0
+                                    )
                                 )
-                            )
+                            } else {
+                                val translation = database.translationDao.getByProductId(shopItem.id)
+                                shopItem.chineseName = translation!!.title
+                                shopItem.chineseDescription = translation.excerpt
+                            }
+                            shopItem.chineseSubtitle = Translation().translateShopItemSubtitle(shopItem.subtitle)
                         }
                     }
                     database.shopItemDao.insertAll(shopItems)
@@ -72,7 +89,11 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
         }
     }
 
-    suspend fun initShipUpgrades() {
+    suspend fun initShipUpgrades(application: Application) {
+        val pref = application.getSharedPreferences(
+            application.getString(R.string.preference_file_key),
+            AppCompatActivity.MODE_PRIVATE
+        )
         withContext(Dispatchers.IO) {
             try {
                 isRefreshing.postValue(true)
@@ -80,23 +101,34 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
                 RSIApi.setUpgradeToken()
                 val data: InitShipUpgradeProperty = RSIApi.retrofitService.initShipUpgrade(initShipUpgradeQuery().getRequestBody())
                 val notTranslatedItems: MutableList<AddNotTranslationBody> = mutableListOf()
-                for (ship in data.data.ships) {
-                    if (!database.translationDao.isProductExist(ship.id + 100000)) {
-                        notTranslatedItems.add(
-                            AddNotTranslationBody(
-                                product_id = ship.id + 100000,
-                                type = "product",
-                                english_title = ship.name,
-                                content = listOf(),
-                                excerpt = "",
-                                contains = listOf(),
-                                from_ship = 0,
-                                to_ship = 0
+                val shopUpgradeItems = data.data.ships.toUpgradeShopItem()
+                val isTranslationEnabled = pref.getBoolean(
+                    application.getString(R.string.enable_localization_key),
+                    false
+                )
+                if (isTranslationEnabled) {
+                    for (shopUpgradeItem in shopUpgradeItems) {
+                        if (!database.translationDao.isProductExist(shopUpgradeItem.id + 100000)) {
+                            notTranslatedItems.add(
+                                AddNotTranslationBody(
+                                    product_id = shopUpgradeItem.id + 100000,
+                                    type = "product",
+                                    english_title = shopUpgradeItem.name,
+                                    content = listOf(),
+                                    excerpt = "",
+                                    contains = listOf(),
+                                    from_ship = 0,
+                                    to_ship = 0
+                                )
                             )
-                        )
+                        } else {
+                            val translation = database.translationDao.getByProductId(shopUpgradeItem.id + 100000)
+                            shopUpgradeItem.chineseName = translation!!.title
+                            shopUpgradeItem.chineseDescription = translation.excerpt
+                        }
+                        shopUpgradeItem.chineseSubtitle = "升级"
                     }
                 }
-                val shopUpgradeItems = data.data.ships.toUpgradeShopItem()
                 val canUpgrade = RSIApi.retrofitService.filterShips(FilterShipsQuery().getRequestBody())
                 val canUpgradeItemIds = canUpgrade.data.to.ships.map { it.id }
                 shopUpgradeItems.forEach {

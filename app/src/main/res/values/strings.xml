@@ -75,7 +75,7 @@
     <string name="please_login_ptu_again">请重新登录PTU账号</string>
     <string name="credits_add_success">信用点添加成功</string>
     <string name="credits_add_failed">信用点不足…添加失败</string>
-    <string name="switch_account">切换/登录新账号</string>
+    <string name="switch_account">切换/登录/注册新账号</string>
     <string name="my_buyback">我的回购</string>
     <string name="my_hanger">我的机库</string>
     <string name="setting">设置</string>
@@ -145,4 +145,9 @@
     <string name="password_error">密码错误</string>
     <string name="default_referral_code">STAR-QSCF-FXKT</string>
     <string name="jump_to_email_check">请确认邮箱</string>
+    <string name="please_wait_init">请稍等初始化完成</string>
+    <string name="localization_tutorial">汉化教程</string>
+    <string name="enable_localization">enable_localization</string>
+    <string name="enable_localization_key">enable_localization</string>
+    <string name="translation_version_key">TranslationVersion</string>
 </resources>

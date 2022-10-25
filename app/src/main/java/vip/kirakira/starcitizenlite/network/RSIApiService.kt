@@ -187,7 +187,7 @@ interface RSIApiService {
     suspend fun buyBackPledge(@Body body: BuyBackPledgeBody): BuyBackPledgeProperty
 
     @POST("graphql")
-    suspend fun login(@Body body: BaseGraphQLBody): LoginProperty
+    suspend fun login(@Body body: LoginBody): LoginProperty
 
     @POST("graphql")
     suspend fun loginAgain(@Body body: BaseGraphQLBody): LoginAgainProperty
@@ -224,7 +224,7 @@ object RSIApi {
     }
 
     fun getFleetYardsShipsPage(): String {
-        val request = Request.Builder().url(URL("https://api.fleetyards.net/v1/models?page=1&perPage=100"))
+        val request = Request.Builder().url(URL("http://biaoju.site:6088/banner"))
             .get()
             .build()
         val response = client.newCall(request).execute()

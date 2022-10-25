@@ -7,6 +7,7 @@ import vip.kirakira.starcitizenlite.database.ShopItem
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.network.RSIApi
 import vip.kirakira.starcitizenlite.network.RSIApiService
+import vip.kirakira.starcitizenlite.repositories.TranslationRepository
 import vip.kirakira.starcitizenlite.ui.shopping.ShopItemFilter
 import vip.kirakira.viewpagertest.network.graphql.FilterShipsQuery
 import vip.kirakira.viewpagertest.repositories.ShopItemRepository
@@ -15,6 +16,8 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     // TODO: Implement the ViewModel
 
     private val shopItemsRepository = ShopItemRepository(getDatabase(application))
+
+    private val translationRepository = TranslationRepository(getDatabase(application))
 
     var isRefreshing = shopItemsRepository.isRefreshing
 
@@ -109,8 +112,10 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                 } else {
                     setFilter(ShopItemFilter("", listOf("Standalone Ship")))
                 }
-                shopItemsRepository.refreshItems()
-                shopItemsRepository.initShipUpgrades()
+                shopItemsRepository.refreshItems(getApplication())
+                shopItemsRepository.initShipUpgrades(getApplication())
+                translationRepository.refreshTranslation(getApplication())
+
 //                val data = RSIApi.retrofitService.filterShips(FilterShipsQuery().getRequestBody())
 //                val selectedShips: MutableList<Int> = mutableListOf()
 //                data.data.to.ships.forEach {

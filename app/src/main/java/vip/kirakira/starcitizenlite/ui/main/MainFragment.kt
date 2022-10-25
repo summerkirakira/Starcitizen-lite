@@ -182,7 +182,7 @@ class MainFragment : Fragment() {
 
         binding.upgradeLayout.setOnClickListener {
             val intent: Intent = Intent(activity, CartActivity::class.java)
-            intent.putExtra("url", "https://robertsspaceindustries.com/account/pledges")
+            intent.putExtra("url", "https://biaoju.site/star-refuge/docs/install-localization")
             startActivity(intent)
         }
 
@@ -194,7 +194,7 @@ class MainFragment : Fragment() {
             .setAdapter( object : BannerImageAdapter<BannerImage>(banners) {
                 override fun onBindView(holder: BannerImageHolder?, data: BannerImage?, position: Int, size: Int) {
                     Glide.with(holder!!.itemView)
-                        .load(data!!.image)
+                        .load(data!!.url)
                         .apply(RequestOptions.bitmapTransform(RoundedCorners(30)))
                         .into(holder.imageView);
                 }

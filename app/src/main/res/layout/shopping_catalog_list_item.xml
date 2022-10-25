@@ -41,7 +41,7 @@
                       android:singleLine="false"
                       android:maxLines="2"
                       tools:text="HAMMERHEAD - STORMBRINGER PAINT "
-                      android:text="@{property.title}"
+                      android:text="@{property.chineseName==null?property.name:property.chineseName}"
                       android:textSize="16sp"
                       android:textStyle="bold"
                       app:layout_constraintStart_toEndOf="@+id/ship_image"
@@ -54,7 +54,7 @@
                       android:layout_marginTop="8dp"
                       tools:text="Paints"
                       android:textStyle="bold"
-                      android:text="@{property.subtitle}"/>
+                      android:text="@{property.chineseSubtitle == null?property.subtitle: property.chineseSubtitle}"/>
             <TextView
                     android:id="@+id/currency_icon"
                     app:layout_constraintStart_toStartOf="@id/ship_name"
@@ -72,6 +72,7 @@
                        android:layout_height="20dp"
                        android:id="@+id/can_buy"
                        android:layout_marginEnd="5dp"
+                       android:visibility="invisible"
                        android:src="@drawable/ic_double_check"
                        app:layout_constraintEnd_toEndOf="parent"
                        app:layout_constraintBottom_toBottomOf="parent"/>

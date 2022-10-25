@@ -175,7 +175,7 @@
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent"
                             android:clickable="true"
-                            android:src="@drawable/ic_fight_jet"
+                            android:src="@drawable/ic_plane"
                             android:background="@drawable/bottom_button_ripple"/>
                 </androidx.constraintlayout.widget.ConstraintLayout>
                 <androidx.constraintlayout.widget.ConstraintLayout

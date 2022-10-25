@@ -113,6 +113,12 @@ interface TranslationDao {
 
     @Query("SELECT CASE WHEN EXISTS (SELECT 1 FROM translation WHERE type='upgrade' AND from_ship=:from_ship AND to_ship=:to_ship) THEN 1 ELSE 0 END")
     fun isUpgradeExist(from_ship: String, to_ship: String): Boolean
+
+    @Query("SELECT * FROM translation WHERE product_id = :product_id")
+    fun getByProductId(product_id: Int): Translation?
+
+    @Query("DELETE FROM translation")
+    fun deleteAll()
 //
 //    @Query("SELECT CASE WHEN EXISTS (SELECT 1 FROM translation WHERE type='buyback' AND english_title=:english_title) THEN 1 ELSE 0 END")
 //    fun isBuybackExist(english_title: String): Boolean
