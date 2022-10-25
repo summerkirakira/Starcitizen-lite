@@ -3,7 +3,7 @@ buildscript {
     ext.kotlin_version = '1.7.20'
     ext {
         version_retrofit = "2.9.0"
-        version_moshi = "1.8.0"
+        version_moshi = "1.14.0"
         version_glide = "4.11.0"
     }
     repositories {

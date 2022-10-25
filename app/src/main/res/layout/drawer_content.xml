@@ -14,7 +14,7 @@
                android:layout_height="200dp"
                app:layout_constraintStart_toStartOf="parent"
                app:layout_constraintTop_toTopOf="parent"
-               android:background="@drawable/drawer_background"
+               android:background="@color/black_overlay"
                android:alpha="0.25"/>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="100dp"

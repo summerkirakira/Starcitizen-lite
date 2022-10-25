@@ -7,8 +7,10 @@ import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -35,15 +37,12 @@ import io.getstream.avatarview.coil.loadImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import vip.kirakira.starcitizenlite.activities.LoginActivity
 import vip.kirakira.starcitizenlite.activities.SettingsActivity
-import vip.kirakira.starcitizenlite.activities.WebLoginActivity
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
-import vip.kirakira.starcitizenlite.network.CirnoApi
+import vip.kirakira.starcitizenlite.network.*
 import vip.kirakira.starcitizenlite.network.CirnoProperty.Announcement
-import vip.kirakira.starcitizenlite.network.rsi_device
-import vip.kirakira.starcitizenlite.network.saveUserData
-import vip.kirakira.starcitizenlite.network.setRSICookie
 import vip.kirakira.starcitizenlite.network.shop.getCartSummary
 import vip.kirakira.starcitizenlite.ui.ScreenSlidePagerAdapter
 import vip.kirakira.starcitizenlite.ui.home.HomeFragment
@@ -82,6 +81,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var shoppingViewModel: ShoppingViewModel
     private lateinit var feedbackButton: ConstraintLayout
     private lateinit var settingsButton: ConstraintLayout
+    lateinit var  shipUpgradeButton: ImageView
 
 
     private var  density: Float = 0f
@@ -150,6 +150,7 @@ class MainActivity : AppCompatActivity() {
         secondLine = findViewById(R.id.avatar_second_line)
         thirdLine = findViewById(R.id.avatar_third_line)
         val filterButton = findViewById<ImageView>(R.id.filter_icon)
+        shipUpgradeButton = findViewById(R.id.ship_upgrade_icon)
 
         val immersionBar = ImmersionBar.with(this)
 
@@ -196,7 +197,7 @@ class MainActivity : AppCompatActivity() {
                             alerter
                                 .enableSwipeToDismiss()
                                 .setOnClickListener {
-                                    val intent = Intent(this@MainActivity, WebLoginActivity::class.java)
+                                    val intent = Intent(this@MainActivity, LoginActivity::class.java)
                                     startActivity(intent)
                                     finish()
                                 }
@@ -288,6 +289,13 @@ class MainActivity : AppCompatActivity() {
                         filterButton.setImageDrawable(getDrawable(R.drawable.ic_filter))
                         filterButton.setColorFilter(getColor(R.color.avatar_left_line))
                         filterButton.visibility = View.VISIBLE
+
+                        if(shoppingViewModel.currentUpgradeStage.value == ShoppingViewModel.UpgradeStage.UNDEFINED) {
+                            shipUpgradeButton.setColorFilter(getColor(R.color.avatar_left_line))
+                        } else {
+                            shipUpgradeButton.setColorFilter(getColor(R.color.upgrade_is_selected))
+                        }
+                        shipUpgradeButton.visibility = View.VISIBLE
                         setAvatarLine(ColorStateList.valueOf(getColor(R.color.avatar_left_line)))
                         immersionBar.statusBarDarkFont(true).init()
                     }
@@ -300,6 +308,9 @@ class MainActivity : AppCompatActivity() {
                         searchButton.setColorFilter(getColor(R.color.avatar_left_line))
                         filterButton.setColorFilter(getColor(R.color.avatar_left_line))
                         filterButton.visibility = View.VISIBLE
+
+                        shipUpgradeButton.visibility = View.GONE
+
                         setAvatarLine(ColorStateList.valueOf(getColor(R.color.avatar_left_line)))
                         immersionBar.statusBarDarkFont(true).init()
                     }
@@ -311,6 +322,9 @@ class MainActivity : AppCompatActivity() {
                         searchButton.setColorFilter(Color.WHITE)
                         setAvatarLine(ColorStateList.valueOf(Color.WHITE))
                         filterButton.visibility = View.GONE
+
+                        shipUpgradeButton.visibility = View.GONE
+
                         immersionBar.statusBarDarkFont(false).init()
                     }
                     FragmentType.ME.value -> {
@@ -319,6 +333,9 @@ class MainActivity : AppCompatActivity() {
                         bottomMainIcon.setColorFilter(Color.GRAY)
                         if(primaryUserId == 0) bottomMeIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
                         filterButton.visibility = View.GONE
+
+                        shipUpgradeButton.visibility = View.GONE
+
                         setAvatarLine(ColorStateList.valueOf(Color.WHITE))
                         immersionBar.statusBarDarkFont(false).init()
                     }
@@ -327,16 +344,24 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+
+//        val intent = Intent(this, LoginActivity::class.java)
+//        startActivity(intent)
+
+
+
+
+
         filterButton.setOnClickListener {
             when(mPager.currentItem) {
                 FragmentType.SHOPPING.value -> {
-                    val itemTypes = listOf("单船", "涂装", "装备", "附加包", "UEC", "礼品卡", "资格包", "组合包", "升级")
+                    val itemTypes = listOf("单船", "涂装", "装备", "附加包", "UEC", "礼品卡", "资格包", "组合包")
                     val builder = QMUIDialog.MultiCheckableDialogBuilder(this)
                     builder.setTitle("请选择商品种类")
                         .setCheckedItems(arrayOf(0).toIntArray())
                         .addItems(itemTypes.toTypedArray(), null)
                         .addAction("取消") { dialog, index -> dialog.dismiss() }
-                        .addAction("提交") { dialog, index ->
+                        .addAction("确认") { dialog, index ->
                             val filterList = mutableListOf<String>()
                             builder.checkedItemIndexes.forEach {
                                 when(it) {
@@ -348,8 +373,9 @@ class MainActivity : AppCompatActivity() {
                                     5 -> filterList.add(ShopItemType.GIFT.itemName)
                                     6 -> filterList.add(ShopItemType.PACKAGE.itemName)
                                     7 -> filterList.add(ShopItemType.PACKS.itemName)
-                                    8 -> filterList.add(ShopItemType.SHIP_UPGRADE.itemName)
                                 }
+                                shoppingViewModel.currentUpgradeStage.value = ShoppingViewModel.UpgradeStage.UNDEFINED
+                                shipUpgradeButton.setColorFilter(getColor(R.color.avatar_left_line))
                                 shoppingViewModel.setFilter(ShopItemFilter("", filterList))
                             }
                             dialog.dismiss()
@@ -368,6 +394,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        shipUpgradeButton.setOnClickListener {
+            shoppingViewModel.isDetailShowing.value = false
+            if (shoppingViewModel.currentUpgradeStage.value == ShoppingViewModel.UpgradeStage.UNDEFINED) {
+                shoppingViewModel.setFilter(ShopItemFilter("", listOf("Upgrade"), onlyCanUpgradeTo = true))
+                shoppingViewModel.currentUpgradeStage.value = ShoppingViewModel.UpgradeStage.CHOOSE_TO_SHIP
+                shipUpgradeButton.setColorFilter(getColor(R.color.upgrade_is_selected))
+            } else {
+                shoppingViewModel.setFilter(ShopItemFilter("", listOf("Standalone Ship")))
+                shoppingViewModel.currentUpgradeStage.value = ShoppingViewModel.UpgradeStage.UNDEFINED
+                shipUpgradeButton.setColorFilter(getColor(R.color.avatar_left_line))
+            }
+        }
+
         switchAccount.setOnClickListener {
             if (allUsers.value != null) {
                 var items = allUsers.value!!.map { it.handle }.toTypedArray()
@@ -382,7 +421,7 @@ class MainActivity : AppCompatActivity() {
                             database.buybackItemDao.deleteAllOldItems(System.currentTimeMillis())
                         }
                         if(builder.checkedIndex == items.size - 1){
-                            val intent = Intent(this, WebLoginActivity::class.java)
+                            val intent = Intent(this, LoginActivity::class.java)
                             startActivity(intent)
                         } else {
                             primaryUserId = allUsers.value!![builder.checkedIndex].id
@@ -430,9 +469,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             val result = ApkUtil.deleteOldApk(this, "${externalCacheDir?.path}/refuge_update.apk")
         }
-
-
-
     }
 
     private suspend fun checkUpdate() {

@@ -4,12 +4,11 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Query
-import vip.kirakira.starcitizenlite.network.CirnoProperty.Announcement
-import vip.kirakira.starcitizenlite.network.CirnoProperty.RecaptchaList
-import vip.kirakira.starcitizenlite.network.CirnoProperty.StarUp
-import vip.kirakira.starcitizenlite.network.CirnoProperty.Version
+import vip.kirakira.starcitizenlite.network.CirnoProperty.*
 
 private const val BASE_URL = "http://biaoju.site:6088/"
 
@@ -35,6 +34,15 @@ interface CirnoApiService {
 
     @GET("reCaptchaV3")
     suspend fun getReCaptchaV3(@Query("limit") limit: Int): RecaptchaList
+
+    @GET("translation/version")
+    suspend fun getTranslationVersion(): TranslationVersionProperty
+
+    @GET("translation/all")
+    suspend fun getAllTranslation(): List<TranslationProperty>
+
+    @POST("translation/add")
+    suspend fun addNotTranslation(@Body translations: List<AddNotTranslationBody>): AddTranslationResult
 }
 
 object CirnoApi {

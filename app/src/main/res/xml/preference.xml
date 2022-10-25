@@ -15,10 +15,10 @@
                 android:key="toggle_preference"
                 android:title="@string/shop_chinese_localization"
                 android:summary="@string/shop_localization_chinese_summary"/>
-        <SwitchPreferenceCompat
-                android:key="currency_chinese_yuan"
-                android:title="货币本地化"
-                android:summary="将货币单位转换为人民币"/>
+<!--        <SwitchPreferenceCompat-->
+<!--                android:key="currency_chinese_yuan"-->
+<!--                android:title="货币本地化"-->
+<!--                android:summary="将货币单位转换为人民币"/>-->
 <!--        <PreferenceScreen-->
 <!--                android:key="intent_preference"-->
 <!--                android:title="Intent preference"-->
@@ -84,5 +84,9 @@
             <intent android:action="android.intent.action.VIEW"
                     android:data="https://github.com/summerkirakira/Starcitizen-lite"/>
         </PreferenceScreen>
+        <Preference
+                android:key="about"
+                android:title="投喂开发者"
+                android:summary="" />
     </PreferenceCategory>
 </PreferenceScreen>

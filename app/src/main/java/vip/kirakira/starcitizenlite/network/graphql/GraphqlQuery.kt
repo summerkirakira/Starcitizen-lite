@@ -1,6 +1,7 @@
 package vip.kirakira.viewpagertest.network.graphql
 
 import android.telecom.Call.Details
+import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
 
 
@@ -1502,4 +1503,78 @@ class UpgradeAddToCartQuery {
     fun getRequestBody(from: Int, to: Int): BaseGraphQLBody {
         return BaseGraphQLBody(query, Variables(from = from, to = to))
     }
+}
+
+class LoginQuery {
+    val query = """mutation signin(${"$"}email: String!, ${"$"}password: String!, ${"$"}captcha: String, ${"$"}remember: Boolean) {
+  account_signin(email: ${"$"}email, password: ${"$"}password, captcha: ${"$"}captcha, remember: ${"$"}remember) {
+    displayname
+    id
+    __typename
+  }
+}
+"""
+    class Variables(
+        val captcha: String,
+        val email: String,
+        val password: String,
+        val remember: Boolean = false
+    )
+
+    fun getRequestBody(email: String, password: String, captcha: String, remember: Boolean = false): BaseGraphQLBody {
+        return BaseGraphQLBody(query, Variables(captcha = captcha, email = email, password = password, remember = remember))
+    }
+}
+
+class MultiStepLoginQuery {
+    val query = """mutation multistep(${"$"}code: String!, ${"$"}deviceType: String!, ${"$"}deviceName: String!, ${"$"}duration: String!) {
+  account_multistep(code: ${"$"}code, device_type: ${"$"}deviceType, device_name: ${"$"}deviceName, duration: ${"$"}duration) {
+    displayname
+    id
+    __typename
+  }
+}"""
+    class Variables(
+        val code: String,
+        val deviceName: String = "StarRefuge",
+        val deviceType: String = "computer",
+        val duration: String = "year"
+    )
+
+    fun getRequestBody(code: String, deviceName: String = "StarRefuge", deviceType: String = "computer", duration: String = "year"): BaseGraphQLBody {
+        return BaseGraphQLBody(query, Variables(code = code, deviceName = deviceName, deviceType = deviceType, duration = duration))
+    }
+}
+
+data class RegisterBody(
+    @Json(name = "query")
+    val query: String = """mutation signup(${"$"}handle: String!, ${"$"}email: String!, ${"$"}password: String!, ${"$"}dob: String!, ${"$"}agreementChecked: Boolean!, ${"$"}messageMe: Boolean, ${"$"}captcha: String!, ${"$"}referralCode: String, ${"$"}mark: String) {
+  account_signup(handle: ${"$"}handle, email: ${"$"}email, password: ${"$"}password, dob: ${"$"}dob, agreementChecked: ${"$"}agreementChecked, messageMe: ${"$"}messageMe, captcha: ${"$"}captcha, referralCode: ${"$"}referralCode, mark: ${"$"}mark) {
+    displayname
+    username
+    __typename
+  }
+}
+""",
+    @Json(name = "variables")
+    val variables: Variables
+) {
+    data class Variables(
+        @Json(name = "agreementChecked")
+        val agreementChecked: Boolean = true,
+        @Json(name = "captcha")
+        val captcha: String,
+        @Json(name = "dob")
+        val dob: String = "1990-01-01",
+        @Json(name = "email")
+        val email: String,
+        @Json(name = "handle")
+        val handle: String,
+        @Json(name = "messageMe")
+        val messageMe: Boolean = false,
+        @Json(name = "password")
+        val password: String,
+        @Json(name = "referralCode")
+        val referralCode: String
+    )
 }

@@ -117,6 +117,28 @@ data class BuybackItem constructor(
     val toSkuId: Int = 0
 )
 
+@Entity(tableName = "translation")
+data class Translation constructor(
+    @PrimaryKey val id: Int,
+    val product_id: Int,
+    val type: String,
+    val create_at: Int = 0,
+    val english_title: String,
+    val content: String,
+    val excerpt: String,
+    val contains: String,
+    val from_ship: Int,
+    val to_ship: Int,
+    val insert_time: Long,
+)
+
+@Entity(tableName = "config")
+data class Config constructor(
+    @PrimaryKey val id: Int,
+    val version: String,
+    val translation_version: Long,
+)
+
 data class HangerPackageWithItems constructor(
     @Embedded var hangerPackage: HangerPackage,
     @Relation(

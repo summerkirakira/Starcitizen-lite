@@ -12,6 +12,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
@@ -35,6 +36,15 @@ val client: OkHttpClient = OkHttpClient
     .Builder()
     .addInterceptor { chain ->
         val request = chain.request()
+        if (request.url.toString() == "https://robertsspaceindustries.com/") {
+            val newRequest = request.newBuilder()
+                .addHeader("cookie", rsi_cookie)
+                .addHeader("referer", "https://robertsspaceindustries.com/")
+                .addHeader("origin", "https://robertsspaceindustries.com")
+                .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
+                .build()
+            return@addInterceptor chain.proceed(newRequest)
+        }
         if(request.url.toString() == "https://robertsspaceindustries.com/graphql"){
             val newRequest = request.newBuilder()
                 .addHeader("cookie", rsi_cookie)
@@ -175,6 +185,19 @@ interface RSIApiService {
 
     @POST("api/store/buyBackPledge")
     suspend fun buyBackPledge(@Body body: BuyBackPledgeBody): BuyBackPledgeProperty
+
+    @POST("graphql")
+    suspend fun login(@Body body: BaseGraphQLBody): LoginProperty
+
+    @POST("graphql")
+    suspend fun loginAgain(@Body body: BaseGraphQLBody): LoginAgainProperty
+
+    @POST("graphql")
+    suspend fun multiStepLogin(@Body body: BaseGraphQLBody): MultiStepLoginProperty
+
+    @POST("graphql")
+    suspend fun signUp(@Body body: RegisterBody): SignUpProperty
+
 }
 
 

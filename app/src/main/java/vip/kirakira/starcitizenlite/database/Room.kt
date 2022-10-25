@@ -100,13 +100,32 @@ interface BannerDao {
     fun getAll(): LiveData<List<BannerImage>>
 }
 
-@Database(entities = [ShopItem::class, HangerItem::class, HangerPackage::class, BuybackItem::class, User::class, BannerImage::class], version = 2)
+@Dao
+interface TranslationDao {
+    @Query("SELECT * FROM translation")
+    fun getAll(): LiveData<List<Translation>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(translations: List<Translation>)
+
+    @Query("SELECT CASE WHEN EXISTS (SELECT 1 FROM translation WHERE product_id = :product_id) THEN 1 ELSE 0 END")
+    fun isProductExist(product_id: Int): Boolean
+
+    @Query("SELECT CASE WHEN EXISTS (SELECT 1 FROM translation WHERE type='upgrade' AND from_ship=:from_ship AND to_ship=:to_ship) THEN 1 ELSE 0 END")
+    fun isUpgradeExist(from_ship: String, to_ship: String): Boolean
+//
+//    @Query("SELECT CASE WHEN EXISTS (SELECT 1 FROM translation WHERE type='buyback' AND english_title=:english_title) THEN 1 ELSE 0 END")
+//    fun isBuybackExist(english_title: String): Boolean
+}
+
+@Database(entities = [ShopItem::class, HangerItem::class, HangerPackage::class, BuybackItem::class, User::class, BannerImage::class, Translation::class], version = 2)
 abstract class ShopItemDatabase: RoomDatabase() {
     abstract val shopItemDao: ShopItemDao
     abstract val hangerItemDao: HangerItemDao
     abstract val buybackItemDao: BuybackItemDao
     abstract val userDao: UserDao
     abstract val bannerDao: BannerDao
+    abstract val translationDao: TranslationDao
 }
 
 private lateinit var INSTANCE: ShopItemDatabase

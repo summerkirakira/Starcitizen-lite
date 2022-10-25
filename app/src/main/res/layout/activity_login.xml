@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".activities.LoginActivity">
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:id="@+id/login_layout"
+                  android:orientation="vertical"
+                  android:gravity="center"
+                  android:layout_marginStart="40dp"
+                  android:layout_marginEnd="40dp"
+                  app:layout_constraintStart_toStartOf="parent"
+                  app:layout_constraintEnd_toEndOf="parent">
+        <ImageView android:layout_width="220dp"
+                   android:layout_height="220dp"
+                   android:layout_marginBottom="30dp"
+                   android:src="@drawable/sc_icon"/>
+        <EditText android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:id="@+id/handle_edit_text"
+                  android:hint="@string/handle"
+                  android:visibility="gone"
+                  tools:visibility="visible"
+                  android:autofillHints=""
+                  android:inputType="textWebEditText"/>
+        <EditText android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:id="@+id/email_edit_text"
+                  android:hint="@string/email"
+                  android:autofillHints=""
+                  android:inputType="textEmailAddress"/>
+        <EditText android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/password_edit_text"
+                    android:hint="@string/password"
+                    android:autofillHints=""
+                    android:inputType="textPassword"/>
+        <EditText android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:id="@+id/re_enter_password_edit_text"
+                  android:hint="@string/re_enter_password"
+                  android:visibility="gone"
+                  tools:visibility="visible"
+                  android:autofillHints=""
+                  android:inputType="textPassword"/>
+        <EditText android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:visibility="gone"
+                  tools:visibility="visible"
+                  android:id="@+id/referral_code_edit_text"
+                  android:hint="@string/referral_code"
+                  android:autofillHints=""
+                  android:inputType="textNoSuggestions"/>
+        <TextView android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:gravity="center"
+                  android:text="@string/login_by_web"
+                  android:id="@+id/login_by_web" />
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content">
+            <Button android:layout_weight="10"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/register_button"
+                    android:text="@string/register"
+                    android:layout_width="wrap_content"/>
+            <Button android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="10"
+                    android:id="@+id/login_button"
+                    style="@style/AlertButton"
+                    android:text="@string/login" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/progress_layout"
+            android:visibility="invisible"
+            android:background="@color/progress_background"
+    >
+        <com.github.ybq.android.spinkit.SpinKitView
+                android:id="@+id/loading_view"
+                style="@style/SpinKitView.Large.Circle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"
+                android:layout_gravity="center"
+                app:SpinKit_Color="@color/bottom_icon_selected_color" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

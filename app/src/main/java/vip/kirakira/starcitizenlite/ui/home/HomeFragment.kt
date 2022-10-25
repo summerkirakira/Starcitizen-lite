@@ -25,6 +25,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.activities.CartActivity
+import vip.kirakira.starcitizenlite.activities.LoginActivity
 import vip.kirakira.starcitizenlite.activities.WebLoginActivity
 import vip.kirakira.starcitizenlite.createSuccessAlerter
 import vip.kirakira.starcitizenlite.createWarningAlerter
@@ -75,7 +76,7 @@ class HomeFragment : Fragment() {
                 binding.errorBox.setButton(
                     getString(R.string.click_to_login)
                 ) {
-                    val intent = Intent(context, WebLoginActivity::class.java)
+                    val intent = Intent(context, LoginActivity::class.java)
                     startActivity(intent)
                 }
                 binding.errorBox.show()
@@ -147,6 +148,26 @@ class HomeFragment : Fragment() {
                     QMUIDialog.MessageDialogBuilder(activity)
                         .setTitle(getString(R.string.reclaim_warning))
                         .setMessage("即将对${item.name}进行回收操作，结束后将会返还${item.price.toFloat() / 100f}信用点\n此操作不可逆！是否继续？")
+                        .addAction("全部回收") { dialog, _ ->
+                            dialog.dismiss()
+                            scope.launch {
+                                for (id in item.idList.split(","))
+                                    try {
+                                        val message = HangerService().reclaimPledge(id, viewModel.currentUser.value!!.password)
+                                        if (message.code == "OK") {
+                                            createSuccessAlerter(requireActivity(), getString(R.string.reclaim_success), "已返还${item.price.toFloat() / 100f}信用点").show()
+                                            viewModel.refresh()
+                                        } else {
+                                            createWarningAlerter(requireActivity(), getString(R.string.reclaim_failed), message.msg).show()
+                                            return@launch
+                                        }
+                                    } catch (e: Exception) {
+                                        createWarningAlerter(requireActivity(), getString(R.string.reclaim_failed), getString(R.string.network_error)).show()
+                                        return@launch
+                                    }
+                            }
+
+                        }
                         .addAction(getString(R.string. cancel)) { dialog, _ -> dialog.dismiss() }
                         .addAction(0, getString(R.string.confirm)) { dialog, _ ->
                             dialog.dismiss()

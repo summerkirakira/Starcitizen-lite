@@ -2,18 +2,16 @@ package vip.kirakira.starcitizenlite.ui.me
 
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import io.getstream.avatarview.coil.loadImage
 import vip.kirakira.starcitizenlite.R
-import vip.kirakira.starcitizenlite.activities.WebLoginActivity
+import vip.kirakira.starcitizenlite.activities.LoginActivity
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.databinding.MeFragmentBinding
@@ -51,7 +49,7 @@ class MeFragment : Fragment() {
                 binding.errorBox.setButton(
                     getString(R.string.click_to_login)
                 ) {
-                    val intent = Intent(context, WebLoginActivity::class.java)
+                    val intent = Intent(context, LoginActivity::class.java)
                     startActivity(intent)
                 }
                 binding.errorBox.show()

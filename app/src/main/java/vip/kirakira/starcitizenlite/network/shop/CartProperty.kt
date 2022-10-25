@@ -153,3 +153,43 @@ data class AddUpgradeToCartProperty(val data: Data) {
 data class ApplyTokenProperty(val success: Int, val msg: String)
 
 data class BuyBackPledgeProperty(val success: Int, val msg: String)
+
+data class LoginProperty(val errors: List<Error>?, val data: Data) {
+    data class Data(val account_signin: Login?) {
+        data class Login(val displayname: String, val id: Int)
+    }
+
+    data class Error(val message: String, val extensions: Extensions, val code: String) {
+        data class Extensions(val category: String, val details: Details) {
+            data class Details(val session_id: String, val device_id: String)
+        }
+    }
+}
+
+data class LoginAgainProperty(val errors: List<Error>?, val data: Data) {
+    data class Data(val account_signin: Login?) {
+        data class Login(val displayname: String, val id: Int)
+    }
+
+    data class Error(val message: String, val extensions: Extensions, val code: String) {
+        data class Extensions(val category: String, val details: String)
+    }
+}
+
+data class MultiStepLoginProperty(val errors: List<Error>?, val data: Data) {
+    data class Data(val account_multistep: Login?) {
+        data class Login(val displayname: String, val id: Int)
+    }
+    data class Error(val message: String, val code: String)
+}
+
+data class SignUpProperty(val errors: List<Error>?, val data: Data) {
+    data class Data(val account_signup: SignUp?) {
+        data class SignUp(val displayname: String, val username: String)
+    }
+    data class Error(val message: String, val code: String, val extensions: Extensions) {
+        data class Extensions(val category: String, val details: Details) {
+            data class Details(val handle: String?, val email: String?, val password: String?)
+        }
+    }
+}

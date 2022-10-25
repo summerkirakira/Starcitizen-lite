@@ -1,16 +1,20 @@
 package vip.kirakira.viewpagertest.repositories
 
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.map
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.database.ShopItem
 import vip.kirakira.starcitizenlite.database.ShopItemDatabase
 import vip.kirakira.starcitizenlite.database.toShopItem
 import vip.kirakira.starcitizenlite.database.toUpgradeShopItem
+import vip.kirakira.starcitizenlite.network.CirnoApi
+import vip.kirakira.starcitizenlite.network.CirnoProperty.AddNotTranslationBody
 import vip.kirakira.starcitizenlite.network.RSIApi
 import vip.kirakira.starcitizenlite.network.shop.InitShipUpgradeProperty
 import vip.kirakira.viewpagertest.network.graphql.FilterShipsQuery
@@ -32,6 +36,7 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
             var page = 1;
             isRefreshing.postValue(true)
             try {
+                val notTranslatedItems: MutableList<AddNotTranslationBody> = mutableListOf()
                 while (true) {
                     val data = RSIApi.retrofitService.getCatalog(
                         UpdateCatalogMutation().getRequestBody(page)
@@ -39,9 +44,27 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
                     if (data.isEmpty()) {
                         break
                     }
-                    database.shopItemDao.insertAll(data.toShopItem())
+                    val shopItems = data.toShopItem()
+                    for (shopItem in shopItems) {
+                        if (!database.translationDao.isProductExist(shopItem.id)) {
+                            notTranslatedItems.add(
+                                AddNotTranslationBody(
+                                    product_id = shopItem.id,
+                                    type = "product",
+                                    english_title = shopItem.name,
+                                    content = listOf(),
+                                    excerpt = shopItem.excerpt,
+                                    contains = listOf(),
+                                    from_ship = 0,
+                                    to_ship = 0
+                                )
+                            )
+                        }
+                    }
+                    database.shopItemDao.insertAll(shopItems)
                     page++
                 }
+                CirnoApi.retrofitService.addNotTranslation(notTranslatedItems)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -56,6 +79,23 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
                 RSIApi.setAuthToken()
                 RSIApi.setUpgradeToken()
                 val data: InitShipUpgradeProperty = RSIApi.retrofitService.initShipUpgrade(initShipUpgradeQuery().getRequestBody())
+                val notTranslatedItems: MutableList<AddNotTranslationBody> = mutableListOf()
+                for (ship in data.data.ships) {
+                    if (!database.translationDao.isProductExist(ship.id + 100000)) {
+                        notTranslatedItems.add(
+                            AddNotTranslationBody(
+                                product_id = ship.id + 100000,
+                                type = "product",
+                                english_title = ship.name,
+                                content = listOf(),
+                                excerpt = "",
+                                contains = listOf(),
+                                from_ship = 0,
+                                to_ship = 0
+                            )
+                        )
+                    }
+                }
                 val shopUpgradeItems = data.data.ships.toUpgradeShopItem()
                 val canUpgrade = RSIApi.retrofitService.filterShips(FilterShipsQuery().getRequestBody())
                 val canUpgradeItemIds = canUpgrade.data.to.ships.map { it.id }
@@ -65,11 +105,12 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
                     }
                 }
                 database.shopItemDao.insertAll(shopUpgradeItems)
+//                CirnoApi.retrofitService.addNotTranslation(notTranslatedItems)
                 isRefreshing.postValue(false)
             } catch (e: Exception) {
                 e.printStackTrace()
+                isRefreshing.postValue(false)
             }
-
         }
     }
 

@@ -60,7 +60,7 @@
         <item name="android:textColor">@color/drawer_top_info_value_text</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">16sp</item>
-        <item name="android:fontFamily">casual</item>
+<!--        <item name="android:fontFamily">casual</item>-->
     </style>
     <style name="drawer_option_content_text">
         <item name="android:layout_width">wrap_content</item>
