@@ -41,9 +41,9 @@ data class TranslationProperty(
     val type: String,
     val english_title: String,
     val title: String,
-    val content: String,
-    val excerpt: String,
-    val contains: String,
+//    val content: String,
+    val excerpt: String? = null,
+//    val contains: String,
     val from_ship: Int,
     val to_ship: Int
 )
@@ -51,14 +51,14 @@ data class TranslationProperty(
 @JsonClass(generateAdapter = true)
 class AddNotTranslationBody(
     val product_id: Int,
-    val type: String,
+    val type: String = "hanger",
     val create_at: Int = 0,
     val english_title: String,
-    val content: List<String>,
-    val excerpt: String,
-    val contains: List<String>,
-    val from_ship: Int,
-    val to_ship: Int
+    val content: List<String> = listOf(),
+    val excerpt: String = "",
+    val contains: List<String> = listOf(),
+    val from_ship: Int = 0,
+    val to_ship: Int = 0
 )
 
 data class AddTranslationResult(

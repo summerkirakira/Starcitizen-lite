@@ -28,7 +28,10 @@ class HangerProcess {
                 }
 //                pledgeValue = (pledge.select(".js-pledge-value").attr("value").replace("$", "").replace(" USD", "").replace(",", "").toFloat() * 100).toInt()
                 val pledgeImage = pledge.select("div.image").attr("style").replace("background-image:url('", "").replace("');", "")
-                val pledgeTitle = pledge.select(".title-col")[0].select("h3").text()
+                var pledgeTitle = pledge.select(".title-col")[0].select("h3").text()
+                if (pledgeTitle.contains("nameable ship") && pledgeTitle.contains(" Contains ")) {
+                    pledgeTitle = pledgeTitle.split(" Contains ")[0]
+                }
                 val pledgeStatus = pledge.select(".availability").text()
                 val pledgeDate = convertDateToLong( pledge.select(".date-col").text().replace("Created: ", ""))
                 val pledgeContains = pledge.select(".items-col").text().replace("Contains:", "")

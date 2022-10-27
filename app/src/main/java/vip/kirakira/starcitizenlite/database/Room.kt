@@ -3,6 +3,9 @@ package vip.kirakira.starcitizenlite.database
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import androidx.room.migration.AutoMigrationSpec
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import vip.kirakira.starcitizenlite.ui.main.Banner
 
 @Dao
@@ -119,12 +122,48 @@ interface TranslationDao {
 
     @Query("DELETE FROM translation")
     fun deleteAll()
+
+    @Query("SELECT * FROM translation WHERE english_title = :english_title limit 1")
+    fun getByEnglishTitle(english_title: String): Translation?
+
+    @Query("SELECT * FROM translation WHERE type = 'product' AND english_title LIKE :english_title limit 1")
+    fun getByEnglishTitleLike(english_title: String): Translation?
 //
 //    @Query("SELECT CASE WHEN EXISTS (SELECT 1 FROM translation WHERE type='buyback' AND english_title=:english_title) THEN 1 ELSE 0 END")
 //    fun isBuybackExist(english_title: String): Boolean
 }
 
-@Database(entities = [ShopItem::class, HangerItem::class, HangerPackage::class, BuybackItem::class, User::class, BannerImage::class, Translation::class], version = 2)
+//@Database(entities = [ShopItem::class, HangerItem::class, HangerPackage::class, BuybackItem::class, User::class, BannerImage::class], version = 1)
+//abstract class ShopItemDatabase0: RoomDatabase() {
+//    abstract val shopItemDao: ShopItemDao
+//    abstract val hangerItemDao: HangerItemDao
+//    abstract val buybackItemDao: BuybackItemDao
+//    abstract val userDao: UserDao
+//    abstract val bannerDao: BannerDao
+//}
+
+
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+                DROP TABLE IF EXISTS shop_items;
+            """.trimIndent()
+        )
+    }
+}
+
+@Database(
+    entities = [ShopItem::class, HangerItem::class, HangerPackage::class, BuybackItem::class, User::class, BannerImage::class, Translation::class],
+//    autoMigrations = [
+//        AutoMigration (
+//            from = 1,
+//            to = 2,
+//            spec = ShopItemDatabase.MyAutoMigration::class
+//        )
+//    ],
+    exportSchema = true,
+    version = 2)
 abstract class ShopItemDatabase: RoomDatabase() {
     abstract val shopItemDao: ShopItemDao
     abstract val hangerItemDao: HangerItemDao
@@ -132,6 +171,12 @@ abstract class ShopItemDatabase: RoomDatabase() {
     abstract val userDao: UserDao
     abstract val bannerDao: BannerDao
     abstract val translationDao: TranslationDao
+
+    @RenameTable.Entries(
+        RenameTable(fromTableName = "banner_image", toTableName = "banner_image2")
+    )
+    class MyAutoMigration : AutoMigrationSpec
+
 }
 
 private lateinit var INSTANCE: ShopItemDatabase

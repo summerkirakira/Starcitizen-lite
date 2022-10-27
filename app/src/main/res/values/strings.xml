@@ -75,11 +75,11 @@
     <string name="please_login_ptu_again">请重新登录PTU账号</string>
     <string name="credits_add_success">信用点添加成功</string>
     <string name="credits_add_failed">信用点不足…添加失败</string>
-    <string name="switch_account">切换/登录/注册新账号</string>
+    <string name="switch_account">切换 / 登录 / 注册新账号</string>
     <string name="my_buyback">我的回购</string>
     <string name="my_hanger">我的机库</string>
     <string name="setting">设置</string>
-    <string name="drawer_feedback">问题反馈</string>
+    <string name="drawer_feedback">问题反馈 / 加入我们</string>
     <string name="CHECK_UPDATE_KEY">check_update</string>
     <string name="background_downloading">少女祈祷中…</string>
     <string name="CURRENT_ANNOUNCEMENT_ID">announcement_id</string>
@@ -118,7 +118,7 @@
     <string name="login_by_web"><u>点击使用网页登录</u></string>
     <string name="please_enter_email_and_password">请输入邮箱和密码</string>
     <string name="get_csrf_token_error">获取CSRF Token失败</string>
-    <string name="get_captcha_failed">获取Token失败</string>
+    <string name="get_captcha_failed">获取Token失败，本月次数可能用尽</string>
     <string name="error">错误</string>
     <string name="already_logged_in">你已登录QAQ</string>
     <string name="get_rsi_token_error">获取RSI Token失败</string>
@@ -150,4 +150,9 @@
     <string name="enable_localization">enable_localization</string>
     <string name="enable_localization_key">enable_localization</string>
     <string name="translation_version_key">TranslationVersion</string>
+    <string name="UUID">unique_id</string>
+    <string name="click_arrow_to_choose_upgrade_to_ship">点击箭头来选择要升级到的舰船</string>
+    <string name="AUTO_ADD_CREDITS_KEY">auto_add_credits</string>
+    <string name="cirno_token_error">可能原因是验证服务器过载，或本月次数用尽</string>
+    <string name="uuid_is_copied">UUID已复制到剪贴板</string>
 </resources>

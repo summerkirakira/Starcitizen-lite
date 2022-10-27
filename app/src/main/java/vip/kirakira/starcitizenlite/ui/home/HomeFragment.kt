@@ -110,6 +110,8 @@ class HomeFragment : Fragment() {
                     binding.itemsLinearLayout.visibility = View.GONE
                     binding.itemsTitle.visibility = View.GONE
                 }
+                val pref = context?.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+                val isTranslationEnabled = pref?.getBoolean(getString(R.string.enable_localization), false) ?: false
                 for(item in it.items) {
                     val deatail_item = inflater.inflate(R.layout.hanger_detail_item, binding.itemsLinearLayout, false)
                     val itemImage = deatail_item.findViewById<ImageView>(R.id.detail_imageview)
@@ -117,8 +119,13 @@ class HomeFragment : Fragment() {
                     val itemKind = deatail_item.findViewById<TextView>(R.id.detail_kind)
                     val itemSubtitle = deatail_item.findViewById<TextView>(R.id.detail_subtitle)
                     loadImage(itemImage, item.image)
-                    itemName.text = item.title
-                    itemKind.text = item.kind
+                    if (isTranslationEnabled) {
+                        itemName.text = item.chineseTitle?:item.title
+                        itemKind.text = item.chineseSubtitle?:item.kind
+                    } else {
+                        itemName.text = item.title
+                        itemKind.text = item.kind
+                    }
                     itemSubtitle.text = item.subtitle
                     binding.itemsLinearLayout.addView(deatail_item)
                 }
@@ -130,7 +137,8 @@ class HomeFragment : Fragment() {
                     binding.alsoContainsLinearLayout.visibility = View.GONE
                     binding.alsoContainsTitle.visibility = View.GONE
                 }
-                for(alsoContains in it.alsoContains.split("#")) {
+                val contains = it.chineseAlsoContains?:it.alsoContains
+                for(alsoContains in contains.split("#")) {
                     val alsoContainsView = TextView(context)
                     alsoContainsView.text = alsoContains
                     alsoContainsView.textSize = 16f

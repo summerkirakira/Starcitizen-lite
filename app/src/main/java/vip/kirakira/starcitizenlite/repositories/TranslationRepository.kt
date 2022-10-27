@@ -56,8 +56,6 @@ class TranslationRepository(private val database: ShopItemDatabase) {
                 product_id = it.product_id,
                 type = it.type,
                 english_title = it.english_title,
-                content = it.content,
-                contains = it.contains,
                 excerpt = it.excerpt,
                 from_ship = it.from_ship,
                 to_ship = it.to_ship,

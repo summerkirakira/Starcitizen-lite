@@ -1,5 +1,7 @@
 package vip.kirakira.starcitizenlite.ui.home
 
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import vip.kirakira.starcitizenlite.database.BuybackItem
 import vip.kirakira.starcitizenlite.database.HangerItem
 import vip.kirakira.starcitizenlite.database.HangerPackageWithItems
@@ -24,12 +26,24 @@ data class HangerItemProperty(
     val isUpgrade: Boolean = false,
     val formShipId: Int = 0,
     val toShipId: Int = 0,
-    val toSkuId: Int = 0
+    val toSkuId: Int = 0,
+    val chineseAlsoContains: String? = null
 ) {
     data class Tag(
         val name: String,
         val color: String
     )
+}
+
+data class UpgradeInfo(
+    val id: Int,
+    val name: String,
+    val upgrade_type: String,
+    val match_items: List<MatchItem>,
+    val target_items: List<MatchItem>
+) {
+    data class MatchItem(val id: Int, val name: String)
+    data class TargetItem(val id: Int, val name: String)
 }
 
 fun List<BuybackItem>.toItemProperty(): List<HangerItemProperty> {
@@ -112,7 +126,7 @@ fun List<HangerPackageWithItems>.toItemPropertyList(): List<HangerItemProperty> 
             map[packageWithItems.hangerPackage.title + packageWithItems.hangerPackage.status] = HangerItemProperty(
                 packageWithItems.hangerPackage.id,
                 packageWithItems.hangerPackage.id.toString(),
-                packageWithItems.hangerPackage.title,
+                packageWithItems.hangerPackage.chineseTitle?:packageWithItems.hangerPackage.title,
                 packageWithItems.hangerPackage.image,
                 1,
                 status,
@@ -122,7 +136,8 @@ fun List<HangerPackageWithItems>.toItemPropertyList(): List<HangerItemProperty> 
                 packageWithItems.hangerPackage.value,
                 insuranceString,
                 packageWithItems.hangerPackage.also_contains,
-                packageWithItems.hangerItems
+                packageWithItems.hangerItems,
+                chineseAlsoContains = packageWithItems.hangerPackage.chineseContains
             )
         } else {
             map[packageWithItems.hangerPackage.title + packageWithItems.hangerPackage.status]!!.number++

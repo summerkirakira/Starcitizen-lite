@@ -1,9 +1,11 @@
 package vip.kirakira.starcitizenlite.activities
 
 import android.app.Application
+import android.content.ClipData
 import android.content.Context
 import android.os.Bundle
 import android.transition.Explode
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
@@ -13,6 +15,7 @@ import vip.kirakira.starcitizenlite.BuildConfig
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.repositories.TranslationRepository
+import vip.kirakira.starcitizenlite.uuid
 import vip.kirakira.viewpagertest.repositories.ShopItemRepository
 
 class SettingsActivity : AppCompatActivity() {
@@ -50,6 +53,18 @@ class SettingsActivity : AppCompatActivity() {
             val currentVersion: Preference? = findPreference("current_version")
             if(currentVersion != null){
                 currentVersion.summary = BuildConfig.VERSION_NAME
+            }
+            val localUUID: Preference? = findPreference("my_uuid")
+            if(localUUID != null){
+                localUUID.summary = uuid
+                localUUID.setOnPreferenceClickListener {
+                   //copy to clipboard
+                    val clip: ClipData = ClipData.newPlainText("uuid", uuid)
+                    val cm = application.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                    cm.setPrimaryClip(clip)
+                    Toast.makeText(application, getString(R.string.uuid_is_copied), Toast.LENGTH_SHORT).show()
+                    true
+                }
             }
             val localization: Preference? = findPreference("enable_localization")
             localization?.setOnPreferenceChangeListener { _, newValue ->

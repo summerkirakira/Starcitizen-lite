@@ -88,10 +88,12 @@ class MainFragment : Fragment() {
         }
 
         binding.shipSearchLayout.setOnClickListener {
-            val intent = Intent()
-            intent.action = "android.intent.action.VIEW"
-            val url = Uri.parse("https://www.erkul.games/live/calculator")
-            intent.data = url
+            if (viewModel.currentUser.value == null){
+                createWarningAlerter(requireActivity(), getString(R.string.please_login), getString(R.string.operate_after_login)).show()
+                return@setOnClickListener
+            }
+            val intent: Intent = Intent(activity, CartActivity::class.java)
+            intent.putExtra("url", "https://robertsspaceindustries.com/account/pledges")
             startActivity(intent)
 //            val intent = Intent(context,CartActivity::class.java)
 //            intent.putExtra("url", "https://www.erkul.games/live/calculator")

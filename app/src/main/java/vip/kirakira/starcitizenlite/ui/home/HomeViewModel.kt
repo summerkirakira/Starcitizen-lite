@@ -73,7 +73,7 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
         viewModelScope.launch {
             hangerItemFilter.value = ""
             try {
-                hangerItemRepository.refreshItems()
+                hangerItemRepository.refreshItems(getApplication())
             } catch (e: Exception) {
                 e.printStackTrace()
                 refreshHangerError.value = true

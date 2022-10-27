@@ -26,25 +26,26 @@ class BuyBackItemRepository(private val database: ShopItemDatabase) {
                         break
                     }
                     database.buybackItemDao.insertAll(data)
-                    for (buybackItem in data) {
-                        if (!database.translationDao.isProductExist(buybackItem.id)) {
-                            notTranslatedItems.add(
-                                AddNotTranslationBody(
-                                    product_id = buybackItem.id + 200000,
-                                    type = "buyback",
-                                    english_title = buybackItem.title,
-                                    content = listOf(),
-                                    excerpt = "",
-                                    contains = listOf(buybackItem.contains),
-                                    from_ship = 0,
-                                    to_ship = 0
-                                )
-                            )
-                        }
-                    }
+//                    for (buybackItem in data) {
+//                        val translation = database.translationDao.getByEnglishTitle(buybackItem.title)
+//                        if (translation == null) {
+//                            notTranslatedItems.add(
+//                                AddNotTranslationBody(
+//                                    product_id = buybackItem.id + 200000,
+//                                    type = "buyback",
+//                                    english_title = buybackItem.title,
+//                                    content = listOf(),
+//                                    excerpt = "",
+//                                    contains = listOf(buybackItem.contains),
+//                                    from_ship = 0,
+//                                    to_ship = 0
+//                                )
+//                            )
+//                        }
+//                    }
                     page++
                 }
-                CirnoApi.retrofitService.addNotTranslation(notTranslatedItems)
+//                CirnoApi.retrofitService.addNotTranslation(notTranslatedItems)
             }
             catch (e: Exception) {
                 e.printStackTrace()

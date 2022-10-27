@@ -55,11 +55,22 @@
                 android:summary="星河避难所 (StarRefuge) 与 CIG无任何联系">
         </Preference>
         <Preference
+                android:key="my_uuid"
+                android:title="本地UUID"
+                android:summary="" />
+        <Preference
                 android:key="about"
                 android:title="作者"
                 android:summary="妖精 &lt;summerkirakira@gmail.com&gt;">
             <intent android:action="android.intent.action.VIEW"
                     android:data="https://github.com/summerkirakira"/>
+        </Preference>
+        <Preference
+                android:key="about"
+                android:title="投喂开发者"
+                android:summary="这么可爱不来支持一下吗？" >
+            <intent android:action="android.intent.action.VIEW"
+                    android:data="https://afdian.net/a/summerkirakira" />
         </Preference>
         <Preference
                 android:key="about"
@@ -84,9 +95,5 @@
             <intent android:action="android.intent.action.VIEW"
                     android:data="https://github.com/summerkirakira/Starcitizen-lite"/>
         </PreferenceScreen>
-        <Preference
-                android:key="about"
-                android:title="投喂开发者"
-                android:summary="" />
     </PreferenceCategory>
 </PreferenceScreen>

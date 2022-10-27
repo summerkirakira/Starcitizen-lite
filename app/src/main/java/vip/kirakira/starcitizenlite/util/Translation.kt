@@ -15,4 +15,16 @@ class Translation {
             else -> subtitle
         }
     }
+    fun translateHangerItemType(type: String): String {
+        return when(type) {
+            "Hanger decoration" -> "机库装饰"
+            "Ship" -> "舰船"
+            "Hangar pass" -> "机库通行证"
+            "Component" -> "组件"
+            "FPS Equipment" -> "FPS装备"
+            "Skin" -> "涂装"
+            "Hangar decoration" -> "机库装饰"
+            else -> type
+        }
+    }
 }

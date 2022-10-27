@@ -458,8 +458,8 @@ class MainActivity : AppCompatActivity() {
         if(sharedPreferences.getBoolean(getString(R.string.CHECK_UPDATE_KEY), true)) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    checkAnnouncement(sharedPreferences.getInt(getString(R.string.CURRENT_ANNOUNCEMENT_ID), 0))
                     checkStartUp()
+                    checkAnnouncement(sharedPreferences.getInt(getString(R.string.CURRENT_ANNOUNCEMENT_ID), 0))
                     checkUpdate()
                     sharedPreferences.edit().putBoolean(getString(R.string.CHECK_UPDATE_KEY), false).apply()
                 } catch (e: Exception) {
@@ -504,8 +504,22 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun checkStartUp() {
         val preference = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
+        if ((preference.getString(getString(R.string.UUID), "DEFAULT") ?: "DEFAULT") == "DEFAULT") {
+            val uniqueID = UUID.randomUUID().toString()
+            preference.edit().putString(getString(R.string.UUID), uniqueID).apply()
+            uuid = uniqueID
+        } else {
+            uuid = preference.getString(getString(R.string.UUID), "DEFAULT") ?: "DEFAULT"
+        }
         if(preference.getBoolean(getString(R.string.FIRST_START_KEY), true)) {
             val startUpMessage = CirnoApi.retrofitService.getStartup()
+            val uniqueID = UUID.randomUUID().toString()
+            preference.edit().apply {
+                putString(getString(R.string.UUID), uniqueID)
+                putBoolean(getString(R.string.enable_localization_key), true)
+                putBoolean(getString(R.string.AUTO_ADD_CREDITS_KEY), true)
+            }.apply()
+            uuid = uniqueID
             this.runOnUiThread {
                 val builder = QMUIDialog.MessageDialogBuilder(this)
                 builder.setTitle(startUpMessage.title)
@@ -520,6 +534,8 @@ class MainActivity : AppCompatActivity() {
                     }
                     .show()
             }
+        } else {
+            uuid = preference.getString(getString(R.string.UUID), "DEFAULT")?: "DEFAULT"
         }
     }
 

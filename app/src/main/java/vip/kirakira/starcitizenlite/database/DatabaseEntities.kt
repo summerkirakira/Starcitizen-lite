@@ -79,9 +79,11 @@ data class HangerItem constructor(
     val image: String,
     val package_id: Int,
     val title: String,
-    val kind: String,
-    val subtitle: String,
-    val insert_time: Long
+    var kind: String,
+    var subtitle: String,
+    val insert_time: Long,
+    var chineseSubtitle: String? = null,
+    var chineseTitle: String? = null
 )
 
 
@@ -96,12 +98,12 @@ data class HangerPackage constructor(
     val upgrade_info: String,
     val date: Long,
     val contains: String,
-    val also_contains: String,
+    var also_contains: String,
     val can_gift: Boolean,
     val exchangeable: Boolean,
     val insert_time: Long,
-    val chineseTitle: String? = null,
-    val chineseContains: String? = null,
+    var chineseTitle: String? = null,
+    var chineseContains: String? = null,
     val chineseAlsoContains: String? = null,
 )
 
@@ -130,9 +132,7 @@ data class Translation constructor(
     val type: String,
     val create_at: Int = 0,
     val english_title: String,
-    val content: String,
-    val excerpt: String,
-    val contains: String,
+    val excerpt: String? = null,
     val from_ship: Int,
     val to_ship: Int,
     val title: String,

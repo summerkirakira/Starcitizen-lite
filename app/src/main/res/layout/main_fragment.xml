@@ -46,7 +46,7 @@
                         app:layout_constraintTop_toTopOf="parent"
                         android:src="@drawable/ic_ship_info_icon" style="@style/main_page_image"/>
                 <TextView
-                        android:text="@string/ship_info"
+                        android:text="@string/my_hanger"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         android:autoSizeMaxTextSize="12dp"

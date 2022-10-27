@@ -146,12 +146,14 @@ class ShoppingFragment : Fragment() {
                 }
                 ShoppingViewModel.UpgradeStage.CHOOSE_TO_SHIP -> {
                     binding.textViewShopItemDetailSubtitle.text = getString(R.string.ship_upgrade)
-                    val descriptionText = "${getString(R.string.click_arrow_to_choose_upgraded_ship)}。\n\n${getString(R.string.buy_upgrade_warning)}"
+                    val descriptionText = "${getString(R.string.click_arrow_to_choose_upgrade_to_ship)}。\n\n${getString(R.string.buy_upgrade_warning)}"
                     binding.textViewShopItemDetailDescription.text = descriptionText
                 }
 
                 ShoppingViewModel.UpgradeStage.CHOOSE_FROM_SHIP -> {
-
+                    binding.textViewShopItemDetailSubtitle.text = getString(R.string.ship_upgrade)
+                    val descriptionText = "${getString(R.string.click_arrow_to_choose_upgraded_ship)}。\n\n${getString(R.string.buy_upgrade_warning)}"
+                    binding.textViewShopItemDetailDescription.text = descriptionText
                 }
 
                 else -> {}
@@ -369,7 +371,7 @@ class ShoppingFragment : Fragment() {
                                                             createWarningAlerter(
                                                                 requireActivity(),
                                                                 "获取Token失败",
-                                                                "验证服务器过载，请稍后再试"
+                                                                getString(R.string.cirno_token_error)
                                                             ).show()
                                                             return@launch
                                                         }
@@ -379,7 +381,7 @@ class ShoppingFragment : Fragment() {
                                                     createWarningAlerter(
                                                         requireActivity(),
                                                         "获取Token失败",
-                                                        "请检查网络连接"
+                                                        getString(R.string.cirno_token_error)
                                                     ).show()
                                                     return@launch
                                                 }
@@ -458,6 +460,7 @@ class ShoppingFragment : Fragment() {
                             .setInputType(InputType.TYPE_CLASS_NUMBER)
                             .addAction("取消") { dialog, _ ->
                                 dialog.dismiss()
+                                upgradeCount = null
                             }
                             .addAction("确定") { dialog, _ ->
                                 upgradeCount = try {
@@ -520,7 +523,13 @@ class ShoppingFragment : Fragment() {
 //                                                    }
                                                 }
                                                 nextStep()
-                                                val tokenList = CirnoApi.retrofitService.getReCaptchaV3(1).captcha_list
+                                                val tokenList: List<RecaptchaList.ReCaptcha>?
+                                                try {
+                                                    tokenList = CirnoApi.retrofitService.getReCaptchaV3(1).captcha_list
+                                                } catch (e: Exception) {
+                                                    createWarningAlerter(requireActivity(), "获取Token失败", getString(R.string.cirno_token_error)).show()
+                                                    return@launch
+                                                }
                                                 if (tokenList == null) {
                                                     createWarningAlerter(requireActivity(), "购买失败", "获取Token失败").show()
                                                     return@launch

@@ -3,9 +3,11 @@ package vip.kirakira.starcitizenlite.activities
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import coil.clear
+import com.gyf.immersionbar.ImmersionBar
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper
 import com.tapadoo.alerter.Alerter
 import com.wyt.searchbox.SearchFragment
@@ -30,6 +32,7 @@ class PlayerSearch : AppCompatActivity() {
     lateinit var fleetText: TextView
     lateinit var organizationRankText: TextView
     lateinit var registerLocationText: TextView
+    lateinit var playerDisplayLayout: LinearLayout
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,11 +46,15 @@ class PlayerSearch : AppCompatActivity() {
         fleetText = findViewById(R.id.organization_name_value)
         organizationRankText = findViewById(R.id.organization_position_value)
         registerLocationText = findViewById(R.id.register_location_value)
+        playerDisplayLayout = findViewById(R.id.player_display_layout)
+        playerDisplayLayout.visibility = LinearLayout.INVISIBLE
         supportActionBar?.hide()
         QMUIStatusBarHelper.translucent(this)
 //        QMUIStatusBarHelper.setStatusBarLightMode(this)
         QMUIStatusBarHelper.getStatusbarHeight(this)
         //设置状态栏透明
+
+        initStatusBar()
 
         val searchButton: ImageView = findViewById(R.id.top_search)
         searchButton.setOnClickListener {
@@ -83,10 +90,20 @@ class PlayerSearch : AppCompatActivity() {
                     }
                     registerText.text = player.enlisted
                     registerLocationText.text = player.location
+                    playerDisplayLayout.visibility = LinearLayout.VISIBLE
                 }
             }
             }
         }
 
     }
+    fun  initStatusBar(){
+        val mImmersionBar = ImmersionBar.with(this)
+        mImmersionBar.transparentBar()
+            .fullScreen(false)
+            .navigationBarColor(R.color.white)
+            .init()
+
+    }
+
 }

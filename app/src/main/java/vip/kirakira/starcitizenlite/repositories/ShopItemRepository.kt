@@ -18,6 +18,7 @@ import vip.kirakira.starcitizenlite.network.CirnoApi
 import vip.kirakira.starcitizenlite.network.CirnoProperty.AddNotTranslationBody
 import vip.kirakira.starcitizenlite.network.RSIApi
 import vip.kirakira.starcitizenlite.network.shop.InitShipUpgradeProperty
+import vip.kirakira.starcitizenlite.repositories.TranslationRepository
 import vip.kirakira.starcitizenlite.util.Translation
 import vip.kirakira.viewpagertest.network.graphql.FilterShipsQuery
 import vip.kirakira.viewpagertest.network.graphql.UpdateCatalogMutation
@@ -28,6 +29,7 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
 
     val allItems: LiveData<List<ShopItem>> = database.shopItemDao.getAll()
     var isRefreshing: MutableLiveData<Boolean> = MutableLiveData(false)
+    val translationRepository = TranslationRepository(database)
 
 //    suspend fun getAll() = database.shopItemDao.getAll()
 //    suspend fun getShopItem(id: Int) = database.shopItemDao.getById(id)
@@ -86,6 +88,7 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
                 e.printStackTrace()
             }
             isRefreshing.postValue(false)
+            translationRepository.refreshTranslation(application)
         }
     }
 
@@ -108,7 +111,7 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
                 )
                 if (isTranslationEnabled) {
                     for (shopUpgradeItem in shopUpgradeItems) {
-                        if (!database.translationDao.isProductExist(shopUpgradeItem.id + 100000)) {
+                        if (!database.translationDao.isProductExist(shopUpgradeItem.id)) {
                             notTranslatedItems.add(
                                 AddNotTranslationBody(
                                     product_id = shopUpgradeItem.id + 100000,
@@ -122,7 +125,7 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
                                 )
                             )
                         } else {
-                            val translation = database.translationDao.getByProductId(shopUpgradeItem.id + 100000)
+                            val translation = database.translationDao.getByProductId(shopUpgradeItem.id)
                             shopUpgradeItem.chineseName = translation!!.title
                             shopUpgradeItem.chineseDescription = translation.excerpt
                         }
