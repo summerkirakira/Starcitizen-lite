@@ -80,7 +80,9 @@ fun List<BuybackItem>.toItemProperty(): List<HangerItemProperty> {
 fun List<HangerPackageWithItems>.toItemPropertyList(): List<HangerItemProperty> {
     val map = mutableMapOf<String, HangerItemProperty>()
     for(packageWithItems in this) {
-        if(map[packageWithItems.hangerPackage.title + packageWithItems.hangerPackage.status] == null){
+        val packageItemString = packageWithItems.hangerItems.map { it.title }.joinToString("#")
+        val saveKey = packageWithItems.hangerPackage.title + packageWithItems.hangerPackage.status + packageItemString + packageWithItems.hangerPackage.also_contains
+        if(map[saveKey] == null){
             var insuranceTime = 0
             var insuranceString = ""
             packageWithItems.hangerPackage.also_contains.split("#").forEach {
@@ -123,7 +125,10 @@ fun List<HangerPackageWithItems>.toItemPropertyList(): List<HangerItemProperty> 
             } else if(packageWithItems.hangerPackage.status == "Gifted") {
                 status = "已礼物"
             }
-            map[packageWithItems.hangerPackage.title + packageWithItems.hangerPackage.status] = HangerItemProperty(
+
+
+
+            map[saveKey] = HangerItemProperty(
                 packageWithItems.hangerPackage.id,
                 packageWithItems.hangerPackage.id.toString(),
                 packageWithItems.hangerPackage.chineseTitle?:packageWithItems.hangerPackage.title,
@@ -140,8 +145,8 @@ fun List<HangerPackageWithItems>.toItemPropertyList(): List<HangerItemProperty> 
                 chineseAlsoContains = packageWithItems.hangerPackage.chineseContains
             )
         } else {
-            map[packageWithItems.hangerPackage.title + packageWithItems.hangerPackage.status]!!.number++
-            map[packageWithItems.hangerPackage.title + packageWithItems.hangerPackage.status]!!.idList += ",${packageWithItems.hangerPackage.id}"
+            map[saveKey]!!.number++
+            map[saveKey]!!.idList += ",${packageWithItems.hangerPackage.id}"
         }
     }
     return map.values.toList()

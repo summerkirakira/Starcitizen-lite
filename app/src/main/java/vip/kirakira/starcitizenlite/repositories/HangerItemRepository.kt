@@ -41,13 +41,13 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
             if (rsi_cookie.contains("_rsi_device")) {
                 val getTime = System.currentTimeMillis()
                 try {
+                    translationRepository.refreshTranslation(application)
                     while (true) {
                         val data = HangerService().getHangerInfo(page)
                         if (data.hangerPackages.isEmpty()) {
                             break
                         }
                         if (isTranslationEnabled) {
-                            translationRepository.refreshTranslation(application)
                             for (hangerPackage in data.hangerPackages) {
                                 val contains: MutableList<String> = mutableListOf()
                                 val content: MutableList<String> = mutableListOf()
@@ -97,6 +97,7 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
                                 }
                                 contains.addAll(hangerPackage.also_contains.split("#"))
 
+
                                 if (hangerPackage.title.startsWith("Standalone Ship -")) {
                                     val shipName = hangerPackage.title.replace("Standalone Ship - ", "").trim()
                                     val ship = database.translationDao.getByEnglishTitle(shipName)
@@ -109,13 +110,19 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
                                     }
                                 }
 
-                                val packageTranslation = database.translationDao.getByEnglishTitle(hangerPackage.title.replace("Upgrades", "").trim())
+                                var translationKey = hangerPackage.title.replace("Upgrades", "").trim()
+
+                                if (hangerPackage.title.contains("nameable ship") && hangerPackage.title.contains("Contains")) {
+                                    translationKey = translationKey.split("Contains")[0].trim()
+                                }
+
+                                val packageTranslation = database.translationDao.getByEnglishTitle(translationKey)
                                 if (packageTranslation == null) {
                                     notTranslatedItems.add(
                                         AddNotTranslationBody(
                                             product_id = hangerPackage.id + 300000,
                                             type = "hanger",
-                                            english_title = hangerPackage.title.replace(" Upgrades", "").trim(),
+                                            english_title = translationKey,
                                             content = content,
                                             excerpt = "",
                                             contains = contains,
