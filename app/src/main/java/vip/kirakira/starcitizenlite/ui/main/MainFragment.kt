@@ -17,9 +17,7 @@ import com.qmuiteam.qmui.widget.dialog.QMUIDialog
 import com.youth.banner.adapter.BannerImageAdapter
 import com.youth.banner.holder.BannerImageHolder
 import com.youth.banner.indicator.CircleIndicator
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.activities.CartActivity
 import vip.kirakira.starcitizenlite.activities.PlayerSearch
@@ -29,6 +27,7 @@ import vip.kirakira.starcitizenlite.createWarningAlerter
 import vip.kirakira.starcitizenlite.database.BannerImage
 import vip.kirakira.starcitizenlite.database.ShopItemDatabase
 import vip.kirakira.starcitizenlite.databinding.MainFragmentBinding
+import vip.kirakira.starcitizenlite.network.CirnoApi
 import vip.kirakira.starcitizenlite.network.RSIApi
 
 
@@ -43,6 +42,8 @@ class MainFragment : Fragment() {
     val viewModel: MainViewModel by activityViewModels()
 
     lateinit var database: ShopItemDatabase
+
+    private val scope = CoroutineScope(Job() + Dispatchers.Main)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -72,19 +73,35 @@ class MainFragment : Fragment() {
         viewModel.currentUser.observe(viewLifecycleOwner) {}
 
         binding.organizationSearchLayout.setOnClickListener {
-            if (viewModel.currentUser.value == null){
-                createWarningAlerter(requireActivity(), getString(R.string.please_login), getString(R.string.operate_after_login)).show()
-                return@setOnClickListener
+            // 修改为促销码查询
+//            if (viewModel.currentUser.value == null){
+//                createWarningAlerter(requireActivity(), getString(R.string.please_login), getString(R.string.operate_after_login)).show()
+//                return@setOnClickListener
+//            }
+            scope.launch {
+                val promotionCode = CirnoApi.retrofitService.getAllPromotion()
+                val promotionNameList = promotionCode.map { it.chinese_title }
+                val builder = QMUIDialog.MultiCheckableDialogBuilder(requireContext())
+                builder.setTitle("请选择要兑换的礼物")
+                    .addItems(promotionNameList.toTypedArray(), null)
+                    .addAction("取消") { dialog, index -> dialog.dismiss() }
+                    .addAction("确认") { dialog, index ->
+                        dialog.dismiss()
+                        builder.checkedItemIndexes.forEach {
+                            scope.launch {
+                                val result = RSIApi.redeemPromoCode(promotionCode[it].promo, promotionCode[it].code, promotionCode[it].currency)
+                                if (result.success != 0) {
+                                    createSuccessAlerter(requireActivity(), "\"${promotionCode[it].chinese_title}\"兑换成功", result.msg).show()
+                                } else {
+                                    createWarningAlerter(requireActivity(), "\"${promotionCode[it].chinese_title}\"兑换失败", result.msg).show()
+                                }
+                            }
+                        }
+
+                    }
+                    .show()
             }
-            if (viewModel.currentUser.value!!.organization.isEmpty()) {
-                val intent = Intent(context, CartActivity::class.java)
-                intent.putExtra("url", "https://robertsspaceindustries.com/community/orgs")
-                startActivity(intent)
-                return@setOnClickListener
-            }
-            val intent = Intent(context,CartActivity::class.java)
-            intent.putExtra("url", "https://robertsspaceindustries.com/orgs/${viewModel.currentUser.value!!.organization}")
-            startActivity(intent)
+
         }
 
         binding.shipSearchLayout.setOnClickListener {

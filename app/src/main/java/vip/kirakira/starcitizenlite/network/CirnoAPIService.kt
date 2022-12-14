@@ -58,6 +58,9 @@ interface CirnoApiService {
 
     @POST("translation/add")
     suspend fun addNotTranslation(@Body translations: List<AddNotTranslationBody>): AddTranslationResult
+
+    @GET("promotion/all")
+    suspend fun getAllPromotion(): List<PromotionCode>
 }
 
 object CirnoApi {

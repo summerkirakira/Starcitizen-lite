@@ -111,7 +111,7 @@
                         style="@style/main_page_image"/>
                 <TextView
                         android:src="@drawable/ic_player_search"
-                        android:text="@string/my_organization"
+                        android:text="@string/redeem_promotion"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         style="@style/main_page_icon"/>

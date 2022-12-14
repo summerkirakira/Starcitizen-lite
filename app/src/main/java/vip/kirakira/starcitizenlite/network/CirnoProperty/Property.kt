@@ -1,6 +1,7 @@
 package vip.kirakira.starcitizenlite.network.CirnoProperty
 
 import com.squareup.moshi.JsonClass
+import java.util.Currency
 
 data class Announcement(
     val id: Int,
@@ -63,4 +64,11 @@ class AddNotTranslationBody(
 
 data class AddTranslationResult(
     val message: String
+)
+
+data class PromotionCode(
+    val chinese_title: String,
+    val promo: String,
+    val currency: String,
+    val code: String
 )

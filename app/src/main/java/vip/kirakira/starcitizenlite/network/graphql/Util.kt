@@ -43,3 +43,10 @@ class ApplyTokenBody(private val jwt: String)
 
 @JsonClass(generateAdapter = true)
 class BuyBackPledgeBody(private val id: Int)
+
+@JsonClass(generateAdapter = true)
+class ApplyPromoBody(
+    private val promo: String,
+    private val currency: String,
+    private val code: String
+    )

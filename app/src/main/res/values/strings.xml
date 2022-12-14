@@ -155,4 +155,6 @@
     <string name="AUTO_ADD_CREDITS_KEY">auto_add_credits</string>
     <string name="cirno_token_error">可能原因是验证服务器过载，或本月次数用尽</string>
     <string name="uuid_is_copied">UUID已复制到剪贴板</string>
+    <string name="promotion_button">礼物领取</string>
+    <string name="redeem_promotion">礼物兑换</string>
 </resources>

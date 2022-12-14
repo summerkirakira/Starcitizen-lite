@@ -193,3 +193,8 @@ data class SignUpProperty(val errors: List<Error>?, val data: Data) {
         }
     }
 }
+
+data class ApplyPromoProperty(
+    val success: Int,
+    val code: String,
+    val msg: String)

@@ -23,6 +23,7 @@ import vip.kirakira.starcitizenlite.network.shop.*
 import vip.kirakira.starcitizenlite.network.upgrades.InitUpgradeProperty
 import vip.kirakira.viewpagertest.network.graphql.*
 import java.net.URL
+import java.util.Currency
 
 //private const val BASE_URL = "http://100.70.59.3:6000"
 
@@ -54,7 +55,9 @@ val client: OkHttpClient = OkHttpClient
                 .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
                 .build()
             return@addInterceptor chain.proceed(newRequest)
-        } else if(request.url.toString().startsWith("https://robertsspaceindustries.com/api/account")) {
+        } else if(request.url.toString().startsWith("https://robertsspaceindustries.com/api/account") ||
+                request.url.toString() == "https://robertsspaceindustries.com/api/promo/redeemPromoCode"
+                ) {
             val newRequest = request.newBuilder()
                 .addHeader("cookie", rsi_cookie)
                 .addHeader("x-rsi-token", rsi_token)
@@ -198,6 +201,9 @@ interface RSIApiService {
     @POST("graphql")
     suspend fun signUp(@Body body: RegisterBody): SignUpProperty
 
+    @POST("api/promo/redeemPromoCode")
+    suspend fun redeemPromoCode(@Body body: ApplyPromoBody): ApplyPromoProperty
+
 }
 
 
@@ -278,6 +284,10 @@ object RSIApi {
 
     suspend fun applyUpgrade(upgrade_id: String, target_id: String, password: String): ApplyUpgradeProperty {
         return retrofitService.applyUpgrade(ApplyUpgradeBody(password, target_id, upgrade_id))
+    }
+
+    suspend fun redeemPromoCode(promo: String, code: String, currency: String): ApplyPromoProperty {
+        return retrofitService.redeemPromoCode(ApplyPromoBody(promo, currency, code))
     }
 
 }

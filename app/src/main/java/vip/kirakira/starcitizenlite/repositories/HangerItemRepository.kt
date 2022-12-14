@@ -99,10 +99,15 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
 
 
                                 if (hangerPackage.title.startsWith("Standalone Ship -")) {
-                                    val shipName = hangerPackage.title.replace("Standalone Ship - ", "").trim()
+                                    val shipName = hangerPackage.title.replace("Standalone Ship - ", "")
+                                        .replace("Upgrades", "").trim()
                                     val ship = database.translationDao.getByEnglishTitle(shipName)
                                     if (ship != null) {
-                                        hangerPackage.chineseTitle = "单船 - ${ship.title}"
+                                        if (hangerPackage.title.contains("Upgrades")) {
+                                            hangerPackage.chineseTitle = "单船 - ${ship.title}" + " 升级"
+                                        } else {
+                                            hangerPackage.chineseTitle = "单船 - ${ship.title}"
+                                        }
                                     } else {
                                         hangerPackage.chineseTitle = "单船 - $shipName"
                                         notTranslatedItems.add(AddNotTranslationBody(hangerPackage.id + 600000,
