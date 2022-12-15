@@ -9,6 +9,7 @@
         <entry key="app/src/main/res/drawable/bottom_button_ripple.xml" value="0.1875" />
         <entry key="app/src/main/res/drawable/ic_broken_image.xml" value="0.1875" />
         <entry key="app/src/main/res/drawable/ic_drawer_feedback.xml" value="0.11842105263157894" />
+        <entry key="app/src/main/res/drawable/ic_drawer_logout.xml" value="0.148" />
         <entry key="app/src/main/res/drawable/ic_exchange.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_hanger_switch.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_search.xml" value="0.1875" />
@@ -26,7 +27,7 @@
         <entry key="app/src/main/res/layout/activity_upgrade.xml" value="0.15921052631578947" />
         <entry key="app/src/main/res/layout/activity_web_login.xml" value="0.17135416666666667" />
         <entry key="app/src/main/res/layout/cool_photo_viewer.xml" value="0.2125126433579356" />
-        <entry key="app/src/main/res/layout/drawer_content.xml" value="0.3800978792822186" />
+        <entry key="app/src/main/res/layout/drawer_content.xml" value="0.20850821863768734" />
         <entry key="app/src/main/res/layout/feed_layout.xml" value="0.10756578947368421" />
         <entry key="app/src/main/res/layout/hanger_detail_item.xml" value="0.1" />
         <entry key="app/src/main/res/layout/hanger_list_item.xml" value="0.2770083102493075" />
