@@ -81,6 +81,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var shoppingViewModel: ShoppingViewModel
     private lateinit var feedbackButton: ConstraintLayout
     private lateinit var settingsButton: ConstraintLayout
+    private lateinit var logoutButton: ConstraintLayout
     lateinit var  shipUpgradeButton: ImageView
 
 
@@ -145,6 +146,7 @@ class MainActivity : AppCompatActivity() {
         switchAccount = findViewById(R.id.switch_account_layout) //切换账号按钮
         feedbackButton = findViewById(R.id.drawer_feedback_loyout) //反馈按钮
         settingsButton = findViewById(R.id.drawer_settings_layout) //设置按钮
+        logoutButton = findViewById(R.id.drawer_logout_loyout) //登出按钮
         val drawerLayout: DrawerLayout = findViewById(R.id.root_drawer) //滑动菜单
         firstLine = findViewById(R.id.avatar_first_line)
         secondLine = findViewById(R.id.avatar_second_line)
@@ -453,6 +455,29 @@ class MainActivity : AppCompatActivity() {
                 }
             }, 1000)
             startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle())
+        }
+
+        logoutButton.setOnClickListener {
+            if (currentUser.value == null) {
+                Toast.makeText(this, "当前未登录账号哟~", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            val builder = QMUIDialog.MessageDialogBuilder(this)
+            builder.setTitle("确认登出")
+                .setMessage("确认要从避难所登出并删除账号${currentUser.value!!.handle}吗？")
+                .addAction("取消") { dialog, index -> dialog.dismiss() }
+                .addAction("确认") { dialog, index ->
+                    thread {
+                        database.userDao.delete(primaryUserId)
+                    }
+                    dialog.dismiss()
+                    Toast.makeText(this, "登出成功...", Toast.LENGTH_SHORT).show()
+                    sharedPreferences.edit().putInt(getString(R.string.primary_user_key), 0).apply()
+                    val intent = Intent(this@MainActivity, MainActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+                .show()
         }
 
         if(sharedPreferences.getBoolean(getString(R.string.CHECK_UPDATE_KEY), true)) {

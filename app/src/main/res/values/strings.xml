@@ -157,4 +157,5 @@
     <string name="uuid_is_copied">UUID已复制到剪贴板</string>
     <string name="promotion_button">礼物领取</string>
     <string name="redeem_promotion">礼物兑换</string>
+    <string name="logout_current_account">登出当前账号</string>
 </resources>
