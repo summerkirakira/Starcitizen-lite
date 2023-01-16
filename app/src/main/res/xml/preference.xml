@@ -5,6 +5,10 @@
                 android:key="auto_add_credits"
                 android:title="@string/auto_add_credits_title"
                 android:summary="@string/auto_add_credits_summary"/>
+        <SwitchPreferenceCompat
+                android:key="auto_add_credits"
+                android:title="@string/do_not_allow_reclaim"
+                android:summary="@string/do_not_allow_reclaim_summary"/>
 <!--        <EditTextPreference-->
 <!--                android:key="edittext_preference"-->
 <!--                android:title="Edit text preference"-->

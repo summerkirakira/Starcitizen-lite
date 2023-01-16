@@ -17,6 +17,7 @@
         <entry key="app/src/main/res/drawable/ic_shop_no_data.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_stock_ok.xml" value="0.1875" />
         <entry key="app/src/main/res/drawable/loading_img.xml" value="0.13453947368421051" />
+        <entry key="app/src/main/res/drawable/number_shape.xml" value="0.1555" />
         <entry key="app/src/main/res/drawable/top_toolbar_button_ripple.xml" value="0.14429967426710097" />
         <entry key="app/src/main/res/layout/activity_cart.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_cool_photo_view.xml" value="0.1" />
@@ -30,7 +31,7 @@
         <entry key="app/src/main/res/layout/drawer_content.xml" value="0.20850821863768734" />
         <entry key="app/src/main/res/layout/feed_layout.xml" value="0.10756578947368421" />
         <entry key="app/src/main/res/layout/hanger_detail_item.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/hanger_list_item.xml" value="0.2770083102493075" />
+        <entry key="app/src/main/res/layout/hanger_list_item.xml" value="0.18582000732421877" />
         <entry key="app/src/main/res/layout/home_fragment.xml" value="0.25110619469026546" />
         <entry key="app/src/main/res/layout/image_banner.xml" value="0.12368421052631579" />
         <entry key="app/src/main/res/layout/main_fragment.xml" value="0.31525735294117646" />
@@ -40,7 +41,7 @@
         <entry key="app/src/main/res/layout/shopping_catalog_list_item.xml" value="0.1" />
         <entry key="app/src/main/res/layout/shopping_fragment.xml" value="0.17135416666666667" />
         <entry key="app/src/main/res/menu/hanger_menu_bar.xml" value="0.1859375" />
-        <entry key="app/src/main/res/xml/preference.xml" value="0.11447368421052631" />
+        <entry key="app/src/main/res/xml/preference.xml" value="0.165" />
         <entry key="app/src/main/res/xml/root_preferences.xml" value="0.11480263157894736" />
       </map>
     </option>
