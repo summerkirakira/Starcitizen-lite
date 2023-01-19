@@ -27,7 +27,7 @@
                                 android:layout_height="300dp"
                                 android:id="@+id/personal_info_top_layout"
                                 app:layout_constraintTop_toTopOf="parent"
-                                android:background="@color/personal_info_background" >
+                                android:background="?attr/colorPrimary" >
                             <io.getstream.avatarview.AvatarView
                                     android:layout_width="140dp"
                                     android:layout_height="140dp"

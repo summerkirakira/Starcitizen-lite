@@ -39,6 +39,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -113,6 +117,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
+
+    implementation 'com.github.vipulasri:timelineview:1.1.5'
 
 //    implementation 'com.github.Hitomis.transferee:Transferee:1.6.1'
 }

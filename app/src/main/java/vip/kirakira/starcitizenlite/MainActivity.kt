@@ -1,16 +1,14 @@
 package vip.kirakira.starcitizenlite
 
 import android.app.ActivityOptions
-import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
+import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -21,8 +19,6 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.azhon.appupdate.manager.DownloadManager
@@ -42,7 +38,6 @@ import vip.kirakira.starcitizenlite.activities.SettingsActivity
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.network.*
-import vip.kirakira.starcitizenlite.network.CirnoProperty.Announcement
 import vip.kirakira.starcitizenlite.network.shop.getCartSummary
 import vip.kirakira.starcitizenlite.ui.ScreenSlidePagerAdapter
 import vip.kirakira.starcitizenlite.ui.home.HomeFragment
@@ -117,6 +112,11 @@ class MainActivity : AppCompatActivity() {
 
         val allUsers: LiveData<List<User>> = database.userDao.getAll()
 
+        var typedValue = TypedValue()
+        theme.resolveAttribute(R.attr.colorPrimary, typedValue, true)
+
+        val colorPrimary = typedValue.data
+
 
 
         allUsers.observe(this) {
@@ -161,8 +161,8 @@ class MainActivity : AppCompatActivity() {
         bottomShopIcon.setColorFilter(Color.GRAY)
         bottomHangerIcon.setColorFilter(Color.GRAY)
         if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
-        bottomMainIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
-        mMovingBar.setBackgroundColor(getColor(R.color.bottom_icon_selected_color))
+        bottomMainIcon.setColorFilter(colorPrimary)
+        mMovingBar.setBackgroundColor(colorPrimary)
 
         currentUser.observe(this) {
             if (it != null) {
@@ -283,7 +283,7 @@ class MainActivity : AppCompatActivity() {
             override fun onPageSelected(position: Int) {
                 when(position) {
                     FragmentType.SHOPPING.value -> {
-                        bottomShopIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
+                        bottomShopIcon.setColorFilter(colorPrimary)
                         bottomHangerIcon.setColorFilter(Color.GRAY)
                         bottomMainIcon.setColorFilter(Color.GRAY)
                         if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
@@ -303,7 +303,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     FragmentType.HANGER.value -> {
                         bottomShopIcon.setColorFilter(Color.GRAY)
-                        bottomHangerIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
+                        bottomHangerIcon.setColorFilter(colorPrimary)
                         bottomMainIcon.setColorFilter(Color.GRAY)
                         if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
                         filterButton.setImageDrawable(getDrawable(R.drawable.ic_exchange))
@@ -319,7 +319,7 @@ class MainActivity : AppCompatActivity() {
                     FragmentType.MAIN.value -> {
                         bottomShopIcon.setColorFilter(Color.GRAY)
                         bottomHangerIcon.setColorFilter(Color.GRAY)
-                        bottomMainIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
+                        bottomMainIcon.setColorFilter(colorPrimary)
                         if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
                         searchButton.setColorFilter(Color.WHITE)
                         setAvatarLine(ColorStateList.valueOf(Color.WHITE))
@@ -333,7 +333,7 @@ class MainActivity : AppCompatActivity() {
                         bottomShopIcon.setColorFilter(Color.GRAY)
                         bottomHangerIcon.setColorFilter(Color.GRAY)
                         bottomMainIcon.setColorFilter(Color.GRAY)
-                        if(primaryUserId == 0) bottomMeIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
+                        if(primaryUserId == 0) bottomMeIcon.setColorFilter(colorPrimary)
                         filterButton.visibility = View.GONE
 
                         shipUpgradeButton.visibility = View.GONE

@@ -21,6 +21,7 @@
         <entry key="app/src/main/res/drawable/top_toolbar_button_ripple.xml" value="0.14429967426710097" />
         <entry key="app/src/main/res/layout/activity_cart.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_cool_photo_view.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_hangar_log.xml" value="0.1111111111111111" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.1006578947368421" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25955917955110863" />
         <entry key="app/src/main/res/layout/activity_player_search.xml" value="0.1" />
@@ -31,7 +32,7 @@
         <entry key="app/src/main/res/layout/drawer_content.xml" value="0.20850821863768734" />
         <entry key="app/src/main/res/layout/feed_layout.xml" value="0.10756578947368421" />
         <entry key="app/src/main/res/layout/hanger_detail_item.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/hanger_list_item.xml" value="0.18582000732421877" />
+        <entry key="app/src/main/res/layout/hanger_list_item.xml" value="0.25" />
         <entry key="app/src/main/res/layout/home_fragment.xml" value="0.25110619469026546" />
         <entry key="app/src/main/res/layout/image_banner.xml" value="0.12368421052631579" />
         <entry key="app/src/main/res/layout/main_fragment.xml" value="0.31525735294117646" />

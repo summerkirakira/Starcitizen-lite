@@ -115,7 +115,9 @@
     <string name="password">密码</string>
     <string name="login">登录</string>
     <string name="register">注册</string>
-    <string name="login_by_web"><u>点击使用网页登录</u></string>
+    <string name="login_by_web">
+        <u>点击使用网页登录</u>
+    </string>
     <string name="please_enter_email_and_password">请输入邮箱和密码</string>
     <string name="get_csrf_token_error">获取CSRF Token失败</string>
     <string name="get_captcha_failed">获取Token失败，本月次数可能用尽</string>
@@ -160,4 +162,5 @@
     <string name="logout_current_account">登出当前账号</string>
     <string name="do_not_allow_reclaim">禁止融船操作</string>
     <string name="do_not_allow_reclaim_summary">打死我都不融船！</string>
+    <string name="theme_key">CURRENT_THEME_KEY</string>
 </resources>

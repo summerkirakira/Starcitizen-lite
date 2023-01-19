@@ -162,6 +162,45 @@ data class BannerImage constructor(
    val url: String
 )
 
+@Entity(tableName = "hangar_ship")
+data class HangarShip constructor(
+    @PrimaryKey
+    val id: Int,
+    val name: String,
+    val shipId: Int? = null,
+    val packageId: Int,
+    val packageTitle: String,
+    val imageUrl: String,
+    val chinesePackageTitle: String? = null,
+    val image: String,
+    val price: Int,
+    val current_price: Int,
+    val is_upgrade: Boolean,
+    val insurance: Int,
+    val date: Long,
+    val isGiftable: Boolean,
+    val packagePrice: Int,
+    val isReclaimable: Boolean,
+    val receiveTime: Long,
+    val insert_time: Long
+)
+
+@Entity(tableName = "hangar_log")
+data class HangarLog constructor(
+    @PrimaryKey
+    val id: Int,
+    val time: Long,
+    val type: String,
+    val name: String,
+    val chineseName: String? = null,
+    val price: Int? = null,
+    val source: String? = null,
+    val target: String? = null,
+    val operator: String? = null,
+    val reason: String? = null,
+    val insert_time: Long
+)
+
 fun List<ShopItem>.toCatalogProperty(): List<CatalogProperty> {
     return map {
         CatalogProperty(

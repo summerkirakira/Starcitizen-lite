@@ -103,6 +103,23 @@ interface BannerDao {
     fun getAll(): LiveData<List<BannerImage>>
 }
 
+interface ShipDao {
+    @Query("SELECT * FROM hangar_ship")
+    fun getAll(): LiveData<List<HangarShip>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(hangarShips: List<HangarShip>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(hangarShip: HangarShip)
+
+    @Query("Delete FROM hangar_ship")
+    fun deleteAll()
+
+    @Query("SELECT * FROM hangar_ship where id = :id")
+    fun getById(id: Int): LiveData<HangarShip>
+}
+
 @Dao
 interface TranslationDao {
     @Query("SELECT * FROM translation")
@@ -154,7 +171,16 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
 }
 
 @Database(
-    entities = [ShopItem::class, HangerItem::class, HangerPackage::class, BuybackItem::class, User::class, BannerImage::class, Translation::class],
+    entities = [
+        ShopItem::class,
+        HangerItem::class,
+        HangerPackage::class,
+        BuybackItem::class,
+        User::class,
+        BannerImage::class,
+        Translation::class,
+        HangarShip::class
+               ],
 //    autoMigrations = [
 //        AutoMigration (
 //            from = 1,
