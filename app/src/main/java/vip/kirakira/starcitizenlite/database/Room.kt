@@ -103,6 +103,7 @@ interface BannerDao {
     fun getAll(): LiveData<List<BannerImage>>
 }
 
+@Dao
 interface ShipDao {
     @Query("SELECT * FROM hangar_ship")
     fun getAll(): LiveData<List<HangarShip>>
@@ -118,6 +119,27 @@ interface ShipDao {
 
     @Query("SELECT * FROM hangar_ship where id = :id")
     fun getById(id: Int): LiveData<HangarShip>
+}
+
+@Dao
+interface HangarLogDao {
+    @Query("SELECT * FROM hangar_log")
+    fun getAll(): LiveData<List<HangarLog>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(hangarLogs: List<HangarLog>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(hangarLog: HangarLog)
+
+    @Query("Delete FROM hangar_log")
+    fun deleteAll()
+
+    @Query("SELECT * FROM hangar_log where id = :id")
+    fun getById(id: Int): LiveData<HangarLog>
+
+    @Query("SELECT * FROM hangar_log where target = :target")
+    fun getByTarget(target: String): LiveData<List<HangarLog>>
 }
 
 @Dao
@@ -179,7 +201,8 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
         User::class,
         BannerImage::class,
         Translation::class,
-        HangarShip::class
+        HangarShip::class,
+        HangarLog::class
                ],
 //    autoMigrations = [
 //        AutoMigration (
@@ -189,7 +212,7 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
 //        )
 //    ],
     exportSchema = true,
-    version = 2)
+    version = 3)
 abstract class ShopItemDatabase: RoomDatabase() {
     abstract val shopItemDao: ShopItemDao
     abstract val hangerItemDao: HangerItemDao
@@ -197,6 +220,7 @@ abstract class ShopItemDatabase: RoomDatabase() {
     abstract val userDao: UserDao
     abstract val bannerDao: BannerDao
     abstract val translationDao: TranslationDao
+    abstract val hangarLogDao: HangarLogDao
 
     @RenameTable.Entries(
         RenameTable(fromTableName = "banner_image", toTableName = "banner_image2")

@@ -188,7 +188,7 @@ data class HangarShip constructor(
 @Entity(tableName = "hangar_log")
 data class HangarLog constructor(
     @PrimaryKey
-    val id: Int,
+    val id: String,
     val time: Long,
     val type: String,
     val name: String,

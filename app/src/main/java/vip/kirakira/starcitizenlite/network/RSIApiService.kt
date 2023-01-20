@@ -83,7 +83,8 @@ val client: OkHttpClient = OkHttpClient
             return@addInterceptor chain.proceed(newRequest)
         } else if (
             request.url.toString() == "https://robertsspaceindustries.com/api/store/v2/cart/token" ||
-                    request.url.toString() == "https://robertsspaceindustries.com/api/store/buyBackPledge"
+            request.url.toString() == "https://robertsspaceindustries.com/api/store/buyBackPledge" ||
+            request.url.toString() == "https://robertsspaceindustries.com/api/account/pledgeLog"
         ) {
             val newRequest = request.newBuilder()
                 .addHeader("cookie", rsi_cookie)
@@ -204,6 +205,9 @@ interface RSIApiService {
     @POST("api/promo/redeemPromoCode")
     suspend fun redeemPromoCode(@Body body: ApplyPromoBody): ApplyPromoProperty
 
+    @POST("api/account/pledgeLog")
+    suspend fun getPledgeLog(@Body body: GetPledgeBody): HangarLogProperty
+
 }
 
 
@@ -288,6 +292,10 @@ object RSIApi {
 
     suspend fun redeemPromoCode(promo: String, code: String, currency: String): ApplyPromoProperty {
         return retrofitService.redeemPromoCode(ApplyPromoBody(promo, currency, code))
+    }
+
+    suspend fun getPledgeLog(): String {
+        return HangarLogParser().parseLog(retrofitService.getPledgeLog(GetPledgeBody(1)).data.rendered)
     }
 
 }

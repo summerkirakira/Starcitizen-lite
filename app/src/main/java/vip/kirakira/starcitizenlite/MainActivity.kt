@@ -186,6 +186,9 @@ class MainActivity : AppCompatActivity() {
                 drawerUserHangerValue.text = userHangerValue
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
+                        //Test here
+                        RSIApi.getPledgeLog()
+
                         saveUserData(20085, it.rsi_device, it.rsi_token, "", "")
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -210,6 +213,8 @@ class MainActivity : AppCompatActivity() {
                                 }
                                 .show()
                         }
+
+
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -479,6 +484,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 .show()
         }
+
 
         if(sharedPreferences.getBoolean(getString(R.string.CHECK_UPDATE_KEY), true)) {
             CoroutineScope(Dispatchers.IO).launch {

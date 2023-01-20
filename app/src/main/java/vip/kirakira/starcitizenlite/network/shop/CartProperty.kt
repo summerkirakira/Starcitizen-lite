@@ -198,3 +198,12 @@ data class ApplyPromoProperty(
     val success: Int,
     val code: String,
     val msg: String)
+
+data class HangarLogProperty(
+    val code: String,
+    val msg: String,
+    val success: Int,
+    val data: Data
+) {
+    data class Data(val page: Int, val pagecount: Int, val rendered: String)
+}
