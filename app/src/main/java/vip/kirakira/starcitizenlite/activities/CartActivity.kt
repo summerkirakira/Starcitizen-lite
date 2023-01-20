@@ -15,6 +15,7 @@ import android.webkit.*
 import androidx.appcompat.app.AppCompatActivity
 import com.gyf.immersionbar.ImmersionBar
 import vip.kirakira.starcitizenlite.R
+import vip.kirakira.starcitizenlite.createWarningAlerter
 import vip.kirakira.starcitizenlite.network.rsi_cookie
 
 
@@ -23,6 +24,8 @@ class CartActivity : AppCompatActivity() {
     var recorder = WebLoginActivity.PayloadRecorder()
 
     val RSI_URL = "https://robertsspaceindustries.com"
+
+    var isWarned = false
 
     fun jumpToCartActivity(context: Context) {
         val bundle = Bundle()
@@ -59,18 +62,23 @@ class CartActivity : AppCompatActivity() {
 
             override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest): WebResourceResponse? {
                 val url = request.url.toString()
-                if (url.startsWith("https://www.paypal.com/checkoutnow")){
-                    val urlList = url.split("&")
-                    var newUrlList = mutableListOf<String>()
-                    urlList.forEach {
-                        if (!it.contains("xcomponent") && !it.contains("version")){
-                            newUrlList.add(it)
-                        }
+                if (url.startsWith("https://www.paypal.com")) {
+                    if (!isWarned) {
+                        isWarned = true
+                        createWarningAlerter(this@CartActivity,"暂不支持PayPal支付", "出于账户安全考量，请使用信用点或者信用卡支付哦").show()
                     }
-                    val intent = Intent()
-                    intent.action = "android.intent.action.VIEW"
-                    intent.data = Uri.parse(newUrlList.joinToString("&"))
-                    startActivity(intent)
+//                    val urlList = url.split("&")
+//                    var newUrlList = mutableListOf<String>()
+//                    urlList.forEach {
+//                        if (!it.contains("xcomponent") && !it.contains("version")){
+//                            newUrlList.add(it)
+//                        }
+//                    }
+//                    val intent = Intent()
+//                    intent.action = "android.intent.action.VIEW"
+//                    intent.data = Uri.parse(newUrlList.joinToString("&"))
+//                    startActivity(intent)
+                    return WebResourceResponse("text/html", "utf-8", null)
                 }
                 if (url == "https://robertsspaceindustries.com/graphql") {
                     // go back to last activity
