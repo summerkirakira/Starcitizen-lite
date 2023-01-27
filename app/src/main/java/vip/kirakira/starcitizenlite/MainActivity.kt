@@ -8,6 +8,7 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
@@ -23,6 +24,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.azhon.appupdate.manager.DownloadManager
 import com.azhon.appupdate.util.ApkUtil
+import com.github.vipulasri.timelineview.TimelineView
 import com.gyf.immersionbar.ImmersionBar
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog
 import com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
@@ -35,11 +37,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import vip.kirakira.starcitizenlite.activities.LoginActivity
 import vip.kirakira.starcitizenlite.activities.SettingsActivity
+import vip.kirakira.starcitizenlite.database.HangarLog
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.network.*
 import vip.kirakira.starcitizenlite.network.shop.getCartSummary
 import vip.kirakira.starcitizenlite.ui.ScreenSlidePagerAdapter
+import vip.kirakira.starcitizenlite.ui.hangarlog.HangarLogBottomSheet
+import vip.kirakira.starcitizenlite.ui.hangarlog.HangarLogViewModel
 import vip.kirakira.starcitizenlite.ui.home.HomeFragment
 import vip.kirakira.starcitizenlite.ui.home.HomeViewModel
 import vip.kirakira.starcitizenlite.ui.loadUserAvatar
@@ -74,6 +79,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var switchAccount: ConstraintLayout
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var shoppingViewModel: ShoppingViewModel
+    private lateinit var hangarLogViewModel: HangarLogViewModel
     private lateinit var feedbackButton: ConstraintLayout
     private lateinit var settingsButton: ConstraintLayout
     private lateinit var logoutButton: ConstraintLayout
@@ -101,6 +107,8 @@ class MainActivity : AppCompatActivity() {
         shoppingViewModel = ViewModelProvider(this).get(ShoppingViewModel::class.java)
 
         homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
+
+        hangarLogViewModel = ViewModelProvider(this).get(HangarLogViewModel::class.java)
 
         val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
 
@@ -186,8 +194,8 @@ class MainActivity : AppCompatActivity() {
                 drawerUserHangerValue.text = userHangerValue
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
-                        //Test here
-                        RSIApi.getPledgeLog()
+                        // Test here
+                        // RSIApi.getPledgeLog()
 
                         saveUserData(20085, it.rsi_device, it.rsi_token, "", "")
                     } catch (e: Exception) {
@@ -303,6 +311,7 @@ class MainActivity : AppCompatActivity() {
                             shipUpgradeButton.setColorFilter(getColor(R.color.upgrade_is_selected))
                         }
                         shipUpgradeButton.visibility = View.VISIBLE
+                        shipUpgradeButton.setImageDrawable(getDrawable(R.drawable.ic_ship_upgrade))
                         setAvatarLine(ColorStateList.valueOf(getColor(R.color.avatar_left_line)))
                         immersionBar.statusBarDarkFont(true).init()
                     }
@@ -316,7 +325,9 @@ class MainActivity : AppCompatActivity() {
                         filterButton.setColorFilter(getColor(R.color.avatar_left_line))
                         filterButton.visibility = View.VISIBLE
 
-                        shipUpgradeButton.visibility = View.GONE
+                        shipUpgradeButton.setImageDrawable(getDrawable(R.drawable.baseline_hangar_log_alt_24))
+                        shipUpgradeButton.setColorFilter(getColor(R.color.avatar_left_line))
+                        shipUpgradeButton.visibility = View.VISIBLE
 
                         setAvatarLine(ColorStateList.valueOf(getColor(R.color.avatar_left_line)))
                         immersionBar.statusBarDarkFont(true).init()
@@ -354,7 +365,6 @@ class MainActivity : AppCompatActivity() {
 
 //        val intent = Intent(this, LoginActivity::class.java)
 //        startActivity(intent)
-
 
 
 
@@ -402,16 +412,24 @@ class MainActivity : AppCompatActivity() {
         }
 
         shipUpgradeButton.setOnClickListener {
-            shoppingViewModel.isDetailShowing.value = false
-            if (shoppingViewModel.currentUpgradeStage.value == ShoppingViewModel.UpgradeStage.UNDEFINED) {
-                shoppingViewModel.setFilter(ShopItemFilter("", listOf("Upgrade"), onlyCanUpgradeTo = true))
-                shoppingViewModel.currentUpgradeStage.value = ShoppingViewModel.UpgradeStage.CHOOSE_TO_SHIP
-                shipUpgradeButton.setColorFilter(getColor(R.color.upgrade_is_selected))
-            } else {
-                shoppingViewModel.setFilter(ShopItemFilter("", listOf("Standalone Ship")))
-                shoppingViewModel.currentUpgradeStage.value = ShoppingViewModel.UpgradeStage.UNDEFINED
-                shipUpgradeButton.setColorFilter(getColor(R.color.avatar_left_line))
+            when(mPager.currentItem) {
+                FragmentType.SHOPPING.value -> {
+                    shoppingViewModel.isDetailShowing.value = false
+                    if (shoppingViewModel.currentUpgradeStage.value == ShoppingViewModel.UpgradeStage.UNDEFINED) {
+                        shoppingViewModel.setFilter(ShopItemFilter("", listOf("Upgrade"), onlyCanUpgradeTo = true))
+                        shoppingViewModel.currentUpgradeStage.value = ShoppingViewModel.UpgradeStage.CHOOSE_TO_SHIP
+                        shipUpgradeButton.setColorFilter(getColor(R.color.upgrade_is_selected))
+                    } else {
+                        shoppingViewModel.setFilter(ShopItemFilter("", listOf("Standalone Ship")))
+                        shoppingViewModel.currentUpgradeStage.value = ShoppingViewModel.UpgradeStage.UNDEFINED
+                        shipUpgradeButton.setColorFilter(getColor(R.color.avatar_left_line))
+                    }
+                }
+                FragmentType.HANGER.value -> {
+                    HangarLogBottomSheet.showDialog(supportFragmentManager)
+                }
             }
+
         }
 
         switchAccount.setOnClickListener {
@@ -426,6 +444,8 @@ class MainActivity : AppCompatActivity() {
                         thread {
                             database.shopItemDao.deleteAll()
                             database.buybackItemDao.deleteAllOldItems(System.currentTimeMillis())
+                            database.hangarLogDao.deleteAll()
+                            sharedPreferences.edit().putInt(getString(R.string.crawled_page_key), 0).apply()
                         }
                         if(builder.checkedIndex == items.size - 1){
                             val intent = Intent(this, LoginActivity::class.java)

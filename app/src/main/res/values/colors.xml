@@ -30,4 +30,6 @@
     <color name="shop_item_can_buy">#ADF659</color>
     <color name="upgrade_is_selected">#FFC107</color>
     <color name="progress_background">#6D000000</color>
+    <color name="colorDivider">#1f000000</color> <!-- 12% black -->
+    <color name="colorGrey50">#fafafa</color>
 </resources>

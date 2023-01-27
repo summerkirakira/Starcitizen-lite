@@ -66,13 +66,13 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
 
                                             hangerPackage.chineseTitle = "升级包 - "
                                             if (fromShip != null) {
-                                                hangerPackage.chineseTitle += fromShip.title
+                                                hangerPackage.chineseTitle += fromShip.title.replace(" ","")
                                             } else {
                                                 hangerPackage.chineseTitle += upgradeInfo.match_items[0].name
                                             }
                                             hangerPackage.chineseTitle += " 到 "
                                             if (toShip != null) {
-                                                hangerPackage.chineseTitle += toShip.title
+                                                hangerPackage.chineseTitle += toShip.title.replace(" ","")
                                             } else {
                                                 hangerPackage.chineseTitle += upgradeInfo.target_items[0].name
                                             }

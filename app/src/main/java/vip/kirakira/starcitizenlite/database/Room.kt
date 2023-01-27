@@ -123,7 +123,7 @@ interface ShipDao {
 
 @Dao
 interface HangarLogDao {
-    @Query("SELECT * FROM hangar_log")
+    @Query("SELECT * FROM hangar_log ORDER BY time DESC")
     fun getAll(): LiveData<List<HangarLog>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -136,10 +136,13 @@ interface HangarLogDao {
     fun deleteAll()
 
     @Query("SELECT * FROM hangar_log where id = :id")
-    fun getById(id: Int): LiveData<HangarLog>
+    fun getById(id: String): LiveData<HangarLog>
 
     @Query("SELECT * FROM hangar_log where target = :target")
     fun getByTarget(target: String): LiveData<List<HangarLog>>
+
+    @Query("SELECT count(*) FROM hangar_log")
+    fun getCount(): LiveData<Int>
 }
 
 @Dao
@@ -212,7 +215,7 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
 //        )
 //    ],
     exportSchema = true,
-    version = 3)
+    version = 4)
 abstract class ShopItemDatabase: RoomDatabase() {
     abstract val shopItemDao: ShopItemDao
     abstract val hangerItemDao: HangerItemDao

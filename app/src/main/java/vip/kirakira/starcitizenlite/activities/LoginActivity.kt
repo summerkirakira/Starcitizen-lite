@@ -366,6 +366,7 @@ class LoginActivity : AppCompatActivity() {
                         createWarningAlerter(this@LoginActivity, getString(R.string.get_csrf_token_error), getString(R.string.network_error)).show()
                     }
                     override fun onResponse(call: Call, response: Response) {
+//                        Log.d("csrf", response.body!!.string())
                         csrf_token = response.body!!.string().split("csrf-token\" content=\"")?.get(1)?.split("\"")?.get(0) ?: ""
                         isPrepared = true
                     }

@@ -192,12 +192,13 @@ data class HangarLog constructor(
     val time: Long,
     val type: String,
     val name: String,
-    val chineseName: String? = null,
-    val price: Int? = null,
-    val source: String? = null,
-    val target: String? = null,
-    val operator: String? = null,
-    val reason: String? = null,
+    var chineseName: String? = null,
+    var price: Int? = null,
+    var source: String? = null,
+    var target: String? = null,
+    var operator: String? = null,
+    var reason: String? = null,
+    var order: String? = null,
     val insert_time: Long
 )
 

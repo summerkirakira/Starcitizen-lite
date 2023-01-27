@@ -203,7 +203,7 @@ data class HangarLogProperty(
     val code: String,
     val msg: String,
     val success: Int,
-    val data: Data
+    val data: Data?
 ) {
     data class Data(val page: Int, val pagecount: Int, val rendered: String)
 }
