@@ -10,11 +10,21 @@
         <entry key="app/src/main/res/drawable/bg_bottom_sheet.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/bottom_button_ripple.xml" value="0.1875" />
         <entry key="app/src/main/res/drawable/ic_account_transfer.xml" value="0.1505" />
+        <entry key="app/src/main/res/drawable/ic_bottomsheet_reclaim.xml" value="0.1685" />
         <entry key="app/src/main/res/drawable/ic_broken_image.xml" value="0.1875" />
         <entry key="app/src/main/res/drawable/ic_drawer_feedback.xml" value="0.11842105263157894" />
         <entry key="app/src/main/res/drawable/ic_drawer_logout.xml" value="0.148" />
         <entry key="app/src/main/res/drawable/ic_exchange.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_expand_more_black_24dp.xml" value="0.1165" />
+        <entry key="app/src/main/res/drawable/ic_hangar_log_bottomsheet_buyback.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_hangar_log_bottomsheet_consume.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_hangar_log_bottomsheet_gift.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_hangar_log_bottomsheet_gift_cancelled.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_hangar_log_bottomsheet_gift_claimed.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_hangar_log_bottomsheet_giveaway.xml" value="0.106" />
+        <entry key="app/src/main/res/drawable/ic_hangar_log_bottomsheet_name_change.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_hangar_log_bottomsheet_shopping.xml" value="0.1685" />
+        <entry key="app/src/main/res/drawable/ic_hangar_log_bottomsheet_upgrade.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_hanger_switch.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_search.xml" value="0.1875" />
         <entry key="app/src/main/res/drawable/ic_ship_upgrade.xml" value="0.1495" />

@@ -12,10 +12,10 @@
             android:id="@+id/timeline"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            app:markerSize="20dp"
+            app:markerSize="30dp"
             app:lineWidth="3dp"
-            app:startLineColor="?attr/colorPrimary"
-            app:endLineColor="?attr/colorPrimary"
+            app:startLineColor="?attr/colorSecondary"
+            app:endLineColor="?attr/colorSecondary"
             app:lineStyle="dash"/>
 
     <androidx.cardview.widget.CardView

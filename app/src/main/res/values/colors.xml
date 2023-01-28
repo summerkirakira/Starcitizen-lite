@@ -32,4 +32,14 @@
     <color name="progress_background">#6D000000</color>
     <color name="colorDivider">#1f000000</color> <!-- 12% black -->
     <color name="colorGrey50">#fafafa</color>
+    <color name="hangar_log_shop_icon">#F44336</color>
+    <color name="hangar_log_reclaim_icon">#03A9F4</color>
+    <color name="hangar_log_giveaway_icon">#FF9800</color>
+    <color name="hangar_log_upgrade_icon">#FF9800</color>
+    <color name="hangar_log_consume_icon">#673AB7</color>
+    <color name="hangar_log_gift_icon">#3F51B5</color>
+    <color name="hangar_log_gift_claimed_icon">#4CAF50</color>
+    <color name="hangar_log_gift_cancelled_icon">#673AB7</color>
+    <color name="hangar_log_buyback_icon">#21DAF3</color>
+    <color name="hangar_log_name_change_icon">#009688</color>
 </resources>

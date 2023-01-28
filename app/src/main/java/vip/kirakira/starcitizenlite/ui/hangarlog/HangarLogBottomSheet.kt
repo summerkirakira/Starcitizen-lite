@@ -1,5 +1,6 @@
 package vip.kirakira.starcitizenlite.ui.hangarlog
 
+import android.content.res.Resources.Theme
 import android.os.Bundle
 import android.util.Log
 import android.view.ContextThemeWrapper
@@ -7,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
-import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,7 +35,7 @@ class HangarLogBottomSheet: RoundedCornerBottomSheet() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         hangarLogViewModel = ViewModelProvider(this).get(HangarLogViewModel::class.java)
-        val contextThemeWrapper = ContextThemeWrapper(activity, R.style.AppBaseTheme)
+        val contextThemeWrapper = ContextThemeWrapper(activity, theme)
         return inflater.cloneInContext(contextThemeWrapper).inflate(R.layout.bottom_sheet_hangar_log, container, false)
     }
 
