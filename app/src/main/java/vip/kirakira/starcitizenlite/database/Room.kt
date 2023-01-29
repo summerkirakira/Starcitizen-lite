@@ -146,6 +146,27 @@ interface HangarLogDao {
 }
 
 @Dao
+interface ShipUpgradeDao {
+    @Query("SELECT * FROM ship_upgrade")
+    fun getAll(): LiveData<List<ShipUpgrade>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(shipUpgrades: List<ShipUpgrade>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(shipUpgrade: ShipUpgrade)
+
+    @Query("Delete FROM ship_upgrade")
+    fun deleteAll()
+
+    @Query("SELECT * FROM ship_upgrade where skuId = :id")
+    fun getById(id: Int): LiveData<ShipUpgrade>
+
+    @Query("UPDATE ship_upgrade SET isAvailable = :isAvailable WHERE skuId = :id")
+    fun updateIsAvailable(id: Int, isAvailable: Boolean)
+}
+
+@Dao
 interface TranslationDao {
     @Query("SELECT * FROM translation")
     fun getAll(): LiveData<List<Translation>>
@@ -205,7 +226,8 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
         BannerImage::class,
         Translation::class,
         HangarShip::class,
-        HangarLog::class
+        HangarLog::class,
+        ShipUpgrade::class
                ],
 //    autoMigrations = [
 //        AutoMigration (
@@ -224,6 +246,7 @@ abstract class ShopItemDatabase: RoomDatabase() {
     abstract val bannerDao: BannerDao
     abstract val translationDao: TranslationDao
     abstract val hangarLogDao: HangarLogDao
+    abstract val shipUpgradeDao: ShipUpgradeDao
 
     @RenameTable.Entries(
         RenameTable(fromTableName = "banner_image", toTableName = "banner_image2")

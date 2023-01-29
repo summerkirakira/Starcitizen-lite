@@ -11,6 +11,7 @@ import vip.kirakira.starcitizenlite.createWarningAlerter
 import vip.kirakira.starcitizenlite.database.HangarLog
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.network.RSIApi
+import vip.kirakira.starcitizenlite.translation.Translation
 
 class HangarLogRepository(private val application: Application) {
     private val database = getDatabase(application)
@@ -29,6 +30,12 @@ class HangarLogRepository(private val application: Application) {
                     page = 127
                 while (true) {
                     val data = RSIApi.getPledgeLog(page)
+                    for(item in data) {
+                        item.chineseName = Translation(database).getTranslation(item.name)
+                        if (item.reason != null) {
+                            item.order = Translation(database).getTranslation(item.reason!!)
+                        }
+                    }
                     database.hangarLogDao.insertAll(data)
                     page--
                     Log.d("HangarLogRepository", "page: $page")

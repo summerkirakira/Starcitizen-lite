@@ -110,37 +110,39 @@ class TimelineAdapter(private val hangarLogs: List<HangarLog>): RecyclerView.Ada
 
     fun formatMessage(hangarLog: HangarLog): String {
         var message = ""
+        val title = hangarLog.chineseName ?: hangarLog.name
         when(hangarLog.type) {
             "CREATED" -> {
                 if(hangarLog.price == null)
-                    message = "购买了<b>${hangarLog.name}</b>(#${hangarLog.target})"
+                    message = "购买了<b>${title}</b>(#${hangarLog.target})"
                 else
-                    message = "购买了<b>${hangarLog.name}</b>(#${hangarLog.target}), 价格为<b>${"$"}${(hangarLog.price!!.toFloat() / 100)} USD</b>"
+                    message = "购买了<b>${title}</b>(#${hangarLog.target}), 价格为<b>${"$"}${(hangarLog.price!!.toFloat() / 100)} USD</b>"
             }
             "RECLAIMED" -> {
-                message = "回收了<b>${hangarLog.name}</b>(#${hangarLog.target})"
+                message = "回收了<b>${title}</b>(#${hangarLog.target})"
             }
             "GIVEAWAY" -> {
-                message = "获得了<b>${hangarLog.name}</b>(#${hangarLog.target})"
+                message = "获得了<b>${title}</b>(#${hangarLog.target})"
             }
             "APPLIED_UPGRADE" -> {
-                message = "将升级包<b>${hangarLog.reason}</b>(#${hangarLog.target})应用于" +
-                        "#${hangarLog.source} 当前价值为<b>${"$"}${(hangarLog.price!!.toFloat() / 100)} USD</b>"
+                val upgradeName = hangarLog.order ?: hangarLog.reason
+                message = "将<b>${upgradeName}</b>(#${hangarLog.source})应用于" +
+                        "<b>${title}</b>(#${hangarLog.target}) 当前价值为<b>${"$"}${(hangarLog.price!!.toFloat() / 100)} USD</b>"
             }
             "CONSUMED" -> {
-                message = "消耗了<b>${hangarLog.name}</b>(#${hangarLog.target})"
+                message = "消耗了<b>${title}</b>(#${hangarLog.target})"
             }
             "GIFT" -> {
-                message = "将价值为<b>${"$"}${(hangarLog.price!!.toFloat() / 100)} USD</b>的<b>${hangarLog.name}</b>(#${hangarLog.target})发送到邮箱: <b>${hangarLog.operator}</b>"
+                message = "将价值为<b>${"$"}${(hangarLog.price!!.toFloat() / 100)} USD</b>的<b>${title}</b>(#${hangarLog.target})发送到邮箱: <b>${hangarLog.operator}</b>"
             }
             "GIFT_CLAIMED" -> {
-                message = "<b>${hangarLog.operator}</b>确认接收了<b>${hangarLog.name}</b>(#${hangarLog.target}), 价值为<b>${"$"}${(hangarLog.price!!.toFloat() / 100)} USD</b>"
+                message = "<b>${hangarLog.operator}</b>确认接收了<b>${title}</b>(#${hangarLog.target}), 价值为<b>${"$"}${(hangarLog.price!!.toFloat() / 100)} USD</b>"
             }
             "GIFT_CANCELLED" -> {
-                message = "<b>${hangarLog.operator}</b>取消了<b>${hangarLog.name}</b>(#${hangarLog.target})的赠送"
+                message = "<b>${hangarLog.operator}</b>取消了<b>${title}</b>(#${hangarLog.target})的赠送"
             }
             "BUYBACK" -> {
-                message = "回购了<b>${hangarLog.name}</b>(#${hangarLog.target})"
+                message = "回购了<b>${title}</b>(#${hangarLog.target})"
             }
             "NAME_CHANGE" -> {
                 message = "将<b>${hangarLog.source!!.split("/")[0]}</b>(#${hangarLog.target})的名称修改为<b>${hangarLog.source!!.split("/")[1]}</b>"
@@ -149,7 +151,7 @@ class TimelineAdapter(private val hangarLogs: List<HangarLog>): RecyclerView.Ada
                 message = "回收了<b>${hangarLog.source!!.split("/")[0]}</b>(#${hangarLog.target})的名称保留: <b>${hangarLog.source!!.split("/")[1]}</b>"
             }
             "UNKNOWN" -> {
-                message = "获得了<b>${hangarLog.name}</b>(#${hangarLog.target})"
+                message = "获得了<b>${title}</b>(#${hangarLog.target})"
                 Log.d("TimelineAdapter", hangarLog.toString())
             }
         }

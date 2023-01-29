@@ -445,7 +445,6 @@ class MainActivity : AppCompatActivity() {
                             database.shopItemDao.deleteAll()
                             database.buybackItemDao.deleteAllOldItems(System.currentTimeMillis())
                             database.hangarLogDao.deleteAll()
-                            sharedPreferences.edit().putInt(getString(R.string.crawled_page_key), 0).apply()
                         }
                         if(builder.checkedIndex == items.size - 1){
                             val intent = Intent(this, LoginActivity::class.java)
@@ -454,11 +453,13 @@ class MainActivity : AppCompatActivity() {
                             primaryUserId = allUsers.value!![builder.checkedIndex].id
                             sharedPreferences.edit().putInt(getString(R.string.primary_user_key), primaryUserId).apply()
                             dialog.dismiss()
-                            Alerter.create(this)
-                                .setTitle("切换成功")
-                                .setText("当前账号为${allUsers.value!![builder.checkedIndex].handle}")
-                                .setBackgroundColorRes(R.color.alerter_default_success_background)
-                                .show()
+//                            Alerter.create(this)
+//                                .setTitle("切换成功")
+//                                .setText("当前账号为${allUsers.value!![builder.checkedIndex].handle}")
+//                                .setBackgroundColorRes(R.color.alerter_default_success_background)
+//                                .show()
+
+                            sharedPreferences.edit().putInt(getString(R.string.crawled_page_key), 0).apply()
                             val intent = Intent(this, MainActivity::class.java)
                             startActivity(intent)
                         }

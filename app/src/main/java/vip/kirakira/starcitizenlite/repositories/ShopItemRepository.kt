@@ -10,10 +10,7 @@ import androidx.lifecycle.map
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import vip.kirakira.starcitizenlite.R
-import vip.kirakira.starcitizenlite.database.ShopItem
-import vip.kirakira.starcitizenlite.database.ShopItemDatabase
-import vip.kirakira.starcitizenlite.database.toShopItem
-import vip.kirakira.starcitizenlite.database.toUpgradeShopItem
+import vip.kirakira.starcitizenlite.database.*
 import vip.kirakira.starcitizenlite.network.CirnoApi
 import vip.kirakira.starcitizenlite.network.CirnoProperty.AddNotTranslationBody
 import vip.kirakira.starcitizenlite.network.RSIApi
@@ -141,12 +138,30 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
                 }
                 database.shopItemDao.insertAll(shopUpgradeItems)
 //                CirnoApi.retrofitService.addNotTranslation(notTranslatedItems)
-                isRefreshing.postValue(false)
+
+                database.shipUpgradeDao.insertAll(convertToShipUpgradeRepoItem(data.data.ships))
+                canUpgrade.data.to.ships.map {
+                    for(sku in it.skus) {
+                        database.shipUpgradeDao.updateIsAvailable(sku.id, true)
+                    }
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
-                isRefreshing.postValue(false)
+            }
+            isRefreshing.postValue(false)
+        }
+    }
+
+    private fun convertToShipUpgradeRepoItem(ships: List<InitShipUpgradeProperty.Data.Ship>): List<ShipUpgrade> {
+        val shipUpgrades: MutableList<ShipUpgrade> = mutableListOf()
+        for(ship in ships) {
+            if(ship.skus == null) {
+                shipUpgrades.add(InitShipUpgradeProperty.Data.Ship.toShipUpgradeRepoItem(ship))
+            } else {
+                shipUpgrades.addAll(InitShipUpgradeProperty.Data.Ship.toShipUpgradeRepoItems(ship))
             }
         }
+        return shipUpgrades
     }
 
 }

@@ -202,6 +202,23 @@ data class HangarLog constructor(
     val insert_time: Long
 )
 
+@Entity(tableName = "ship_upgrade")
+data class ShipUpgrade constructor(
+    @PrimaryKey
+    val skuId: Int,
+    val shipId: Int,
+    val name: String,
+    val isFlyable: Boolean,
+    val focus: String,
+    val link: String,
+    val manufacturer: String,
+    val productThumbMediumAndSmall: String,
+    val slideShow: String,
+    val price: Int,
+    val edition: String,
+    var isAvailable: Boolean
+)
+
 fun List<ShopItem>.toCatalogProperty(): List<CatalogProperty> {
     return map {
         CatalogProperty(
