@@ -141,7 +141,7 @@ data class InitShipUpgradeProperty(val data: Data) {
                         productThumbMediumAndSmall = ship.medias.productThumbMediumAndSmall,
                         slideShow = ship.medias.slideShow,
                         price = ship.msrp,
-                        edition = ship.type,
+                        edition = "Standard Edition",
                         isAvailable = false
                     )
                 }
@@ -159,7 +159,7 @@ data class InitShipUpgradeProperty(val data: Data) {
                             productThumbMediumAndSmall = ship.medias.productThumbMediumAndSmall,
                             slideShow = ship.medias.slideShow,
                             price = sku.price,
-                            edition = ship.type,
+                            edition = sku.title,
                             isAvailable = false
                         )
                     }

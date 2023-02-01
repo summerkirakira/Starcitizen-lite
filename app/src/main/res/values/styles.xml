@@ -43,6 +43,7 @@
     <style name="shop_item_price_text">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">?attr/textFillColor</item>
         <item name="android:textSize">23sp</item>
         <item name="android:layout_marginStart">2dp</item>
         <item name="android:textStyle">bold</item>
@@ -51,6 +52,7 @@
     <style name="shop_item_dollar_text">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">?attr/textFillColor</item>
         <item name="android:textSize">16sp</item>
         <item name="android:fontFamily">serif</item>
     </style>

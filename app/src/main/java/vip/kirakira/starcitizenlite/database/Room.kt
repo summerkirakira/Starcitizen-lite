@@ -167,6 +167,9 @@ interface ShipUpgradeDao {
 
     @Query("SELECT * FROM ship_upgrade where name = :name and edition = :edition")
     fun getByName(name: String, edition: String="Standard Edition"): ShipUpgrade?
+
+    @Query("SELECT * FROM ship_upgrade where name like '%' || :name || '%' and edition = :edition limit 1")
+    fun getByNameLike(name: String, edition: String="Standard Edition"): ShipUpgrade?
 }
 
 @Dao
@@ -216,7 +219,7 @@ interface ShipDetailDao {
     @Query("SELECT * FROM ship_detail where id = :id")
     fun getById(id: String): LiveData<ShipDetail>
 
-    @Query("SELECT * FROM ship_detail where rsiName = :rsiName")
+    @Query("SELECT * FROM ship_detail where rsiName like '%' || :rsiName || '%' limit 1")
     fun getByName(rsiName: String): ShipDetail?
 }
 

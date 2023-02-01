@@ -1,20 +1,11 @@
 package vip.kirakira.starcitizenlite.network
-
-import android.util.Log
-import com.google.gson.Gson
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.Headers
 import retrofit2.http.POST
 import vip.kirakira.starcitizenlite.database.HangarLog
 import vip.kirakira.starcitizenlite.network.account.PtuAccountBody
@@ -24,7 +15,6 @@ import vip.kirakira.starcitizenlite.network.shop.*
 import vip.kirakira.starcitizenlite.network.upgrades.InitUpgradeProperty
 import vip.kirakira.viewpagertest.network.graphql.*
 import java.net.URL
-import java.util.Currency
 
 //private const val BASE_URL = "http://100.70.59.3:6000"
 

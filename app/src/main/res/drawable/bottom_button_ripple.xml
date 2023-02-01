@@ -1,2 +1,3 @@
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-        android:color="#6640729A" android:radius="50dp" />
+        android:color="?attr/colorSecondaryVariant"
+        android:radius="50dp" />

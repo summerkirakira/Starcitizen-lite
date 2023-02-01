@@ -42,4 +42,9 @@
     <color name="hangar_log_gift_cancelled_icon">#673AB7</color>
     <color name="hangar_log_buyback_icon">#21DAF3</color>
     <color name="hangar_log_name_change_icon">#009688</color>
+
+
+
+    <color name="night_background">#181818</color>
+    <color name="night_text">#FFFFFF</color>
 </resources>

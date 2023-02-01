@@ -163,7 +163,7 @@
     <string name="do_not_allow_reclaim">禁止融船操作</string>
     <string name="do_not_allow_reclaim_summary">打死我都不融船！</string>
     <string name="theme_key">CURRENT_THEME_KEY</string>
-    <string name="warbond_short">War</string>
+    <string name="warbond_short">WB</string>
     <string name="crawled_page_key">CRAWlED_PAGE_KEY</string>
     <string name="hangar_log">机库日志</string>
     <string name="SHIP_DETAIL_VERSION_KEY">ship_detail_version_key</string>

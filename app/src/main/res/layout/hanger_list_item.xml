@@ -63,7 +63,7 @@
                 app:qmui_backgroundColor="#FF9800"
                 android:visibility="gone"
                 tools:visibility="visible"
-                tools:text="War"
+                tools:text="WB"
                 android:text="@string/warbond_short"
                 android:padding="2dp"
                 android:textColor="@color/white"
@@ -90,6 +90,7 @@
                   android:ellipsize="end"
                   android:singleLine="false"
                   android:maxLines="2"
+                  android:textColor="?attr/textFillColor"
                   android:layout_marginEnd="0dp"
                   android:id="@+id/hanger_item_title"
                   app:layout_constraintEnd_toEndOf="parent"
@@ -146,6 +147,7 @@
                   android:layout_height="wrap_content"
                   android:id="@+id/time_text"
                   tools:text="2022-12-12"
+                    android:textColor="?attr/textFillColor"
                   android:text="@{hangerItemProperty.date}"
                   app:layout_constraintEnd_toEndOf="parent"
                   app:layout_constraintBottom_toBottomOf="parent" />
@@ -161,6 +163,23 @@
                   app:layout_constraintBaseline_toBaselineOf="@+id/dollar_icon"
                   tools:text="40"
                   android:text="@{String.valueOf(Float.valueOf(hangerItemProperty.price) / 100.0f)}"/>
+        <TextView style="@style/shop_item_dollar_text"
+                    android:id="@+id/dollar_icon2"
+                    android:layout_marginStart="10dp"
+                    android:textColor="?attr/colorSecondary"
+                    app:layout_constraintEnd_toStartOf="@+id/price_text2"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/price_text"
+                    android:visibility="@{hangerItemProperty.currentPrice == null? 8 : 0}"
+                    android:text="@string/dollar"/>
+        <TextView style="@style/shop_item_price_text"
+                    android:id="@+id/price_text2"
+                    app:layout_constraintEnd_toStartOf="@+id/time_text"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/dollar_icon2"
+                    android:textColor="?attr/colorSecondary"
+                    tools:text="40"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="@{hangerItemProperty.currentPrice == null? 8 : 0}"
+                    android:text="@{String.valueOf(Float.valueOf(hangerItemProperty.currentPrice) / 100.0f)}"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

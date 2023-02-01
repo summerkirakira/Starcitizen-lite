@@ -155,9 +155,8 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
     private fun convertToShipUpgradeRepoItem(ships: List<InitShipUpgradeProperty.Data.Ship>): List<ShipUpgrade> {
         val shipUpgrades: MutableList<ShipUpgrade> = mutableListOf()
         for(ship in ships) {
-            if(ship.skus == null) {
-                shipUpgrades.add(InitShipUpgradeProperty.Data.Ship.toShipUpgradeRepoItem(ship))
-            } else {
+            shipUpgrades.add(InitShipUpgradeProperty.Data.Ship.toShipUpgradeRepoItem(ship))
+            if(ship.skus != null) {
                 shipUpgrades.addAll(InitShipUpgradeProperty.Data.Ship.toShipUpgradeRepoItems(ship))
             }
         }

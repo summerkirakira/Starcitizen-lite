@@ -37,7 +37,7 @@
         <entry key="app/src/main/res/layout/activity_cool_photo_view.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_hangar_log.xml" value="0.1111111111111111" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.1006578947368421" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.25955917955110863" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.10245468736360863" />
         <entry key="app/src/main/res/layout/activity_player_search.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_three_party_site.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_upgrade.xml" value="0.15921052631578947" />
@@ -49,7 +49,7 @@
         <entry key="app/src/main/res/layout/fragment_hangar_log.xml" value="0.1" />
         <entry key="app/src/main/res/layout/hangar_log_item_timeline.xml" value="0.25" />
         <entry key="app/src/main/res/layout/hanger_detail_item.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/hanger_list_item.xml" value="0.27936790790336935" />
+        <entry key="app/src/main/res/layout/hanger_list_item.xml" value="0.24936676025390625" />
         <entry key="app/src/main/res/layout/home_fragment.xml" value="0.25110619469026546" />
         <entry key="app/src/main/res/layout/image_banner.xml" value="0.12368421052631579" />
         <entry key="app/src/main/res/layout/main_fragment.xml" value="0.31525735294117646" />

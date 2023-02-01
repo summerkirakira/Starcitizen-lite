@@ -7,13 +7,17 @@
         <item name="colorPrimaryVariant">@color/transparent</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
         <item name="qmui_dialog_max_width">420dp</item>
         <item name="qmui_dialog_min_width">320dp</item>
+        <item name="backgroundColor">@color/white</item>
+        <item name="textFillColor">@color/black</item>
+        <item name="colorOutline">@color/transparent</item>
+        <item name="colorPrimarySurface">#2e2e2e</item>
+        <item name="colorSecondaryVariant">#46FF6A65</item>
     </style>
 
     <style name="BottomButtonRipple">
