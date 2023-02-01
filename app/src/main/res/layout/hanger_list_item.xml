@@ -15,8 +15,7 @@
                    android:id="@+id/hanger_item_image"
                    app:layout_constraintStart_toStartOf="parent"
                    app:layout_constraintTop_toTopOf="parent"
-                   android:imageUrl="@{hangerItemProperty.image}"
-                   tools:src="@drawable/ic_launcher_background" />
+                   android:imageUrl="@{hangerItemProperty.image}"/>
         <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -36,6 +35,25 @@
                 app:qmui_radiusBottomLeft="4dp"
                 app:qmui_radiusBottomRight="4dp"
                  />
+        <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/saving_button"
+                app:layout_constraintBottom_toBottomOf="@+id/hanger_item_image"
+                app:layout_constraintStart_toStartOf="parent"
+                app:qmui_backgroundColor="#4CAF50"
+                android:visibility="gone"
+                tools:visibility="visible"
+                tools:text="-100%"
+                android:text="@{hangerItemProperty.savingString}"
+                android:padding="2dp"
+                android:textColor="@color/white"
+                app:qmui_borderColor="#4CAF50"
+                app:qmui_radiusTopLeft="4dp"
+                app:qmui_radiusTopRight="4dp"
+                app:qmui_radiusBottomLeft="0dp"
+                app:qmui_radiusBottomRight="4dp"
+        />
         <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

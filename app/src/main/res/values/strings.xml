@@ -166,4 +166,5 @@
     <string name="warbond_short">War</string>
     <string name="crawled_page_key">CRAWlED_PAGE_KEY</string>
     <string name="hangar_log">机库日志</string>
+    <string name="SHIP_DETAIL_VERSION_KEY">ship_detail_version_key</string>
 </resources>

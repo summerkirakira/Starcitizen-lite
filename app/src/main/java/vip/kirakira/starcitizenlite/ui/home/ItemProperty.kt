@@ -27,7 +27,8 @@ data class HangerItemProperty(
     val formShipId: Int = 0,
     val toShipId: Int = 0,
     val toSkuId: Int = 0,
-    val chineseAlsoContains: String? = null
+    val chineseAlsoContains: String? = null,
+    val savingString: String? = null
 ) {
     data class Tag(
         val name: String,
@@ -126,6 +127,10 @@ fun List<HangerPackageWithItems>.toItemPropertyList(): List<HangerItemProperty> 
                 status = "已礼物"
             }
 
+            var savingString: String? = null
+            if(packageWithItems.hangerPackage.currentPrice != 0){
+                savingString = "-${(packageWithItems.hangerPackage.currentPrice - packageWithItems.hangerPackage.value) / packageWithItems.hangerPackage.currentPrice * 100}%"
+            }
 
 
             map[saveKey] = HangerItemProperty(
@@ -142,7 +147,8 @@ fun List<HangerPackageWithItems>.toItemPropertyList(): List<HangerItemProperty> 
                 insuranceString,
                 packageWithItems.hangerPackage.also_contains,
                 packageWithItems.hangerItems,
-                chineseAlsoContains = packageWithItems.hangerPackage.chineseContains
+                chineseAlsoContains = packageWithItems.hangerPackage.chineseContains,
+                savingString = savingString
             )
         } else {
             map[saveKey]!!.number++

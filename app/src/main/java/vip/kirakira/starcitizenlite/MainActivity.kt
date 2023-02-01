@@ -1,6 +1,7 @@
 package vip.kirakira.starcitizenlite
 
 import android.app.ActivityOptions
+import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
@@ -41,6 +42,8 @@ import vip.kirakira.starcitizenlite.database.HangarLog
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.network.*
+import vip.kirakira.starcitizenlite.network.CirnoProperty.ClientInfo
+import vip.kirakira.starcitizenlite.network.CirnoProperty.RefugeInfo
 import vip.kirakira.starcitizenlite.network.shop.getCartSummary
 import vip.kirakira.starcitizenlite.ui.ScreenSlidePagerAdapter
 import vip.kirakira.starcitizenlite.ui.hangarlog.HangarLogBottomSheet
@@ -171,6 +174,24 @@ class MainActivity : AppCompatActivity() {
         if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
         bottomMainIcon.setColorFilter(colorPrimary)
         mMovingBar.setBackgroundColor(colorPrimary)
+
+        currentUser.observe(this) {
+            if (it != null) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        CirnoApi.getShipDetail("https://image.biaoju.site/starcitizen/ship_detail.0.1.json")
+                        CirnoApi.retrofitService.updateClientInfo(
+                            ClientInfo(
+                                primaryUser = it.handle
+                            )
+                        )
+                    } catch (e: Exception) {
+                        Log.d("Cirno", "Error updating client info", e)
+                    }
+                }
+
+            }
+        }
 
         currentUser.observe(this) {
             if (it != null) {
@@ -524,7 +545,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun checkUpdate() {
-        val latestVersion = CirnoApi.retrofitService.getVersion()
+        val latestVersion = CirnoApi.retrofitService.getVersion(
+            RefugeInfo(
+                version = BuildConfig.VERSION_NAME,
+                androidVersion = android.os.Build.VERSION.RELEASE,
+                systemModel = android.os.Build.MODEL
+            )
+        )
         if(compareVersion(latestVersion.version, BuildConfig.VERSION_NAME)) {
             val manager = DownloadManager.Builder(this).run {
                 apkUrl(latestVersion.url)
@@ -535,6 +562,16 @@ class MainActivity : AppCompatActivity() {
                 build()
             }
             manager.download()
+        }
+        val shipDetailVersion = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE).getString(getString(R.string.SHIP_DETAIL_VERSION_KEY), "0.0.0")
+        if(compareVersion(latestVersion.shipDetailVersion, shipDetailVersion!!)) {
+            Log.d("ShipDetail", "Updating ship detail...")
+            val shipDetails = CirnoApi.getShipDetail(latestVersion.shipDetailUrl)
+            if(shipDetails.isNotEmpty()) {
+                val database = getDatabase(application)
+                database.shipDetailDao.insertAll(shipDetails)
+                getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE).edit().putString(getString(R.string.SHIP_DETAIL_VERSION_KEY), latestVersion.shipDetailVersion).apply()
+            }
         }
     }
 
@@ -572,6 +609,7 @@ class MainActivity : AppCompatActivity() {
                 putBoolean(getString(R.string.AUTO_ADD_CREDITS_KEY), true)
             }.apply()
             uuid = uniqueID
+
             this.runOnUiThread {
                 val builder = QMUIDialog.MessageDialogBuilder(this)
                 builder.setTitle(startUpMessage.title)

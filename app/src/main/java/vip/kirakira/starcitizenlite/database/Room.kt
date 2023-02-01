@@ -164,6 +164,9 @@ interface ShipUpgradeDao {
 
     @Query("UPDATE ship_upgrade SET isAvailable = :isAvailable WHERE skuId = :id")
     fun updateIsAvailable(id: Int, isAvailable: Boolean)
+
+    @Query("SELECT * FROM ship_upgrade where name = :name and edition = :edition")
+    fun getByName(name: String, edition: String="Standard Edition"): ShipUpgrade?
 }
 
 @Dao
@@ -194,6 +197,27 @@ interface TranslationDao {
 //
 //    @Query("SELECT CASE WHEN EXISTS (SELECT 1 FROM translation WHERE type='buyback' AND english_title=:english_title) THEN 1 ELSE 0 END")
 //    fun isBuybackExist(english_title: String): Boolean
+}
+
+@Dao
+interface ShipDetailDao {
+    @Query("SELECT * FROM ship_detail")
+    fun getAll(): LiveData<List<ShipDetail>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(shipDetails: List<ShipDetail>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(shipDetail: ShipDetail)
+
+    @Query("Delete FROM ship_detail")
+    fun deleteAll()
+
+    @Query("SELECT * FROM ship_detail where id = :id")
+    fun getById(id: String): LiveData<ShipDetail>
+
+    @Query("SELECT * FROM ship_detail where rsiName = :rsiName")
+    fun getByName(rsiName: String): ShipDetail?
 }
 
 //@Database(entities = [ShopItem::class, HangerItem::class, HangerPackage::class, BuybackItem::class, User::class, BannerImage::class], version = 1)
@@ -227,7 +251,8 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
         Translation::class,
         HangarShip::class,
         HangarLog::class,
-        ShipUpgrade::class
+        ShipUpgrade::class,
+        ShipDetail::class
                ],
 //    autoMigrations = [
 //        AutoMigration (
@@ -237,7 +262,7 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
 //        )
 //    ],
     exportSchema = true,
-    version = 4)
+    version = 5)
 abstract class ShopItemDatabase: RoomDatabase() {
     abstract val shopItemDao: ShopItemDao
     abstract val hangerItemDao: HangerItemDao
@@ -247,6 +272,7 @@ abstract class ShopItemDatabase: RoomDatabase() {
     abstract val translationDao: TranslationDao
     abstract val hangarLogDao: HangarLogDao
     abstract val shipUpgradeDao: ShipUpgradeDao
+    abstract val shipDetailDao: ShipDetailDao
 
     @RenameTable.Entries(
         RenameTable(fromTableName = "banner_image", toTableName = "banner_image2")

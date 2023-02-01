@@ -93,6 +93,7 @@ data class HangerPackage constructor(
     val title: String,
     val image: String,
     val value: Int,
+    var currentPrice: Int,
     val status: String,
     val is_upgrade: Boolean,
     val upgrade_info: String,
@@ -217,6 +218,31 @@ data class ShipUpgrade constructor(
     val price: Int,
     val edition: String,
     var isAvailable: Boolean
+)
+
+@Entity(tableName = "ship_detail")
+data class ShipDetail constructor(
+    @PrimaryKey
+    val id: String,
+    val storeUrl: String,
+    val description: String? = null,
+    val beam: Float,
+    val classification: String,
+    val hasModules: Boolean,
+    val name: String,
+    val maxCrew: Int? = null,
+    val price: Float? = null,
+    val rsiName: String,
+    val rsiSlug: String,
+    val lastPledgePrice: Float? = null,
+    val length: Float,
+    val height: Float,
+    val focus: String,
+    val mass: Float,
+    val size: String? = null,
+    val storeImageSmall: String,
+    val storeImageMedium: String,
+    val storeImageLarge: String
 )
 
 fun List<ShopItem>.toCatalogProperty(): List<CatalogProperty> {

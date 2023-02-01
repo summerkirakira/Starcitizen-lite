@@ -77,6 +77,12 @@ class HangerViewAdapter(private val onClickListener: HangerViewAdapter.OnClickLi
                 binding.isWarbond.visibility = View.GONE
             }
 
+            if (item.savingString != null) {
+                binding.savingButton.visibility = View.VISIBLE
+            } else {
+                binding.savingButton.visibility = View.GONE
+            }
+
             binding.executePendingBindings()
         }
 

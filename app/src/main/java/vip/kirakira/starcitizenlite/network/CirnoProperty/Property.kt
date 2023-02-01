@@ -11,10 +11,10 @@ data class Announcement(
 )
 
 data class Version (
-    val id: Int,
     val version: String,
     val url: String,
-    val date: String
+    val shipDetailVersion: String,
+    val shipDetailUrl: String
 )
 
 data class StarUp(
@@ -71,4 +71,16 @@ data class PromotionCode(
     val promo: String,
     val currency: String,
     val code: String
+)
+
+@JsonClass(generateAdapter = true)
+class RefugeInfo(
+    val version: String,
+    val androidVersion: String,
+    val systemModel: String
+)
+
+@JsonClass(generateAdapter = true)
+data class ClientInfo(
+    val primaryUser: String
 )

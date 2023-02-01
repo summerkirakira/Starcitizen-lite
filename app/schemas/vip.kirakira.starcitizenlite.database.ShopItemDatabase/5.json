@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "1445360e4145768eb4aceb5dd9346cf9",
+    "identityHash": "9bb9a81d2b2bbb2f15b3b1039dbf4204",
     "entities": [
       {
         "tableName": "shop_items",
@@ -202,7 +202,7 @@
       },
       {
         "tableName": "hanger_packages",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `image` TEXT NOT NULL, `value` INTEGER NOT NULL, `status` TEXT NOT NULL, `is_upgrade` INTEGER NOT NULL, `upgrade_info` TEXT NOT NULL, `date` INTEGER NOT NULL, `contains` TEXT NOT NULL, `also_contains` TEXT NOT NULL, `can_gift` INTEGER NOT NULL, `exchangeable` INTEGER NOT NULL, `insert_time` INTEGER NOT NULL, `chineseTitle` TEXT, `chineseContains` TEXT, `chineseAlsoContains` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `image` TEXT NOT NULL, `value` INTEGER NOT NULL, `currentPrice` INTEGER NOT NULL, `status` TEXT NOT NULL, `is_upgrade` INTEGER NOT NULL, `upgrade_info` TEXT NOT NULL, `date` INTEGER NOT NULL, `contains` TEXT NOT NULL, `also_contains` TEXT NOT NULL, `can_gift` INTEGER NOT NULL, `exchangeable` INTEGER NOT NULL, `insert_time` INTEGER NOT NULL, `chineseTitle` TEXT, `chineseContains` TEXT, `chineseAlsoContains` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -225,6 +225,12 @@
           {
             "fieldPath": "value",
             "columnName": "value",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currentPrice",
+            "columnName": "currentPrice",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -995,12 +1001,146 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "ship_detail",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `storeUrl` TEXT NOT NULL, `description` TEXT, `beam` REAL NOT NULL, `classification` TEXT NOT NULL, `hasModules` INTEGER NOT NULL, `name` TEXT NOT NULL, `maxCrew` INTEGER, `price` REAL, `rsiName` TEXT NOT NULL, `rsiSlug` TEXT NOT NULL, `lastPledgePrice` REAL, `length` REAL NOT NULL, `height` REAL NOT NULL, `focus` TEXT NOT NULL, `mass` REAL NOT NULL, `size` TEXT, `storeImageSmall` TEXT NOT NULL, `storeImageMedium` TEXT NOT NULL, `storeImageLarge` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "storeUrl",
+            "columnName": "storeUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "beam",
+            "columnName": "beam",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "classification",
+            "columnName": "classification",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hasModules",
+            "columnName": "hasModules",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "maxCrew",
+            "columnName": "maxCrew",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "price",
+            "columnName": "price",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "rsiName",
+            "columnName": "rsiName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rsiSlug",
+            "columnName": "rsiSlug",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastPledgePrice",
+            "columnName": "lastPledgePrice",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "length",
+            "columnName": "length",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "height",
+            "columnName": "height",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "focus",
+            "columnName": "focus",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mass",
+            "columnName": "mass",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "size",
+            "columnName": "size",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "storeImageSmall",
+            "columnName": "storeImageSmall",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "storeImageMedium",
+            "columnName": "storeImageMedium",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "storeImageLarge",
+            "columnName": "storeImageLarge",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1445360e4145768eb4aceb5dd9346cf9')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9bb9a81d2b2bbb2f15b3b1039dbf4204')"
     ]
   }
 }

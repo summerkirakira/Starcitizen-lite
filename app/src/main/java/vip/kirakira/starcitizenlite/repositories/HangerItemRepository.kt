@@ -47,6 +47,22 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
                         if (data.hangerPackages.isEmpty()) {
                             break
                         }
+
+                        for(hangerPackage in data.hangerPackages) {
+                            var currentPrice = 0
+                            for(hangerItem in data.hangerItems) {
+                                if (hangerItem.package_id == hangerPackage.id) {
+                                    if(hangerItem.kind == "Ship") {
+                                        val shipUpgrade = database.shipUpgradeDao.getByName(hangerItem.title)
+                                        if (shipUpgrade != null) {
+                                            currentPrice += shipUpgrade.price
+                                        }
+                                    }
+                                }
+                            }
+                            hangerPackage.currentPrice = currentPrice
+                        }
+
                         if (isTranslationEnabled) {
                             for (hangerPackage in data.hangerPackages) {
                                 val contains: MutableList<String> = mutableListOf()
@@ -96,7 +112,6 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
                                     }
                                 }
                                 contains.addAll(hangerPackage.also_contains.split("#"))
-
 
                                 if (hangerPackage.title.startsWith("Standalone Ship -")) {
                                     val shipName = hangerPackage.title.replace("Standalone Ship - ", "")
