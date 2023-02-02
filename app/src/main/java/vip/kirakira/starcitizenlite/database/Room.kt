@@ -143,6 +143,9 @@ interface HangarLogDao {
 
     @Query("SELECT count(*) FROM hangar_log")
     fun getCount(): LiveData<Int>
+
+    @Query("SELECT * FROM hangar_log where target = :target ORDER BY time DESC")
+    fun getByTargetDesc(target: String): LiveData<List<HangarLog>>
 }
 
 @Dao

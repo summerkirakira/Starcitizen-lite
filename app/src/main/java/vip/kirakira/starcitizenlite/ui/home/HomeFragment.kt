@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat.getColor
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.nambimobile.widgets.efab.FabOption
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog
 import com.tapadoo.alerter.Alerter
 import kotlinx.coroutines.CoroutineScope
@@ -24,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import vip.kirakira.starcitizenlite.R
+import vip.kirakira.starcitizenlite.RefugeApplication
 import vip.kirakira.starcitizenlite.activities.CartActivity
 import vip.kirakira.starcitizenlite.activities.LoginActivity
 import vip.kirakira.starcitizenlite.activities.WebLoginActivity
@@ -49,17 +51,37 @@ class HomeFragment : Fragment() {
 
     private lateinit var viewModel: HomeViewModel
 
-    val scope = CoroutineScope(Job() + Dispatchers.Main)
+    private val scope = CoroutineScope(Job() + Dispatchers.Main)
 
 
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val viewModel: HomeViewModel by activityViewModels()
         binding = DataBindingUtil.inflate(inflater, R.layout.home_fragment, container, false)
         binding.lifecycleOwner = this
+        binding.fabReset.setOnClickListener {
+            onResetFabClick(viewModel)
+        }
+        binding.fabUpgrade.setOnClickListener {
+            onUpgradeFabClick(viewModel)
+        }
+        binding.fabShip.setOnClickListener {
+            onShipFabClick(viewModel)
+        }
+
+        binding.fabSubscription.setOnClickListener {
+            onSubscribeFabClick(viewModel)
+        }
+
+        binding.fabPaint.setOnClickListener {
+            onPaintFabClick(viewModel)
+        }
+        binding.fabTrash.setOnClickListener {
+            onTrashFabClick(viewModel)
+        }
 
 //        binding.contentContainer.setOnClickListener(View.OnClickListener {
 //            binding.popupLayout.visibility = View.GONE
@@ -110,6 +132,17 @@ class HomeFragment : Fragment() {
                     binding.itemsLinearLayout.visibility = View.GONE
                     binding.itemsTitle.visibility = View.GONE
                 }
+
+                val hangerItem = it
+
+                binding.contentDetail.setOnClickListener {
+                    HangarItemDetailBottomSheet.showDialog(
+                        requireActivity().supportFragmentManager,
+                        hangerItem
+                    )
+                }
+
+
                 val pref = context?.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
                 val isTranslationEnabled = pref?.getBoolean(getString(R.string.enable_localization), false) ?: false
                 for(item in it.items) {
@@ -497,4 +530,29 @@ class HomeFragment : Fragment() {
         intent.putExtras(bundle)
         startActivity(intent)
     }
+
+    private fun onResetFabClick(homeViewModel: HomeViewModel) {
+        homeViewModel.setFilter("")
+    }
+
+    private fun onUpgradeFabClick(homeViewModel: HomeViewModel) {
+        homeViewModel.setFilter("Upgrade - ")
+    }
+
+    private fun onShipFabClick(homeViewModel: HomeViewModel) {
+        homeViewModel.setFilter("Ship")
+    }
+
+    private fun onSubscribeFabClick(homeViewModel: HomeViewModel) {
+        homeViewModel.setFilter("Subscribe")
+    }
+
+    private fun onPaintFabClick(homeViewModel: HomeViewModel) {
+        homeViewModel.setFilter("paint")
+    }
+
+    private fun onTrashFabClick(homeViewModel: HomeViewModel) {
+        homeViewModel.setFilter("Trash")
+    }
+
 }

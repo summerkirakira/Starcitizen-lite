@@ -167,4 +167,7 @@
     <string name="crawled_page_key">CRAWlED_PAGE_KEY</string>
     <string name="hangar_log">机库日志</string>
     <string name="SHIP_DETAIL_VERSION_KEY">ship_detail_version_key</string>
+    <string name="more_info">详情 ></string>
+    <string name="pledge_detail">物品详情</string>
+    <string name="upgrade_detail">升级记录</string>
 </resources>

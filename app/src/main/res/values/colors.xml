@@ -47,4 +47,5 @@
 
     <color name="night_background">#181818</color>
     <color name="night_text">#FFFFFF</color>
+    <color name="subscribe">#FFEB3B</color>
 </resources>

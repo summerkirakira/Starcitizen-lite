@@ -7,6 +7,7 @@
         <entry key="../../../../../layout/custom_preview.xml" value="0.18333333333333332" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.21856677524429968" />
         <entry key="app/src/main/res/drawable/baseline_hangar_log_alt_24.xml" value="0.1865" />
+        <entry key="app/src/main/res/drawable/baseline_stars_24.xml" value="0.107" />
         <entry key="app/src/main/res/drawable/bg_bottom_sheet.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/bottom_button_ripple.xml" value="0.1875" />
         <entry key="app/src/main/res/drawable/ic_account_transfer.xml" value="0.1505" />
@@ -16,6 +17,13 @@
         <entry key="app/src/main/res/drawable/ic_drawer_logout.xml" value="0.148" />
         <entry key="app/src/main/res/drawable/ic_exchange.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_expand_more_black_24dp.xml" value="0.1165" />
+        <entry key="app/src/main/res/drawable/ic_fab_add_long.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_fab_hangar_ship.xml" value="0.107" />
+        <entry key="app/src/main/res/drawable/ic_hangar_fab_paint.xml" value="0.107" />
+        <entry key="app/src/main/res/drawable/ic_hangar_fab_reset.xml" value="0.107" />
+        <entry key="app/src/main/res/drawable/ic_hangar_fab_ship.xml" value="0.107" />
+        <entry key="app/src/main/res/drawable/ic_hangar_fab_trash.xml" value="0.107" />
+        <entry key="app/src/main/res/drawable/ic_hangar_fab_upgrade.xml" value="0.107" />
         <entry key="app/src/main/res/drawable/ic_hangar_log_bottomsheet_buyback.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_hangar_log_bottomsheet_consume.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_hangar_log_bottomsheet_gift.xml" value="0.1" />
@@ -26,6 +34,7 @@
         <entry key="app/src/main/res/drawable/ic_hangar_log_bottomsheet_shopping.xml" value="0.1685" />
         <entry key="app/src/main/res/drawable/ic_hangar_log_bottomsheet_upgrade.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_hanger_switch.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_plane.xml" value="0.107" />
         <entry key="app/src/main/res/drawable/ic_search.xml" value="0.1875" />
         <entry key="app/src/main/res/drawable/ic_ship_upgrade.xml" value="0.1495" />
         <entry key="app/src/main/res/drawable/ic_shop_no_data.xml" value="0.1" />
@@ -42,6 +51,7 @@
         <entry key="app/src/main/res/layout/activity_three_party_site.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_upgrade.xml" value="0.15921052631578947" />
         <entry key="app/src/main/res/layout/activity_web_login.xml" value="0.17135416666666667" />
+        <entry key="app/src/main/res/layout/bottom_sheet_hangar_detail.xml" value="0.15789473684210525" />
         <entry key="app/src/main/res/layout/bottom_sheet_hangar_log.xml" value="0.1" />
         <entry key="app/src/main/res/layout/cool_photo_viewer.xml" value="0.2125126433579356" />
         <entry key="app/src/main/res/layout/drawer_content.xml" value="0.20850821863768734" />
@@ -50,7 +60,7 @@
         <entry key="app/src/main/res/layout/hangar_log_item_timeline.xml" value="0.25" />
         <entry key="app/src/main/res/layout/hanger_detail_item.xml" value="0.1" />
         <entry key="app/src/main/res/layout/hanger_list_item.xml" value="0.24936676025390625" />
-        <entry key="app/src/main/res/layout/home_fragment.xml" value="0.25110619469026546" />
+        <entry key="app/src/main/res/layout/home_fragment.xml" value="0.1966063777957342" />
         <entry key="app/src/main/res/layout/image_banner.xml" value="0.12368421052631579" />
         <entry key="app/src/main/res/layout/main_fragment.xml" value="0.31525735294117646" />
         <entry key="app/src/main/res/layout/me_fragment.xml" value="0.165" />

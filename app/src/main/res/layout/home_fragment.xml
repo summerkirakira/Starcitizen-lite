@@ -70,31 +70,49 @@
                         android:layout_height="wrap_content"
                         android:id="@+id/contentContainer"
                         android:orientation="vertical">
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/itemsTitle"
-                            android:text="@string/items"
-                            android:textSize="20sp"
-                            android:textStyle="bold"
-                            android:gravity="start"
-                            android:padding="10dp"/>
-<!--                        <View-->
-<!--                            android:layout_width="match_parent"-->
-<!--                            android:layout_height="2dp"-->
-<!--                            android:background="@color/black" />-->
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+                            <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    android:id="@+id/itemsTitle"
+                                    android:text="@string/items"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    android:gravity="start"
+                                    android:padding="10dp"/>
+                            <TextView android:layout_width="wrap_content"
+                                      android:layout_height="wrap_content"
+                                      android:id="@+id/contentDetail"
+                                      android:textColor="?attr/textFillColor"
+                                      android:text="@string/more_info"
+                                      android:textStyle="bold"
+                                      android:textSize="15sp"
+                                      app:layout_constraintEnd_toEndOf="parent"
+                                      app:layout_constraintBaseline_toBaselineOf="@+id/itemsTitle" />
+                        </androidx.constraintlayout.widget.ConstraintLayout>
                         <LinearLayout android:layout_width="match_parent"
                                       android:layout_height="wrap_content"
                                       android:id="@+id/itemsLinearLayout"
                                       android:orientation="vertical" />
-                        <TextView android:layout_width="match_parent"
-                                  android:layout_height="wrap_content"
-                                  android:id="@+id/alsoContainsTitle"
-                                  android:text="@string/also_contains"
-                                  android:textSize="20sp"
-                                  android:textStyle="bold"
-                                  android:gravity="start"
-                                  android:padding="10dp"/>
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+                            <TextView android:id="@+id/alsoContainsTitle"
+                                      android:text="@string/also_contains"
+                                      android:layout_height="wrap_content"
+                                      android:layout_width="wrap_content"
+                                      android:textSize="20sp"
+                                      android:textStyle="bold"
+                                      android:gravity="start"
+                                      app:layout_constraintStart_toStartOf="parent"
+                                      app:layout_constraintTop_toTopOf="parent"
+                                      android:padding="10dp"/>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
                         <LinearLayout android:layout_width="match_parent"
                                       android:layout_height="wrap_content"
                                       android:id="@+id/alsoContainsLinearLayout"
@@ -106,5 +124,82 @@
                 </ScrollView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+        <com.nambimobile.widgets.efab.ExpandableFabLayout
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            <!-- The next 3 Views will only display in portrait orientation -->
+            <com.nambimobile.widgets.efab.Overlay
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:overlay_orientation="portrait"/>
+            <com.nambimobile.widgets.efab.ExpandableFab
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|end"
+                    android:layout_marginBottom="80dp"
+                    app:efab_firstFabOptionMarginPx="120"
+
+                    app:efab_successiveFabOptionMarginPx="110"
+                    app:efab_icon="@drawable/ic_fab_add_long"
+                    android:layout_marginEnd="15dp"
+                    app:efab_color="?attr/colorPrimary"
+                    app:efab_orientation="portrait"/>
+            <com.nambimobile.widgets.efab.FabOption
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/fabReset"
+                    app:fab_orientation="portrait"
+                    app:fab_icon="@drawable/ic_hangar_fab_reset"
+                    app:fab_color="@color/hangar_log_name_change_icon"
+                    app:label_text="重置筛选"/>
+            <com.nambimobile.widgets.efab.FabOption
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/fabUpgrade"
+                    app:fab_orientation="portrait"
+                    app:fab_icon="@drawable/ic_hangar_fab_upgrade"
+                    app:fab_color="@color/hangar_log_upgrade_icon"
+                    app:label_text="升级"/>
+            <com.nambimobile.widgets.efab.FabOption
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/fabShip"
+                    app:fab_orientation="portrait"
+                    app:fab_icon="@drawable/ic_hangar_fab_ship"
+                    app:fab_color="@color/shop_fab"
+                    app:label_text="舰船"
+                    android:onClick="onClickPortraitOption1"/>
+            <com.nambimobile.widgets.efab.FabOption
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/fabSubscription"
+                    app:fab_orientation="portrait"
+                    app:fab_icon="@drawable/ic_hangar_fab_subscribe"
+                    app:fab_color="@color/subscribe"
+                    app:label_text="订阅"
+                    android:onClick="onClickPortraitOption1"/>
+            <com.nambimobile.widgets.efab.FabOption
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/fabPaint"
+                    app:fab_orientation="portrait"
+                    app:fab_icon="@drawable/ic_hangar_fab_paint"
+                    app:fab_color="@color/purple_200"
+                    app:label_text="涂装"
+                    android:onClick="onClickPortraitOption1"/>
+            <com.nambimobile.widgets.efab.FabOption
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/fabTrash"
+                    app:fab_orientation="portrait"
+                    app:fab_icon="@drawable/ic_hangar_fab_trash"
+                    app:fab_color="@color/shop_item_no_data"
+                    app:label_text="杂项"
+                    android:onClick="onClickPortraitOption1"/>
+
+        </com.nambimobile.widgets.efab.ExpandableFabLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

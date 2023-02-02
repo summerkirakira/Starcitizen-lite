@@ -120,6 +120,8 @@ dependencies {
 
     implementation 'com.github.vipulasri:timelineview:1.1.5'
 
+    implementation 'com.nambimobile.widgets:expandable-fab:1.2.1'
+
 //    implementation 'com.github.Hitomis.transferee:Transferee:1.6.1'
 }
 repositories {
