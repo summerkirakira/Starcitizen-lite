@@ -14,7 +14,11 @@ data class Version (
     val version: String,
     val url: String,
     val shipDetailVersion: String,
-    val shipDetailUrl: String
+    val shipDetailUrl: String,
+    val isVip: Boolean,
+    val vipExpire: Int,
+    val credit: Int,
+    val totalVipTime: Int
 )
 
 data class StarUp(

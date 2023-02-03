@@ -36,6 +36,7 @@ import vip.kirakira.starcitizenlite.network.RSIApi
 import vip.kirakira.starcitizenlite.network.hanger.HangerService
 import vip.kirakira.starcitizenlite.network.shop.clearCart
 import vip.kirakira.starcitizenlite.ui.loadImage
+import vip.kirakira.starcitizenlite.ui.widgets.RefugeVip
 import vip.kirakira.viewpagertest.network.graphql.ApplyTokenBody
 import vip.kirakira.viewpagertest.network.graphql.BuyBackPledgeBody
 import vip.kirakira.viewpagertest.network.graphql.UpgradeAddToCartQuery
@@ -136,6 +137,10 @@ class HomeFragment : Fragment() {
                 val hangerItem = it
 
                 binding.contentDetail.setOnClickListener {
+                    if(!RefugeVip.isVip()) {
+                        RefugeVip.createWarningAlert(requireActivity())
+                        return@setOnClickListener
+                    }
                     HangarItemDetailBottomSheet.showDialog(
                         requireActivity().supportFragmentManager,
                         hangerItem
@@ -191,6 +196,10 @@ class HomeFragment : Fragment() {
                         .setMessage("即将对${item.name}进行回收操作，结束后将会返还${item.price.toFloat() / 100f}信用点\n此操作不可逆！是否继续？")
                         .addAction("全部回收") { dialog, _ ->
                             dialog.dismiss()
+                            if(!RefugeVip.isVip()) {
+                                RefugeVip.createWarningAlert(requireActivity())
+                                return@addAction
+                            }
                             scope.launch {
                                 for (id in item.idList.split(","))
                                     try {
@@ -536,22 +545,42 @@ class HomeFragment : Fragment() {
     }
 
     private fun onUpgradeFabClick(homeViewModel: HomeViewModel) {
+        if(!RefugeVip.isVip()) {
+            RefugeVip.createWarningAlert(requireActivity())
+            return
+        }
         homeViewModel.setFilter("Upgrade - ")
     }
 
     private fun onShipFabClick(homeViewModel: HomeViewModel) {
+        if(!RefugeVip.isVip()) {
+            RefugeVip.createWarningAlert(requireActivity())
+            return
+        }
         homeViewModel.setFilter("Ship")
     }
 
     private fun onSubscribeFabClick(homeViewModel: HomeViewModel) {
+        if(!RefugeVip.isVip()) {
+            RefugeVip.createWarningAlert(requireActivity())
+            return
+        }
         homeViewModel.setFilter("Subscribe")
     }
 
     private fun onPaintFabClick(homeViewModel: HomeViewModel) {
+        if(!RefugeVip.isVip()) {
+            RefugeVip.createWarningAlert(requireActivity())
+            return
+        }
         homeViewModel.setFilter("paint")
     }
 
     private fun onTrashFabClick(homeViewModel: HomeViewModel) {
+        if(!RefugeVip.isVip()) {
+            RefugeVip.createWarningAlert(requireActivity())
+            return
+        }
         homeViewModel.setFilter("Trash")
     }
 

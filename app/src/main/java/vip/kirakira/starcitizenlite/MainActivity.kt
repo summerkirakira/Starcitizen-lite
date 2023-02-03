@@ -54,6 +54,7 @@ import vip.kirakira.starcitizenlite.ui.loadUserAvatar
 import vip.kirakira.starcitizenlite.ui.main.MainFragment
 import vip.kirakira.starcitizenlite.ui.me.MeFragment
 import vip.kirakira.starcitizenlite.ui.shopping.ShopItemFilter
+import vip.kirakira.starcitizenlite.ui.widgets.RefugeVip
 import vip.kirakira.viewpagertest.ui.shopping.ShoppingFragment
 import vip.kirakira.viewpagertest.ui.shopping.ShoppingViewModel
 import java.util.*
@@ -447,7 +448,12 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 FragmentType.HANGER.value -> {
-                    HangarLogBottomSheet.showDialog(supportFragmentManager)
+                    if(RefugeVip.isVip()){
+                        HangarLogBottomSheet.showDialog(supportFragmentManager)
+                    } else {
+                        RefugeVip.createWarningAlert(this)
+                    }
+
                 }
             }
 
@@ -545,6 +551,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun checkUpdate() {
+        val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
         val latestVersion = CirnoApi.retrofitService.getVersion(
             RefugeInfo(
                 version = BuildConfig.VERSION_NAME,
@@ -552,6 +559,35 @@ class MainActivity : AppCompatActivity() {
                 systemModel = android.os.Build.MODEL
             )
         )
+
+        val isVip = sharedPreferences.getBoolean(getString(R.string.IS_VIP), false)
+
+        sharedPreferences.edit().apply {
+            putBoolean(getString(R.string.IS_VIP), latestVersion.isVip)
+            putInt(getString(R.string.VIP_EXPIRE), latestVersion.vipExpire)
+            putInt(getString(R.string.TOTAL_VIP_TIME), latestVersion.totalVipTime)
+            putInt(getString(R.string.REFUGE_CREDIT), latestVersion.credit)
+            apply()
+        }
+        if(isVip != latestVersion.isVip) {
+//            if (latestVersion.isVip) {
+//                Alerter.create(this)
+//                    .setTitle("星河避难所 Premium已激活")
+//                    .setText("有效期至${Date(Date().time + latestVersion.vipExpire.toLong() * 1000).toLocaleString()}")
+//                    .setBackgroundColorRes(R.color.alerter_default_success_background)
+//                    .show()
+//            } else {
+//                Alerter.create(this)
+//                    .setTitle("星河避难所 Premium已到期")
+//                    .setText("您的Premium有效期至${Date(Date().time + latestVersion.vipExpire.toLong() * 1000).toLocaleString()}")
+//                    .setBackgroundColorRes(R.color.alert_dialog_background_failure)
+//                    .show()
+//            }
+            //更新主界面
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+
         if(compareVersion(latestVersion.version, BuildConfig.VERSION_NAME)) {
             val manager = DownloadManager.Builder(this).run {
                 apkUrl(latestVersion.url)
@@ -563,14 +599,14 @@ class MainActivity : AppCompatActivity() {
             }
             manager.download()
         }
-        val shipDetailVersion = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE).getString(getString(R.string.SHIP_DETAIL_VERSION_KEY), "0.0.0")
+        val shipDetailVersion = sharedPreferences.getString(getString(R.string.SHIP_DETAIL_VERSION_KEY), "0.0.0")
         if(compareVersion(latestVersion.shipDetailVersion, shipDetailVersion!!)) {
             Log.d("ShipDetail", "Updating ship detail...")
             val shipDetails = CirnoApi.getShipDetail(latestVersion.shipDetailUrl)
             if(shipDetails.isNotEmpty()) {
                 val database = getDatabase(application)
                 database.shipDetailDao.insertAll(shipDetails)
-                getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE).edit().putString(getString(R.string.SHIP_DETAIL_VERSION_KEY), latestVersion.shipDetailVersion).apply()
+                sharedPreferences.edit().putString(getString(R.string.SHIP_DETAIL_VERSION_KEY), latestVersion.shipDetailVersion).apply()
             }
         }
     }

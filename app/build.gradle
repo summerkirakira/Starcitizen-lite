@@ -122,6 +122,8 @@ dependencies {
 
     implementation 'com.nambimobile.widgets:expandable-fab:1.2.1'
 
+    implementation 'com.akexorcist:round-corner-progress-bar:2.1.2'
+
 //    implementation 'com.github.Hitomis.transferee:Transferee:1.6.1'
 }
 repositories {

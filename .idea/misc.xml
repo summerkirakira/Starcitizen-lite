@@ -34,11 +34,15 @@
         <entry key="app/src/main/res/drawable/ic_hangar_log_bottomsheet_shopping.xml" value="0.1685" />
         <entry key="app/src/main/res/drawable/ic_hangar_log_bottomsheet_upgrade.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_hanger_switch.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_lack_refuge_vip.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_me_not_vip_avatar.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_me_vip_avatar.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_plane.xml" value="0.107" />
         <entry key="app/src/main/res/drawable/ic_search.xml" value="0.1875" />
         <entry key="app/src/main/res/drawable/ic_ship_upgrade.xml" value="0.1495" />
         <entry key="app/src/main/res/drawable/ic_shop_no_data.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_stock_ok.xml" value="0.1875" />
+        <entry key="app/src/main/res/drawable/ic_vip_me_progress.xml" value="0.162" />
         <entry key="app/src/main/res/drawable/loading_img.xml" value="0.13453947368421051" />
         <entry key="app/src/main/res/drawable/number_shape.xml" value="0.1555" />
         <entry key="app/src/main/res/drawable/top_toolbar_button_ripple.xml" value="0.14429967426710097" />

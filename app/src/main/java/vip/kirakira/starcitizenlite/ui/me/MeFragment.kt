@@ -1,7 +1,9 @@
 package vip.kirakira.starcitizenlite.ui.me
 
+import android.annotation.SuppressLint
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -103,11 +105,44 @@ class MeFragment : Fragment() {
             binding.recValue.text = recValue
             binding.referralCodeValue.text = referralValue
             binding.referralCodeValueText.text = referralCode
+            initRefugeVip(binding)
         }
 
         return binding.root
     }
 
+    @SuppressLint("SetTextI18n", "UseCompatLoadingForDrawables")
+    fun initRefugeVip(binding: MeFragmentBinding) {
+        val sharedPreferences =
+            requireActivity().getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
+        val isVip = sharedPreferences.getBoolean(getString(R.string.IS_VIP), false)
+        val vipExpire = sharedPreferences.getInt(getString(R.string.VIP_EXPIRE), 0)
+        val totalVipTime = sharedPreferences.getInt(getString(R.string.TOTAL_VIP_TIME), 0)
+        val credit = sharedPreferences.getInt(getString(R.string.REFUGE_CREDIT), 0)
+
+        if (isVip) {
+            binding.refugeVipTotalTimeText.text = "已陪伴避难所${(totalVipTime - vipExpire) / (3600 * 24)}天"
+            binding.refugeVipTokenNumText.text = credit.toString()
+            binding.refugeVipRemainDayText.text = (vipExpire / (3600 * 24) + 1).toString()
+            binding.refugeVipProgressBar.progress = (totalVipTime.toFloat() - vipExpire.toFloat()) / totalVipTime.toFloat() * 100
+            if(binding.refugeVipProgressBar.progress < 85) {
+                if(binding.refugeVipProgressBar.progress < 10) {
+                    binding.refugeVipProgressBar.progress = 10f
+                }
+                binding.refugeVipProgressBar.secondaryProgress = binding.refugeVipProgressBar.progress + 15
+            } else {
+                binding.refugeVipProgressBar.secondaryProgress = 100f
+            }
+        } else {
+            binding.vipIcon.setImageDrawable(resources.getDrawable(R.drawable.ic_me_not_vip_avatar))
+            binding.refugeVipTotalTimeText.text = "避难所 Premium已过期"
+            binding.refugeVipTokenNumText.text = credit.toString()
+            binding.refugeVipRemainDayText.text = "0"
+            binding.refugeVipProgressBar.setIconBackgroundColor(resources.getColor(R.color.colorDeepGrey100))
+            binding.refugeVipProgressBar.progressColor = resources.getColor(R.color.colorDeepGrey80)
+            binding.refugeVipProgressBar.secondaryProgressColor = resources.getColor(R.color.colorDeepGrey30)
+        }
+    }
 
 
 }

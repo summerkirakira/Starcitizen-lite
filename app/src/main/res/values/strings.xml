@@ -170,4 +170,8 @@
     <string name="more_info">详情 ></string>
     <string name="pledge_detail">物品详情</string>
     <string name="upgrade_detail">升级记录</string>
+    <string name="VIP_EXPIRE">refuge_vip_expire</string>
+    <string name="IS_VIP">refuge_is_vip</string>
+    <string name="TOTAL_VIP_TIME">refuge_total_vip_time</string>
+    <string name="REFUGE_CREDIT">refuge_credit</string>
 </resources>
