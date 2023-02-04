@@ -22,6 +22,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.azhon.appupdate.manager.DownloadManager
 import com.azhon.appupdate.util.ApkUtil
@@ -532,8 +533,9 @@ class MainActivity : RefugeBaseActivity() {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     checkStartUp()
-                    checkAnnouncement(sharedPreferences.getInt(getString(R.string.CURRENT_ANNOUNCEMENT_ID), 0))
                     checkUpdate()
+                    checkSubscription()
+                    checkAnnouncement(sharedPreferences.getInt(getString(R.string.CURRENT_ANNOUNCEMENT_ID), 0))
                     sharedPreferences.edit().putBoolean(getString(R.string.CHECK_UPDATE_KEY), false).apply()
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -553,34 +555,6 @@ class MainActivity : RefugeBaseActivity() {
                 systemModel = android.os.Build.MODEL
             )
         )
-
-        val isVip = sharedPreferences.getBoolean(getString(R.string.IS_VIP), false)
-
-        sharedPreferences.edit().apply {
-            putBoolean(getString(R.string.IS_VIP), latestVersion.isVip)
-            putInt(getString(R.string.VIP_EXPIRE), latestVersion.vipExpire)
-            putInt(getString(R.string.TOTAL_VIP_TIME), latestVersion.totalVipTime)
-            putInt(getString(R.string.REFUGE_CREDIT), latestVersion.credit)
-            apply()
-        }
-        if(isVip != latestVersion.isVip) {
-//            if (latestVersion.isVip) {
-//                Alerter.create(this)
-//                    .setTitle("星河避难所 Premium已激活")
-//                    .setText("有效期至${Date(Date().time + latestVersion.vipExpire.toLong() * 1000).toLocaleString()}")
-//                    .setBackgroundColorRes(R.color.alerter_default_success_background)
-//                    .show()
-//            } else {
-//                Alerter.create(this)
-//                    .setTitle("星河避难所 Premium已到期")
-//                    .setText("您的Premium有效期至${Date(Date().time + latestVersion.vipExpire.toLong() * 1000).toLocaleString()}")
-//                    .setBackgroundColorRes(R.color.alert_dialog_background_failure)
-//                    .show()
-//            }
-            //更新主界面
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-        }
 
         if(compareVersion(latestVersion.version, BuildConfig.VERSION_NAME)) {
             val manager = DownloadManager.Builder(this).run {
@@ -623,12 +597,12 @@ class MainActivity : RefugeBaseActivity() {
 
     private suspend fun checkStartUp() {
         val preference = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
-        if ((preference.getString(getString(R.string.UUID), "DEFAULT") ?: "DEFAULT") == "DEFAULT") {
+        if (preference.getString(getString(R.string.UUID), "DEFAULT")!! == "DEFAULT") {
             val uniqueID = UUID.randomUUID().toString()
             preference.edit().putString(getString(R.string.UUID), uniqueID).apply()
             uuid = uniqueID
         } else {
-            uuid = preference.getString(getString(R.string.UUID), "DEFAULT") ?: "DEFAULT"
+            uuid = preference.getString(getString(R.string.UUID), "DEFAULT")!!
         }
         if(preference.getBoolean(getString(R.string.FIRST_START_KEY), true)) {
             val startUpMessage = CirnoApi.retrofitService.getStartup()
@@ -720,5 +694,42 @@ class MainActivity : RefugeBaseActivity() {
         }
     }
 
+    private suspend fun checkSubscription() {
+            val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
+            val latestVersion = CirnoApi.retrofitService.getVersion(
+                RefugeInfo(
+                    version = BuildConfig.VERSION_NAME,
+                    androidVersion = android.os.Build.VERSION.RELEASE,
+                    systemModel = android.os.Build.MODEL
+                )
+            )
+            val isVip = sharedPreferences.getBoolean(getString(R.string.IS_VIP), false)
 
+            sharedPreferences.edit().apply {
+                putBoolean(getString(R.string.IS_VIP), latestVersion.isVip)
+                putInt(getString(R.string.VIP_EXPIRE), latestVersion.vipExpire)
+                putInt(getString(R.string.TOTAL_VIP_TIME), latestVersion.totalVipTime)
+                putInt(getString(R.string.REFUGE_CREDIT), latestVersion.credit)
+                apply()
+            }
+            if (isVip != latestVersion.isVip) {
+//            if (latestVersion.isVip) {
+//                Alerter.create(this)
+//                    .setTitle("星河避难所 Premium已激活")
+//                    .setText("有效期至${Date(Date().time + latestVersion.vipExpire.toLong() * 1000).toLocaleString()}")
+//                    .setBackgroundColorRes(R.color.alerter_default_success_background)
+//                    .show()
+//            } else {
+//                Alerter.create(this)
+//                    .setTitle("星河避难所 Premium已到期")
+//                    .setText("您的Premium有效期至${Date(Date().time + latestVersion.vipExpire.toLong() * 1000).toLocaleString()}")
+//                    .setBackgroundColorRes(R.color.alert_dialog_background_failure)
+//                    .show()
+//            }
+                //更新主界面
+                val intent = Intent(this@MainActivity, MainActivity::class.java)
+                startActivity(intent)
+            }
+
+    }
 }

@@ -30,6 +30,7 @@ import vip.kirakira.starcitizenlite.network.*
 import vip.kirakira.starcitizenlite.network.CirnoProperty.RecaptchaList
 import vip.kirakira.starcitizenlite.network.shop.LoginProperty
 import vip.kirakira.starcitizenlite.repositories.UserRepository
+import vip.kirakira.starcitizenlite.ui.widgets.RefugeVip
 import vip.kirakira.viewpagertest.network.graphql.LoginBody
 import vip.kirakira.viewpagertest.network.graphql.LoginQuery
 import vip.kirakira.viewpagertest.network.graphql.MultiStepLoginQuery
@@ -96,17 +97,9 @@ class LoginActivity : RefugeBaseActivity() {
                         createWarningAlerter(this@LoginActivity, getString(R.string.network_error), getString(R.string.token_server_error)).show()
                         return@launchWhenCreated
                     }
-                    if (token.captcha_list == null) {
-                        createWarningAlerter(this@LoginActivity, getString(R.string.network_error), getString(R.string.token_server_error)).show()
-                        return@launchWhenCreated
-                    }
                     if (token.captcha_list.isEmpty()) {
-                        startLoading()
-                        createWarningAlerter(
-                            this@LoginActivity,
-                            getString(R.string.error),
-                            getString(R.string.get_captcha_failed)
-                        ).show()
+                        stopLoading()
+                        RefugeVip.createWarningAlert(this@LoginActivity, getString(R.string.no_cirno_token), token.message)
                     }
                     val loginDetail: LoginProperty
                     try {
@@ -198,7 +191,15 @@ class LoginActivity : RefugeBaseActivity() {
                                                     startActivity(intent)
                                                 }
                                             }.start()
+                                        } else {
+                                            stopLoading()
+                                            createWarningAlerter(
+                                                this@LoginActivity,
+                                                getString(R.string.error),
+                                                getString(R.string.invalid_validation_code)
+                                            ).show()
                                         }
+
                                     } catch (e: Exception) {
                                         stopLoading()
                                         createWarningAlerter(

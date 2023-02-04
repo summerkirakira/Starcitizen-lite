@@ -379,7 +379,7 @@ fun getDatabase(context: Context): ShopItemDatabase {
                 ShopItemDatabase::class.java,
                 "shops")
                 .addMigrations(MIGRATION_2_5)
-//                .fallbackToDestructiveMigration()
+                .fallbackToDestructiveMigration()
                 .build()
         }
     }

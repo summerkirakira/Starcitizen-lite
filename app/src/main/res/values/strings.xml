@@ -179,4 +179,6 @@
     <string name="banned_reclaim_key">banned_reclaim_key</string>
     <string name="already_banned_reclaim">已禁止避难所的融船操作</string>
     <string name="please_switch_off_banned_reclaim">请在设置中关闭禁止融船选项后重试哦</string>
+    <string name="no_cirno_token">Token数量不足</string>
+    <string name="invalid_validation_code">校验码错误</string>
 </resources>

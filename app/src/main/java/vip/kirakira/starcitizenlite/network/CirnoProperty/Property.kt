@@ -28,8 +28,9 @@ data class StarUp(
 )
 
 data class RecaptchaList(
-    val captcha_list: List<ReCaptcha>? = null,
-    val error: String? = null
+    val captcha_list: List<ReCaptcha>,
+    val error: String? = null,
+    val message: String
 ) {
     data class ReCaptcha(
         val token: String

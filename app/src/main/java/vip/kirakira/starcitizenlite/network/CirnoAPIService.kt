@@ -15,6 +15,7 @@ import retrofit2.http.Query
 import vip.kirakira.starcitizenlite.database.ShipDetail
 import vip.kirakira.starcitizenlite.network.CirnoProperty.*
 import vip.kirakira.starcitizenlite.uuid
+import java.util.Locale
 
 private const val BASE_URL = "http://biaoju.site:6089/"
 
@@ -54,7 +55,7 @@ interface CirnoApiService {
     @GET("startup")
     suspend fun getStartup(): StarUp
 
-    @GET("reCaptchaV3")
+    @GET("v2/reCaptchaV3")
     suspend fun getReCaptchaV3(@Query("limit") limit: Int): RecaptchaList
 
     @GET("translation/version")
