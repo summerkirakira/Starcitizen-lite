@@ -165,9 +165,9 @@
                   android:text="@{String.valueOf(Float.valueOf(hangerItemProperty.price) / 100.0f)}"/>
         <TextView style="@style/shop_item_dollar_text"
                     android:id="@+id/dollar_icon2"
-                    android:layout_marginStart="200dp"
+                    android:layout_marginStart="10dp"
                     android:textColor="?attr/colorSecondary"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/price_text"
                   app:layout_constraintBaseline_toBaselineOf="@+id/price_text"
                     android:visibility="@{hangerItemProperty.currentPrice == null? 8 : 0}"
                     android:text="@string/dollar"/>
