@@ -52,4 +52,6 @@
     <color name="night_text">#FFFFFF</color>
     <color name="subscribe">#FFEB3B</color>
     <color name="refuge_subscribe_more">#FF9800</color>
+
+    <color name="color_night_secondary">#151515</color>
 </resources>

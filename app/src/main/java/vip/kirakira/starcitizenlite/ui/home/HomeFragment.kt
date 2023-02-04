@@ -3,9 +3,11 @@ package vip.kirakira.starcitizenlite.ui.home
 import android.content.ClipData.newIntent
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnTouchListener
@@ -61,6 +63,11 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val viewModel: HomeViewModel by activityViewModels()
+
+        val theme: Resources.Theme = context!!.theme
+        val textFillColor = TypedValue()
+        theme.resolveAttribute(R.attr.textFillColor, textFillColor, true)
+
         binding = DataBindingUtil.inflate(inflater, R.layout.home_fragment, container, false)
         binding.lifecycleOwner = this
         binding.fabReset.setOnClickListener {
@@ -181,6 +188,7 @@ class HomeFragment : Fragment() {
                     alsoContainsView.text = alsoContains
                     alsoContainsView.textSize = 16f
                     alsoContainsView.setPadding(15, 4, 0, 4)
+                    alsoContainsView.setTextColor(textFillColor.data)
                     binding.alsoContainsLinearLayout.addView(alsoContainsView)
                 }
                 // set max height

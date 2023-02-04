@@ -137,7 +137,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:id="@+id/bar"
-                android:background="?attr/backgroundColor"
+                android:background="?attr/colorOnSecondary"
                 android:elevation="20dp"
                 app:layout_constraintBottom_toBottomOf="parent">
 

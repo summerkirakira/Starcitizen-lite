@@ -140,7 +140,6 @@ class MainActivity : RefugeBaseActivity() {
 //        QMUIStatusBarHelper.setStatusBarLightMode(this)
 //        QMUIStatusBarHelper.getStatusbarHeight(this)
          //设置状态栏透明
-        initStatusBar()
 
         mMovingBar = findViewById(R.id.bottom_moving_bar) //底部滑动条
         mPager = findViewById(R.id.pager) //ViewPager
@@ -674,15 +673,6 @@ class MainActivity : RefugeBaseActivity() {
         secondLine.setStrokeData(4, colorStateList)
         thirdLine.setBgData(colorStateList)
         thirdLine.setStrokeData(4, colorStateList)
-    }
-
-    fun  initStatusBar(){
-        val mImmersionBar = ImmersionBar.with(this)
-        mImmersionBar.transparentBar()
-            .fullScreen(false)
-            .navigationBarColor(R.color.white)
-            .init()
-
     }
 
     override fun onBackPressed() {

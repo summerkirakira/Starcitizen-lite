@@ -6,8 +6,9 @@
         <item name="colorSecondary">#4CAF50</item>
         <item name="colorPrimaryVariant">@color/transparent</item>
         <item name="colorOnPrimary">@color/white</item>
+
         <!-- Secondary brand color. -->
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorOnSecondary">@color/white</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
@@ -28,7 +29,7 @@
         <item name="colorPrimaryVariant">@color/transparent</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorOnSecondary">@color/white</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
@@ -40,6 +41,94 @@
         <item name="colorPrimarySurface">#B92E2E2E</item>
         <item name="colorSecondaryVariant">#46FF6A65</item>
         <item name="colorAccent">@color/colorPrimaryLightBlue</item>
+    </style>
+
+    <style name="Theme.StarcitizenLiteLightPink" parent="QMUI.Compat.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#ffb3b3</item>
+        <item name="colorSecondary">#7C03A9F4</item>
+        <item name="colorPrimaryVariant">@color/transparent</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorOnSecondary">@color/white</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="qmui_dialog_max_width">420dp</item>
+        <item name="qmui_dialog_min_width">320dp</item>
+        <item name="backgroundColor">@color/white</item>
+        <item name="textFillColor">@color/black</item>
+        <item name="colorOutline">@color/transparent</item>
+        <item name="colorPrimarySurface">#B92E2E2E</item>
+        <item name="colorSecondaryVariant">#46FF6A65</item>
+        <item name="colorAccent">#ffb3b3</item>
+    </style>
+
+    <style name="Theme.StarcitizenLiteDeepPurple" parent="QMUI.Compat.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#AB47BC</item>
+        <item name="colorSecondary">#42A5F5</item>
+        <item name="colorPrimaryVariant">@color/transparent</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorOnSecondary">@color/white</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="qmui_dialog_max_width">420dp</item>
+        <item name="qmui_dialog_min_width">320dp</item>
+        <item name="backgroundColor">@color/white</item>
+        <item name="textFillColor">@color/black</item>
+        <item name="colorOutline">@color/transparent</item>
+        <item name="colorPrimarySurface">#B92E2E2E</item>
+        <item name="colorSecondaryVariant">#46FF6A65</item>
+        <item name="colorAccent">#AB47BC</item>
+    </style>
+
+
+    <style name="Theme.StarcitizenLiteLightGreen" parent="QMUI.Compat.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#66BB6A</item>
+        <item name="colorSecondary">#29B6F6</item>
+        <item name="colorPrimaryVariant">@color/transparent</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorOnSecondary">@color/white</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="qmui_dialog_max_width">420dp</item>
+        <item name="qmui_dialog_min_width">320dp</item>
+        <item name="backgroundColor">@color/white</item>
+        <item name="textFillColor">@color/black</item>
+        <item name="colorOutline">@color/transparent</item>
+        <item name="colorPrimarySurface">#B92E2E2E</item>
+        <item name="colorSecondaryVariant">#46FF6A65</item>
+        <item name="colorAccent">#66BB6A</item>
+    </style>
+
+
+    <!-- night mode -->
+    <style name="Theme.StarcitizenLiteBlack" parent="QMUI.Compat.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/light_blue_900</item>
+        <item name="colorSecondary">#4CAF50</item>
+        <item name="colorPrimaryVariant">@color/transparent</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorOnSecondary">@color/color_night_secondary</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="qmui_dialog_max_width">420dp</item>
+        <item name="qmui_dialog_min_width">320dp</item>
+        <item name="backgroundColor">@color/black</item>
+        <item name="textFillColor">#DCDBDB</item>
+        <item name="colorOutline">@color/transparent</item>
+        <item name="colorPrimarySurface">#B9A5A5A5</item>
+        <item name="colorSecondaryVariant">#6001579B</item>
+        <item name="colorAccent">@color/light_blue_900</item>
+        <item name="background">@color/black</item>"
     </style>
 
 

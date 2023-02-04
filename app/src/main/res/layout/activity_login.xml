@@ -5,11 +5,13 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:background="?attr/backgroundColor"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".activities.LoginActivity">
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="match_parent"
+                  android:background="?attr/backgroundColor"
                   android:id="@+id/login_layout"
                   android:orientation="vertical"
                   android:gravity="center"
@@ -20,6 +22,7 @@
         <ImageView android:layout_width="220dp"
                    android:layout_height="220dp"
                    android:layout_marginBottom="30dp"
+                   android:tint="?attr/textFillColor"
                    android:src="@drawable/sc_icon"/>
         <EditText android:layout_width="match_parent"
                   android:layout_height="wrap_content"
@@ -60,6 +63,7 @@
         <TextView android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:gravity="center"
+                  android:textColor="?attr/backgroundColor"
                   android:text="@string/login_by_web"
                   android:id="@+id/login_by_web" />
         <LinearLayout android:layout_width="match_parent"
