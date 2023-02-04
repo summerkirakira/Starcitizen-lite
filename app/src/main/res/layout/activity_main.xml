@@ -4,6 +4,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/root_drawer"
+        android:background="?attr/backgroundColor"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -124,7 +125,7 @@
                     android:layout_height="40dp"
                     android:visibility="invisible"
                     app:exb_backgroundCornerRadius="10dp"
-                    app:exb_backgroundColor="#2e2e2e"
+                    app:exb_backgroundColor="?attr/colorPrimarySurface"
                     app:exb_itemInactiveColor="#fff"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -136,7 +137,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:id="@+id/bar"
-                android:background="@color/white"
+                android:background="?attr/colorOnSecondary"
                 android:elevation="20dp"
                 app:layout_constraintBottom_toBottomOf="parent">
 

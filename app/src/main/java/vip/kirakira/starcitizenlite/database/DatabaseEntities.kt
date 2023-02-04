@@ -1,9 +1,6 @@
 package vip.kirakira.starcitizenlite.database
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.Relation
+import androidx.room.*
 import vip.kirakira.starcitizenlite.network.shop.CatalogProperty
 import vip.kirakira.starcitizenlite.network.shop.InitShipUpgradeProperty
 
@@ -93,6 +90,9 @@ data class HangerPackage constructor(
     val title: String,
     val image: String,
     val value: Int,
+
+    @ColumnInfo(defaultValue = "0")
+    var currentPrice: Int,
     val status: String,
     val is_upgrade: Boolean,
     val upgrade_info: String,
@@ -160,6 +160,88 @@ data class BannerImage constructor(
    @PrimaryKey
    val id: Int,
    val url: String
+)
+
+@Entity(tableName = "hangar_ship")
+data class HangarShip constructor(
+    @PrimaryKey
+    val id: Int,
+    val name: String,
+    val shipId: Int? = null,
+    val packageId: Int,
+    val packageTitle: String,
+    val imageUrl: String,
+    val chinesePackageTitle: String? = null,
+    val image: String,
+    val price: Int,
+    val current_price: Int,
+    val is_upgrade: Boolean,
+    val insurance: Int,
+    val date: Long,
+    val isGiftable: Boolean,
+    val packagePrice: Int,
+    val isReclaimable: Boolean,
+    val receiveTime: Long,
+    val insert_time: Long
+)
+
+@Entity(tableName = "hangar_log")
+data class HangarLog constructor(
+    @PrimaryKey
+    val id: String,
+    val time: Long,
+    val type: String,
+    val name: String,
+    var chineseName: String? = null,
+    var price: Int? = null,
+    var source: String? = null,
+    var target: String? = null,
+    var operator: String? = null,
+    var reason: String? = null,
+    var order: String? = null,
+    val insert_time: Long
+)
+
+@Entity(tableName = "ship_upgrade")
+data class ShipUpgrade constructor(
+    @PrimaryKey
+    val skuId: Int,
+    val shipId: Int,
+    val name: String,
+    val isFlyable: Boolean,
+    val focus: String,
+    val link: String,
+    val manufacturer: String,
+    val productThumbMediumAndSmall: String,
+    val slideShow: String,
+    val price: Int,
+    val edition: String,
+    var isAvailable: Boolean
+)
+
+@Entity(tableName = "ship_detail")
+data class ShipDetail constructor(
+    @PrimaryKey
+    val id: String,
+    val storeUrl: String,
+    val description: String? = null,
+    val beam: Float,
+    val classification: String,
+    val hasModules: Boolean,
+    val name: String,
+    val maxCrew: Int? = null,
+    val price: Float? = null,
+    val rsiName: String,
+    val rsiSlug: String,
+    val lastPledgePrice: Float? = null,
+    val length: Float,
+    val height: Float,
+    val focus: String,
+    val mass: Float,
+    val size: String? = null,
+    val storeImageSmall: String,
+    val storeImageMedium: String,
+    val storeImageLarge: String
 )
 
 fun List<ShopItem>.toCatalogProperty(): List<CatalogProperty> {

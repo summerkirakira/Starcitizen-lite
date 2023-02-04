@@ -4,6 +4,10 @@
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
+
+    <color name="colorPrimaryLightBlue">#FF6A65</color>
+    <color name="colorPrimaryTransparentBlue">#8DFF6A65</color>
+
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
@@ -26,4 +30,28 @@
     <color name="shop_item_can_buy">#ADF659</color>
     <color name="upgrade_is_selected">#FFC107</color>
     <color name="progress_background">#6D000000</color>
+    <color name="colorDivider">#1f000000</color> <!-- 12% black -->
+    <color name="colorGrey50">#fafafa</color>
+    <color name="colorDeepGrey100">#737373</color>
+    <color name="colorDeepGrey80">#989898</color>
+    <color name="colorDeepGrey30">#C3C3C3</color>
+    <color name="hangar_log_shop_icon">#F44336</color>
+    <color name="hangar_log_reclaim_icon">#03A9F4</color>
+    <color name="hangar_log_giveaway_icon">#FF9800</color>
+    <color name="hangar_log_upgrade_icon">#FF9800</color>
+    <color name="hangar_log_consume_icon">#673AB7</color>
+    <color name="hangar_log_gift_icon">#3F51B5</color>
+    <color name="hangar_log_gift_claimed_icon">#4CAF50</color>
+    <color name="hangar_log_gift_cancelled_icon">#673AB7</color>
+    <color name="hangar_log_buyback_icon">#21DAF3</color>
+    <color name="hangar_log_name_change_icon">#009688</color>
+
+
+
+    <color name="night_background">#181818</color>
+    <color name="night_text">#FFFFFF</color>
+    <color name="subscribe">#FFEB3B</color>
+    <color name="refuge_subscribe_more">#FF9800</color>
+
+    <color name="color_night_secondary">#151515</color>
 </resources>

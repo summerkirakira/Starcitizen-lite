@@ -52,6 +52,7 @@ class HangerViewAdapter(private val onClickListener: HangerViewAdapter.OnClickLi
             binding.canUpgrade.visibility = View.GONE
             binding.canReclaim.visibility = View.GONE
             binding.canGift.visibility = View.GONE
+
             for(tag in item.tags) {
                 if(tag.name == "可赠送"){
                     binding.canGift.visibility = View.VISIBLE
@@ -69,6 +70,21 @@ class HangerViewAdapter(private val onClickListener: HangerViewAdapter.OnClickLi
                 binding.insuranceItemButton.visibility = View.VISIBLE
             } else {
                 binding.insuranceItemButton.visibility = View.GONE
+            }
+            if (item.name.contains("Warbond") || item.name.contains("战争债券")){
+                binding.isWarbond.visibility = View.VISIBLE
+            } else {
+                binding.isWarbond.visibility = View.GONE
+            }
+
+            if (item.savingString != null && item.savingString != "-0%") {
+                binding.savingButton.visibility = View.VISIBLE
+                binding.priceText2.visibility = View.VISIBLE
+                binding.dollarIcon2.visibility = View.VISIBLE
+            } else {
+                binding.savingButton.visibility = View.GONE
+                binding.priceText2.visibility = View.GONE
+                binding.dollarIcon2.visibility = View.GONE
             }
 
             binding.executePendingBindings()

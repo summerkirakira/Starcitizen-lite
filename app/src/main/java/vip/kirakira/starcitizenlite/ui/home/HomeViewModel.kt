@@ -103,11 +103,32 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
     }
 
     private fun filterHangerByTitle(filter: String):  LiveData<List<HangerPackageWithItems>> {
-        return Transformations.map(originHangerItems) {
-            it.filter {
-                item -> item.hangerPackage.title.contains(filter, true)
+        return if(filter == "Subscribe") {
+            Transformations.map(originHangerItems) {
+                    it.filter { item -> item.hangerPackage.can_gift && item.hangerPackage.currentPrice == 0
+                }
+            }
+        } else if(filter == "Ship") {
+            Transformations.map(originHangerItems) {
+                it.filter { item -> !item.hangerPackage.is_upgrade && item.hangerPackage.currentPrice >= 15
+                }
+            }
+        } else if(filter == "Trash") {
+            Transformations.map(originHangerItems) {
+                it.filter { item -> !item.hangerPackage.is_upgrade &&
+                        item.hangerPackage.currentPrice == 0 &&
+                        !item.hangerPackage.can_gift
+                }
             }
         }
+
+        else {
+            Transformations.map(originHangerItems) {
+                    it.filter { item -> item.hangerPackage.title.contains(filter, true)
+                }
+            }
+        }
+
     }
 
     private fun filterBuybackByTitle(filter: String):  LiveData<List<BuybackItem>> {
@@ -126,7 +147,6 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
             Mode.BUYBACK -> {
                 buybackItemFilter.value = filter
             }
-
             else -> {}
         }
     }

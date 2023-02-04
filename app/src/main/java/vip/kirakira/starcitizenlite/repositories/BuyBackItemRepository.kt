@@ -1,5 +1,7 @@
 package vip.kirakira.starcitizenlite.repositories
 
+import android.util.Log
+import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.Dispatchers
@@ -9,6 +11,7 @@ import vip.kirakira.starcitizenlite.database.ShopItemDatabase
 import vip.kirakira.starcitizenlite.network.CirnoApi
 import vip.kirakira.starcitizenlite.network.CirnoProperty.AddNotTranslationBody
 import vip.kirakira.starcitizenlite.network.hanger.HangerService
+import vip.kirakira.starcitizenlite.ui.home.Parser
 
 class BuyBackItemRepository(private val database: ShopItemDatabase) {
     val allItems: LiveData<List<BuybackItem>> = database.buybackItemDao.getAll()
@@ -25,6 +28,25 @@ class BuyBackItemRepository(private val database: ShopItemDatabase) {
                     if (data.isEmpty()) {
                         break
                     }
+                    View.GONE
+//                    for(hangerPackage in data) {
+//                        if(hangerPackage.title.startsWith("Upgrade - ")) {
+//                            val upgradeShips = Parser.getUpgradeOriginalName(hangerPackage.title)
+//                            val upgradeFromShip = database.shipUpgradeDao.getByNameLike(upgradeShips[0].name)
+//                            val upgradeToShip = database.shipUpgradeDao.getByNameLike(upgradeShips[1].name)
+//                            if (upgradeFromShip != null && upgradeToShip != null) {
+//
+//                            } else {
+//                                val fromShip = database.shipDetailDao.getByName(upgradeShips[0].name)
+//                                val toShip = database.shipDetailDao.getByName(upgradeShips[1].name)
+//                                if (fromShip?.lastPledgePrice != null && toShip?.lastPledgePrice != null) {
+//                                } else {
+//                                    Log.d("BuybackItemRepository", upgradeShips[0].name + " " + upgradeShips[1].name)
+//                                }
+//                            }
+//                        }
+//                    }
+
                     database.buybackItemDao.insertAll(data)
 //                    for (buybackItem in data) {
 //                        val translation = database.translationDao.getByEnglishTitle(buybackItem.title)

@@ -115,7 +115,9 @@
     <string name="password">密码</string>
     <string name="login">登录</string>
     <string name="register">注册</string>
-    <string name="login_by_web"><u>点击使用网页登录</u></string>
+    <string name="login_by_web">
+        <u>点击使用网页登录</u>
+    </string>
     <string name="please_enter_email_and_password">请输入邮箱和密码</string>
     <string name="get_csrf_token_error">获取CSRF Token失败</string>
     <string name="get_captcha_failed">获取Token失败，本月次数可能用尽</string>
@@ -160,4 +162,23 @@
     <string name="logout_current_account">登出当前账号</string>
     <string name="do_not_allow_reclaim">禁止融船操作</string>
     <string name="do_not_allow_reclaim_summary">打死我都不融船！</string>
+    <string name="theme_key">CURRENT_THEME_KEY</string>
+    <string name="warbond_short">WB</string>
+    <string name="crawled_page_key">CRAWlED_PAGE_KEY</string>
+    <string name="hangar_log">机库日志</string>
+    <string name="SHIP_DETAIL_VERSION_KEY">ship_detail_version_key</string>
+    <string name="more_info">详情 ></string>
+    <string name="pledge_detail">物品详情</string>
+    <string name="upgrade_detail">升级记录</string>
+    <string name="VIP_EXPIRE">refuge_vip_expire</string>
+    <string name="IS_VIP">refuge_is_vip</string>
+    <string name="TOTAL_VIP_TIME">refuge_total_vip_time</string>
+    <string name="REFUGE_CREDIT">refuge_credit</string>
+    <string name="please_enter_reclaim_password">请输入融船密码</string>
+    <string name="theme_color_key">theme_color_key</string>
+    <string name="banned_reclaim_key">banned_reclaim_key</string>
+    <string name="already_banned_reclaim">已禁止避难所的融船操作</string>
+    <string name="please_switch_off_banned_reclaim">请在设置中关闭禁止融船选项后重试哦</string>
+    <string name="no_cirno_token">Token数量不足</string>
+    <string name="invalid_validation_code">校验码错误</string>
 </resources>

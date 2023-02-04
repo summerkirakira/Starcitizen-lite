@@ -1,5 +1,7 @@
 package vip.kirakira.starcitizenlite.network.shop
 
+import vip.kirakira.starcitizenlite.database.ShipUpgrade
+
 data class Error(val message: String, val extensions: Extensions) {
     data class Extensions(val code: Int?, val details: Details?){
         data class Details(val amount: String?)
@@ -125,6 +127,44 @@ data class InitShipUpgradeProperty(val data: Data) {
                     return "$title#&$price#&$id"
                 }
             }
+
+            companion object {
+                fun toShipUpgradeRepoItem(ship: Ship): ShipUpgrade {
+                    return ShipUpgrade(
+                        skuId = ship.id,
+                        shipId = ship.id,
+                        name = ship.name,
+                        isFlyable = ship.flyableStatus == "Flyable",
+                        focus = ship.focus?: "",
+                        link = ship.link,
+                        manufacturer = ship.manufacturer.name,
+                        productThumbMediumAndSmall = ship.medias.productThumbMediumAndSmall,
+                        slideShow = ship.medias.slideShow,
+                        price = ship.msrp,
+                        edition = "Standard Edition",
+                        isAvailable = false
+                    )
+                }
+
+                fun toShipUpgradeRepoItems(ship: Ship): List<ShipUpgrade> {
+                    return ship.skus!!.map { sku ->
+                        ShipUpgrade(
+                            skuId = sku.id,
+                            shipId = ship.id,
+                            name = ship.name,
+                            isFlyable = ship.flyableStatus == "Flyable",
+                            focus = ship.focus?: "",
+                            link = ship.link,
+                            manufacturer = ship.manufacturer.name,
+                            productThumbMediumAndSmall = ship.medias.productThumbMediumAndSmall,
+                            slideShow = ship.medias.slideShow,
+                            price = sku.price,
+                            edition = sku.title,
+                            isAvailable = false
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -198,3 +238,12 @@ data class ApplyPromoProperty(
     val success: Int,
     val code: String,
     val msg: String)
+
+data class HangarLogProperty(
+    val code: String,
+    val msg: String,
+    val success: Int,
+    val data: Data?
+) {
+    data class Data(val page: Int, val pagecount: Int, val rendered: String)
+}

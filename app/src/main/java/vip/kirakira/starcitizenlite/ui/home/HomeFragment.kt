@@ -3,9 +3,11 @@ package vip.kirakira.starcitizenlite.ui.home
 import android.content.ClipData.newIntent
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnTouchListener
@@ -17,6 +19,7 @@ import androidx.core.content.ContextCompat.getColor
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.nambimobile.widgets.efab.FabOption
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog
 import com.tapadoo.alerter.Alerter
 import kotlinx.coroutines.CoroutineScope
@@ -24,6 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import vip.kirakira.starcitizenlite.R
+import vip.kirakira.starcitizenlite.RefugeApplication
 import vip.kirakira.starcitizenlite.activities.CartActivity
 import vip.kirakira.starcitizenlite.activities.LoginActivity
 import vip.kirakira.starcitizenlite.activities.WebLoginActivity
@@ -34,6 +38,7 @@ import vip.kirakira.starcitizenlite.network.RSIApi
 import vip.kirakira.starcitizenlite.network.hanger.HangerService
 import vip.kirakira.starcitizenlite.network.shop.clearCart
 import vip.kirakira.starcitizenlite.ui.loadImage
+import vip.kirakira.starcitizenlite.ui.widgets.RefugeVip
 import vip.kirakira.viewpagertest.network.graphql.ApplyTokenBody
 import vip.kirakira.viewpagertest.network.graphql.BuyBackPledgeBody
 import vip.kirakira.viewpagertest.network.graphql.UpgradeAddToCartQuery
@@ -49,17 +54,42 @@ class HomeFragment : Fragment() {
 
     private lateinit var viewModel: HomeViewModel
 
-    val scope = CoroutineScope(Job() + Dispatchers.Main)
+    private val scope = CoroutineScope(Job() + Dispatchers.Main)
 
 
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val viewModel: HomeViewModel by activityViewModels()
+
+        val theme: Resources.Theme = context!!.theme
+        val textFillColor = TypedValue()
+        theme.resolveAttribute(R.attr.textFillColor, textFillColor, true)
+
         binding = DataBindingUtil.inflate(inflater, R.layout.home_fragment, container, false)
         binding.lifecycleOwner = this
+        binding.fabReset.setOnClickListener {
+            onResetFabClick(viewModel)
+        }
+        binding.fabUpgrade.setOnClickListener {
+            onUpgradeFabClick(viewModel)
+        }
+        binding.fabShip.setOnClickListener {
+            onShipFabClick(viewModel)
+        }
+
+        binding.fabSubscription.setOnClickListener {
+            onSubscribeFabClick(viewModel)
+        }
+
+        binding.fabPaint.setOnClickListener {
+            onPaintFabClick(viewModel)
+        }
+        binding.fabTrash.setOnClickListener {
+            onTrashFabClick(viewModel)
+        }
 
 //        binding.contentContainer.setOnClickListener(View.OnClickListener {
 //            binding.popupLayout.visibility = View.GONE
@@ -110,6 +140,21 @@ class HomeFragment : Fragment() {
                     binding.itemsLinearLayout.visibility = View.GONE
                     binding.itemsTitle.visibility = View.GONE
                 }
+
+                val hangerItem = it
+
+                binding.contentDetail.setOnClickListener {
+                    if(!RefugeVip.isVip()) {
+                        RefugeVip.createWarningAlert(requireActivity())
+                        return@setOnClickListener
+                    }
+                    HangarItemDetailBottomSheet.showDialog(
+                        requireActivity().supportFragmentManager,
+                        hangerItem
+                    )
+                }
+
+
                 val pref = context?.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
                 val isTranslationEnabled = pref?.getBoolean(getString(R.string.enable_localization), false) ?: false
                 for(item in it.items) {
@@ -143,6 +188,7 @@ class HomeFragment : Fragment() {
                     alsoContainsView.text = alsoContains
                     alsoContainsView.textSize = 16f
                     alsoContainsView.setPadding(15, 4, 0, 4)
+                    alsoContainsView.setTextColor(textFillColor.data)
                     binding.alsoContainsLinearLayout.addView(alsoContainsView)
                 }
                 // set max height
@@ -153,58 +199,93 @@ class HomeFragment : Fragment() {
             HangerViewAdapter.OnTagClickListener {
                 tag, item ->
                 if(tag == "can_reclaim") {
+                    val pref = context?.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+                    val isBannedReclaim = pref?.getBoolean(getString(R.string.banned_reclaim_key), false) ?: false
+                    if (isBannedReclaim) {
+                        createWarningAlerter(requireActivity(), getString(R.string.already_banned_reclaim), getString(R.string.please_switch_off_banned_reclaim)).show()
+                        return@OnTagClickListener
+                    }
                     QMUIDialog.MessageDialogBuilder(activity)
                         .setTitle(getString(R.string.reclaim_warning))
                         .setMessage("即将对${item.name}进行回收操作，结束后将会返还${item.price.toFloat() / 100f}信用点\n此操作不可逆！是否继续？")
                         .addAction("全部回收") { dialog, _ ->
                             dialog.dismiss()
-                            scope.launch {
-                                for (id in item.idList.split(","))
-                                    try {
-                                        val message = HangerService().reclaimPledge(id, viewModel.currentUser.value!!.password)
-                                        if (message.code == "OK") {
-                                            createSuccessAlerter(requireActivity(), getString(R.string.reclaim_success), "已返还${item.price.toFloat() / 100f}信用点").show()
-                                            viewModel.refresh()
-                                        } else {
-                                            createWarningAlerter(requireActivity(), getString(R.string.reclaim_failed), message.msg).show()
-                                            return@launch
-                                        }
-                                    } catch (e: Exception) {
-                                        createWarningAlerter(requireActivity(), getString(R.string.reclaim_failed), getString(R.string.network_error)).show()
-                                        return@launch
-                                    }
+                            if (!RefugeVip.isVip()) {
+                                RefugeVip.createWarningAlert(requireActivity())
+                                return@addAction
                             }
+                            QMUIDialog.MessageDialogBuilder(activity)
+                                .setTitle(getString(R.string.reclaim_warning))
+                                .setMessage("确定要对${item.name}进行全部回收吗？\n此操作不可逆！！！")
+                                .addAction(getString(R.string.cancel)) { dialog, _ -> dialog.dismiss() }
+                                .addAction(getString(R.string.accept)) {
+                                    dialog, _ ->
+                                    dialog.dismiss()
+                                    scope.launch {
+                                        for (id in item.idList.split(","))
+                                            try {
+                                                val message = HangerService().reclaimPledge(id, viewModel.currentUser.value!!.password)
+                                                if (message.code == "OK") {
+                                                    Toast.makeText(context, "已返还${item.price.toFloat() / 100f}信用点", Toast.LENGTH_SHORT).show()
+                                                } else {
+                                                    createWarningAlerter(requireActivity(), getString(R.string.reclaim_failed), message.msg).show()
+                                                    viewModel.refresh()
+                                                    return@launch
+                                                }
+                                            } catch (e: Exception) {
+                                                createWarningAlerter(requireActivity(), getString(R.string.reclaim_failed), getString(R.string.network_error)).show()
+                                                viewModel.refresh()
+                                                return@launch
+                                            }
+                                        viewModel.refresh()
+                                    }
+                                }.show()
 
                         }
                         .addAction(getString(R.string. cancel)) { dialog, _ -> dialog.dismiss() }
                         .addAction(0, getString(R.string.confirm)) { dialog, _ ->
                             dialog.dismiss()
-                            scope.launch {
-                                try {
-                                    val message = HangerService().reclaimPledge(item.id.toString(), viewModel.currentUser.value!!.password)
-                                    if (message.code == "OK") {
-                                        Alerter.create(activity!!)
-                                            .setTitle(getString(R.string.reclaim_success))
-                                            .setText("已返还${item.price.toFloat() / 100f}信用点")
-                                            .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background))
-                                            .show()
-                                        viewModel.refresh()
-                                    } else {
-                                        Alerter.create(activity!!)
-                                            .setTitle(getString(R.string.reclaim_failed))
-                                            .setText(message.msg)
-                                            .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
-                                            .show()
+                            val builder = QMUIDialog.EditTextDialogBuilder(activity)
+                            builder
+                                .setTitle(getString(R.string.reclaim_warning))
+                                .setPlaceholder(getString(R.string.please_enter_reclaim_password))
+                                .setInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD)
+                                .addAction(getString(R.string.cancel)) { dialog, _ -> dialog.dismiss() }
+                                .addAction(getString(R.string.accept)) {
+                                    dialog, _ ->
+                                    val password = builder.editText.text.toString()
+                                    if (viewModel.currentUser.value!!.password != password) {
+                                        createWarningAlerter(requireActivity(), getString(R.string.reclaim_failed), getString(R.string.password_not_match)).show()
+                                        return@addAction
                                     }
-                                } catch (e: Exception) {
-                                    Alerter.create(activity!!)
-                                        .setTitle(getString(R.string.reclaim_failed))
-                                        .setText(getString(R.string.network_error))
-                                        .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
-                                        .show()
-                                }
+                                    dialog.dismiss()
+                                    scope.launch {
+                                        try {
+                                            val message = HangerService().reclaimPledge(item.id.toString(), viewModel.currentUser.value!!.password)
+                                            if (message.code == "OK") {
+                                                Alerter.create(activity!!)
+                                                    .setTitle(getString(R.string.reclaim_success))
+                                                    .setText("已返还${item.price.toFloat() / 100f}信用点")
+                                                    .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background))
+                                                    .show()
+                                                viewModel.refresh()
+                                            } else {
+                                                Alerter.create(activity!!)
+                                                    .setTitle(getString(R.string.reclaim_failed))
+                                                    .setText(message.msg)
+                                                    .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
+                                                    .show()
+                                            }
+                                        } catch (e: Exception) {
+                                            Alerter.create(activity!!)
+                                                .setTitle(getString(R.string.reclaim_failed))
+                                                .setText(getString(R.string.network_error))
+                                                .setBackgroundColorInt(getColor(context!!, R.color.alert_dialog_background_failure))
+                                                .show()
+                                        }
 
-                            }
+                                    }
+                                }.show()
                         }
                         .show()
 
@@ -497,4 +578,49 @@ class HomeFragment : Fragment() {
         intent.putExtras(bundle)
         startActivity(intent)
     }
+
+    private fun onResetFabClick(homeViewModel: HomeViewModel) {
+        homeViewModel.setFilter("")
+    }
+
+    private fun onUpgradeFabClick(homeViewModel: HomeViewModel) {
+        if(!RefugeVip.isVip()) {
+            RefugeVip.createWarningAlert(requireActivity())
+            return
+        }
+        homeViewModel.setFilter("Upgrade - ")
+    }
+
+    private fun onShipFabClick(homeViewModel: HomeViewModel) {
+        if(!RefugeVip.isVip()) {
+            RefugeVip.createWarningAlert(requireActivity())
+            return
+        }
+        homeViewModel.setFilter("Ship")
+    }
+
+    private fun onSubscribeFabClick(homeViewModel: HomeViewModel) {
+        if(!RefugeVip.isVip()) {
+            RefugeVip.createWarningAlert(requireActivity())
+            return
+        }
+        homeViewModel.setFilter("Subscribe")
+    }
+
+    private fun onPaintFabClick(homeViewModel: HomeViewModel) {
+        if(!RefugeVip.isVip()) {
+            RefugeVip.createWarningAlert(requireActivity())
+            return
+        }
+        homeViewModel.setFilter("paint")
+    }
+
+    private fun onTrashFabClick(homeViewModel: HomeViewModel) {
+        if(!RefugeVip.isVip()) {
+            RefugeVip.createWarningAlert(requireActivity())
+            return
+        }
+        homeViewModel.setFilter("Trash")
+    }
+
 }

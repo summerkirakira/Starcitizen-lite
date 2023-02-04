@@ -15,6 +15,7 @@
             tools:src="@drawable/ic_launcher_background" />
     <TextView android:layout_width="0dp"
               android:layout_height="wrap_content"
+              android:textColor="?attr/textFillColor"
               android:id="@+id/detail_title"
               android:textSize="18sp"
               android:ellipsize="end"
@@ -28,6 +29,7 @@
               tools:text="RADEGAST WHISKEY 2947 LIMITED EDITION" />
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
+              android:textColor="?attr/textFillColor"
               app:layout_constraintStart_toStartOf="@+id/detail_title"
               app:layout_constraintTop_toBottomOf="@+id/detail_title"
               android:id="@+id/detail_kind"
@@ -36,6 +38,7 @@
               android:textSize="14sp" />
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
+              android:textColor="?attr/textFillColor"
               app:layout_constraintStart_toStartOf="@+id/detail_title"
               app:layout_constraintTop_toBottomOf="@+id/detail_kind"
               android:id="@+id/detail_subtitle"

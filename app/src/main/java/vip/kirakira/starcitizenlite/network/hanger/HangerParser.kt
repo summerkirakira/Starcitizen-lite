@@ -40,7 +40,7 @@ class HangerProcess {
                 val canUpgrade = pledge.select(".shadow-button.js-apply-upgrade").isNotEmpty()
                 val upgradeInfo = pledge.select(".js-upgrade-data").attr("value")
                 val alsoContainsString = pledge.select(".title").joinToString("#") { it.text() }
-                val hangerPackage = HangerPackage(pledgeId, pledgeTitle, pledgeImage, pledgeValue, pledgeStatus, canUpgrade, upgradeInfo, pledgeDate, pledgeContains, alsoContainsString, canGift, canExchange, System.currentTimeMillis())
+                val hangerPackage = HangerPackage(pledgeId, pledgeTitle, pledgeImage, pledgeValue, 0, pledgeStatus, canUpgrade, upgradeInfo, pledgeDate, pledgeContains, alsoContainsString, canGift, canExchange, System.currentTimeMillis())
                 val itemList = pledge.select(".with-images").select(".item").mapIndexed { position, item ->
                     val id = "$pledgeId#$position"
                     val title = item.select(".title").text()

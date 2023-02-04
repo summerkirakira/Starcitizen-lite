@@ -33,6 +33,7 @@ import vip.kirakira.starcitizenlite.network.RSIApi
 import vip.kirakira.starcitizenlite.network.csrf_token
 import vip.kirakira.starcitizenlite.network.shop.*
 import vip.kirakira.starcitizenlite.ui.shopping.ShopItemFilter
+import vip.kirakira.starcitizenlite.ui.widgets.RefugeVip
 import vip.kirakira.viewpagertest.network.graphql.ApplyTokenBody
 import vip.kirakira.viewpagertest.network.graphql.FilterShipsQuery
 import vip.kirakira.viewpagertest.network.graphql.SearchFromShipQuery
@@ -367,12 +368,8 @@ class ShoppingFragment : Fragment() {
                                                     while (tokenList.size < requiredTokenNumber) {
                                                         val token =
                                                             CirnoApi.retrofitService.getReCaptchaV3(requiredTokenNumber)
-                                                        if (token.captcha_list == null) {
-                                                            createWarningAlerter(
-                                                                requireActivity(),
-                                                                "获取Token失败",
-                                                                getString(R.string.cirno_token_error)
-                                                            ).show()
+                                                        if (token.captcha_list.isEmpty()) {
+                                                            RefugeVip.createWarningAlert(requireActivity(), "获取Token失败", token.message)
                                                             return@launch
                                                         }
                                                         tokenList.addAll(token.captcha_list)
@@ -524,22 +521,17 @@ class ShoppingFragment : Fragment() {
                                                 }
                                                 nextStep()
                                                 val tokenList: List<RecaptchaList.ReCaptcha>?
+                                                val recaptchaList: RecaptchaList
                                                 try {
-                                                    tokenList = CirnoApi.retrofitService.getReCaptchaV3(1).captcha_list
+                                                    recaptchaList = CirnoApi.retrofitService.getReCaptchaV3(1)
+                                                    tokenList = recaptchaList.captcha_list
                                                 } catch (e: Exception) {
                                                     createWarningAlerter(requireActivity(), "获取Token失败", getString(R.string.cirno_token_error)).show()
                                                     return@launch
                                                 }
-                                                if (tokenList == null) {
-                                                    createWarningAlerter(requireActivity(), "购买失败", "获取Token失败").show()
-                                                    return@launch
-                                                }
                                                 if (tokenList.isEmpty()) {
-                                                    createWarningAlerter(
-                                                        requireActivity(),
-                                                        "购买失败",
-                                                        "Token列表为空, 请稍后再试"
-                                                    ).show()
+                                                    RefugeVip.createWarningAlert(requireActivity(), "获取Token失败", recaptchaList.message)
+                                                    return@launch
                                                 }
                                                 val token = tokenList[0]
                                                 cartValidation(token.token)

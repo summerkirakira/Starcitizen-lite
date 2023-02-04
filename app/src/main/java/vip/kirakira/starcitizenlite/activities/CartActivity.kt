@@ -19,7 +19,7 @@ import vip.kirakira.starcitizenlite.createWarningAlerter
 import vip.kirakira.starcitizenlite.network.rsi_cookie
 
 
-class CartActivity : AppCompatActivity() {
+class CartActivity : RefugeBaseActivity() {
     lateinit var loginWebView: WebView
     var recorder = WebLoginActivity.PayloadRecorder()
 
