@@ -236,11 +236,97 @@ interface ShipDetailDao {
 //}
 
 
-val MIGRATION_1_2 = object : Migration(1, 2) {
+val MIGRATION_2_5 = object : Migration(2, 5) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
             """
-                DROP TABLE IF EXISTS shop_items;
+                ALTER TABLE hanger_packages ADD COLUMN currentPrice Integer DEFAULT 0 NOT NULL;
+            """.trimIndent()
+        )
+        database.execSQL(
+            """
+                CREATE TABLE `hangar_log` 
+                (`id` TEXT NOT NULL,
+                `time` INTEGER NOT NULL, 
+                `type` TEXT NOT NULL, 
+                `name` TEXT NOT NULL,
+                `chineseName` TEXT DEFAULT NULL,
+                `price` INTEGER DEFAULT NULL, 
+                `source` TEXT DEFAULT NULL,
+                `target` TEXT DEFAULT NULL, 
+                `operator` TEXT DEFAULT NULL,
+                `reason` TEXT DEFAULT NULL,
+                `order` TEXT DEFAULT NULL,
+                `insert_time` INTEGER NOT NULL,
+                PRIMARY KEY(`id`))
+            """.trimIndent()
+        )
+        database.execSQL(
+            """
+                CREATE TABLE `hangar_ship` 
+                (`id` INTEGER NOT NULL,
+                `name` TEXT NOT NULL, 
+                `shipId` INTEGER DEFAULT NULL, 
+                `packageId` INTEGER NOT NULL,
+                `packageTitle` TEXT NOT NULL,
+                `imageUrl` TEXT NOT NULL,
+                `chinesePackageTitle` TEXT DEFAULT NULL,
+                `image` TEXT NOT NULL,
+                `price` INTEGER NOT NULL,
+                `current_price` INTEGER NOT NULL,
+                `is_upgrade` INTEGER NOT NULL,
+                `insurance` INTEGER NOT NULL,
+                `date` INTEGER NOT NULL,
+                `isGiftable` INTEGER NOT NULL,
+                `packagePrice` INTEGER NOT NULL,
+                `isReclaimable` INTEGER NOT NULL,
+                `receiveTime` INTEGER NOT NULL,
+                `insert_time` INTEGER NOT NULL,
+                PRIMARY KEY(`id`))
+            """.trimIndent()
+        )
+        database.execSQL(
+            """
+                CREATE TABLE `ship_upgrade` 
+                (`skuId` INTEGER NOT NULL,
+                `shipId` INTEGER NOT NULL, 
+                `name` TEXT NOT NULL,
+                `isFlyable` INTEGER NOT NULL,
+                `focus` TEXT NOT NULL,
+                `link` TEXT NOT NULL,
+                `manufacturer` TEXT NOT NULL,
+                `productThumbMediumAndSmall` TEXT NOT NULL,
+                `slideShow` TEXT NOT NULL,
+                `price` INTEGER NOT NULL,
+                `edition` TEXT NOT NULL,
+                `isAvailable` INTEGER NOT NULL,
+                PRIMARY KEY(`skuId`))
+            """.trimIndent()
+        )
+        database.execSQL(
+            """
+                CREATE TABLE `ship_detail` 
+                (`id` TEXT NOT NULL,
+                `storeUrl` TEXT NOT NULL,
+                `description` TEXT DEFAULT NULL,
+                `beam` REAL NOT NULL,
+                `classification` TEXT NOT NULL,
+                `hasModules` INTEGER NOT NULL,
+                'name' TEXT NOT NULL,
+                `maxCrew` INTEGER DEFAULT NULL,
+                `price` REAL DEFAULT NULL,
+                `rsiName` TEXT NOT NULL,
+                `rsiSlug` TEXT NOT NULL,
+                `lastPledgePrice` REAL DEFAULT NULL,
+                `length` REAL NOT NULL,
+                `height` REAL NOT NULL,
+                `focus` TEXT NOT NULL,
+                `mass` REAL NOT NULL,
+                `size` TEXT DEFAULT NULL,
+                `storeImageSmall` TEXT NOT NULL,
+                `storeImageMedium` TEXT NOT NULL,
+                `storeImageLarge` TEXT NOT NULL,
+                PRIMARY KEY(`id`))
             """.trimIndent()
         )
     }
@@ -262,8 +348,8 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
                ],
 //    autoMigrations = [
 //        AutoMigration (
-//            from = 1,
-//            to = 2,
+//            from = 2,
+//            to = 5,
 //            spec = ShopItemDatabase.MyAutoMigration::class
 //        )
 //    ],
@@ -280,9 +366,6 @@ abstract class ShopItemDatabase: RoomDatabase() {
     abstract val shipUpgradeDao: ShipUpgradeDao
     abstract val shipDetailDao: ShipDetailDao
 
-    @RenameTable.Entries(
-        RenameTable(fromTableName = "banner_image", toTableName = "banner_image2")
-    )
     class MyAutoMigration : AutoMigrationSpec
 
 }
@@ -295,10 +378,12 @@ fun getDatabase(context: Context): ShopItemDatabase {
             INSTANCE = Room.databaseBuilder(context.applicationContext,
                 ShopItemDatabase::class.java,
                 "shops")
-                .fallbackToDestructiveMigration()
+                .addMigrations(MIGRATION_2_5)
+//                .fallbackToDestructiveMigration()
                 .build()
         }
     }
     return INSTANCE
 }
+
 

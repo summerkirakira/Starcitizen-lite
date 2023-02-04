@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.text.Html
 import androidx.fragment.app.Fragment
@@ -18,6 +19,7 @@ import vip.kirakira.starcitizenlite.activities.LoginActivity
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.databinding.MeFragmentBinding
+import vip.kirakira.starcitizenlite.network.CirnoApi
 import vip.kirakira.starcitizenlite.network.saveUserData
 import kotlin.concurrent.thread
 
@@ -142,6 +144,12 @@ class MeFragment : Fragment() {
             binding.refugeVipProgressBar.setIconBackgroundColor(resources.getColor(R.color.colorDeepGrey100))
             binding.refugeVipProgressBar.progressColor = resources.getColor(R.color.colorDeepGrey80)
             binding.refugeVipProgressBar.secondaryProgressColor = resources.getColor(R.color.colorDeepGrey30)
+        }
+
+        binding.getSubscription.setOnClickListener {
+            val uri = Uri.parse(CirnoApi.getSubscribeUrl())
+            val intent = Intent(Intent.ACTION_VIEW, uri)
+            startActivity(intent)
         }
     }
 

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "9bb9a81d2b2bbb2f15b3b1039dbf4204",
+    "identityHash": "5b45f6b7cfcfd9aa2162b6aad153276a",
     "entities": [
       {
         "tableName": "shop_items",
@@ -202,7 +202,7 @@
       },
       {
         "tableName": "hanger_packages",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `image` TEXT NOT NULL, `value` INTEGER NOT NULL, `currentPrice` INTEGER NOT NULL, `status` TEXT NOT NULL, `is_upgrade` INTEGER NOT NULL, `upgrade_info` TEXT NOT NULL, `date` INTEGER NOT NULL, `contains` TEXT NOT NULL, `also_contains` TEXT NOT NULL, `can_gift` INTEGER NOT NULL, `exchangeable` INTEGER NOT NULL, `insert_time` INTEGER NOT NULL, `chineseTitle` TEXT, `chineseContains` TEXT, `chineseAlsoContains` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `image` TEXT NOT NULL, `value` INTEGER NOT NULL, `currentPrice` INTEGER NOT NULL DEFAULT 0, `status` TEXT NOT NULL, `is_upgrade` INTEGER NOT NULL, `upgrade_info` TEXT NOT NULL, `date` INTEGER NOT NULL, `contains` TEXT NOT NULL, `also_contains` TEXT NOT NULL, `can_gift` INTEGER NOT NULL, `exchangeable` INTEGER NOT NULL, `insert_time` INTEGER NOT NULL, `chineseTitle` TEXT, `chineseContains` TEXT, `chineseAlsoContains` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -232,7 +232,8 @@
             "fieldPath": "currentPrice",
             "columnName": "currentPrice",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": true,
+            "defaultValue": "0"
           },
           {
             "fieldPath": "status",
@@ -1140,7 +1141,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9bb9a81d2b2bbb2f15b3b1039dbf4204')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5b45f6b7cfcfd9aa2162b6aad153276a')"
     ]
   }
 }

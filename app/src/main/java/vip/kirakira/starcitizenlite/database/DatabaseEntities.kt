@@ -1,9 +1,6 @@
 package vip.kirakira.starcitizenlite.database
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.Relation
+import androidx.room.*
 import vip.kirakira.starcitizenlite.network.shop.CatalogProperty
 import vip.kirakira.starcitizenlite.network.shop.InitShipUpgradeProperty
 
@@ -93,6 +90,8 @@ data class HangerPackage constructor(
     val title: String,
     val image: String,
     val value: Int,
+
+    @ColumnInfo(defaultValue = "0")
     var currentPrice: Int,
     val status: String,
     val is_upgrade: Boolean,

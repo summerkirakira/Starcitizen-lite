@@ -70,6 +70,7 @@ interface CirnoApiService {
     suspend fun getAllPromotion(): List<PromotionCode>
 }
 
+
 object CirnoApi {
     val retrofitService: CirnoApiService by lazy {
         retrofit.create(CirnoApiService::class.java)
@@ -84,6 +85,10 @@ object CirnoApi {
         val json = response.body?.string()
         val shipDetails = Gson().fromJson(json, Array<ShipDetail>::class.java)
         return shipDetails.toList()
+    }
+
+    fun getSubscribeUrl(): String {
+        return BASE_URL + "subscribe"
     }
 
 }

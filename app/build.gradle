@@ -7,17 +7,22 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdk 32
+    compileSdk 33
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    sourceSets {
+        // Adds exported schema location as test app assets.
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+    }
+
     defaultConfig {
         applicationId "vip.kirakira.starcitizenlite"
         minSdk 26
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "2.0.5"
 
@@ -40,8 +45,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
-            applicationIdSuffix ".debug"
-            versionNameSuffix "-debug"
+//            applicationIdSuffix ".debug"
+//            versionNameSuffix "-debug"
         }
     }
     compileOptions {
@@ -123,6 +128,8 @@ dependencies {
     implementation 'com.nambimobile.widgets:expandable-fab:1.2.1'
 
     implementation 'com.akexorcist:round-corner-progress-bar:2.1.2'
+
+    androidTestImplementation "androidx.room:room-testing:2.5.0"
 
 //    implementation 'com.github.Hitomis.transferee:Transferee:1.6.1'
 }

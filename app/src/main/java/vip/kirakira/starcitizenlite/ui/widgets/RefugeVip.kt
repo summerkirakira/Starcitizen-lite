@@ -1,14 +1,18 @@
 package vip.kirakira.starcitizenlite.ui.widgets
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
+import androidx.core.content.ContextCompat.startActivity
 import com.tapadoo.alerter.Alerter
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.RefugeApplication
+import vip.kirakira.starcitizenlite.network.CirnoApi
 
 class RefugeVip {
     companion object {
-        fun createWarningAlert(activity: Activity, title: String = "缺失有效的避难所Premium订阅", detail: String = "点击此处解锁更多功能", button: String = "立即解锁") {
+        fun createWarningAlert(activity: Activity, title: String = "缺少有效的避难所Premium订阅", detail: String = "点击此处解锁更多功能", button: String = "立即解锁") {
             Alerter.create(activity)
                 .setTitle(title)
                 .setText(detail)
@@ -17,7 +21,9 @@ class RefugeVip {
                 .setIconColorFilter(0)
                 .setDuration(5000)
                 .setOnClickListener {
-                    Log.d("RefugeVip", "Alert hide")
+                    val uri = Uri.parse(CirnoApi.getSubscribeUrl())
+                    val intent = Intent(Intent.ACTION_VIEW, uri)
+                    startActivity(activity, intent, null)
                 }
                 .show()
         }
