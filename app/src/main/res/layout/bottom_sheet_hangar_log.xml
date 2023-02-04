@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.appcompat.widget.AppCompatTextView
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/bottom_sheet_peek_height"
+            android:id="@+id/text_attributes_heading"
+            android:gravity="center"
+            android:text="@string/hangar_log"
+            android:textSize="18sp" />
+
+    <View
+            android:layout_width="0sp"
+            android:layout_height="1dp"
+            android:background="@color/colorDivider"
+            app:layout_constraintTop_toBottomOf="@id/text_attributes_heading"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" android:id="@+id/view"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/image_toggle"
+            android:layout_marginEnd="@dimen/bottom_sheet_peek_padding"
+            app:srcCompat="@drawable/ic_expand_more_black_24dp"
+            app:layout_constraintTop_toTopOf="@id/text_attributes_heading"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/text_attributes_heading"/>
+        <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="?attr/backgroundColor"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                app:layout_constraintTop_toBottomOf="@id/text_attributes_heading"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:id="@+id/hangar_log_recycler_view"/>
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

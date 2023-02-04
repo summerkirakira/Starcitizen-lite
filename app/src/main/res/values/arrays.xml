@@ -9,4 +9,23 @@
         <item>reply</item>
         <item>reply_all</item>
     </string-array>
+
+    <string-array name="theme_values">
+        <item>DEEP_BLUE</item>
+        <item>DEEP_RED</item>
+        <item>LIGHT_PINK</item>
+        <item>DEEP_PURPLE</item>
+        <item>LIGHT_GREEN</item>
+        <item>BLACK</item>
+    </string-array>
+
+    <string-array name="theme_entries">
+        <item>妖精蓝</item>
+        <item>琥珀红</item>
+        <item>少女粉</item>
+        <item>罗兰紫</item>
+        <item>早苗绿</item>
+        <item>午夜黑(测试)</item>
+    </string-array>
+
 </resources>

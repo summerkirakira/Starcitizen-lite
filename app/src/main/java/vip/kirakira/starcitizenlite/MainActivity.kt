@@ -7,10 +7,10 @@ import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -21,12 +21,12 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.azhon.appupdate.manager.DownloadManager
 import com.azhon.appupdate.util.ApkUtil
+import com.github.vipulasri.timelineview.TimelineView
 import com.gyf.immersionbar.ImmersionBar
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog
 import com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
@@ -38,19 +38,25 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import vip.kirakira.starcitizenlite.activities.LoginActivity
+import vip.kirakira.starcitizenlite.activities.RefugeBaseActivity
 import vip.kirakira.starcitizenlite.activities.SettingsActivity
+import vip.kirakira.starcitizenlite.database.HangarLog
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.network.*
-import vip.kirakira.starcitizenlite.network.CirnoProperty.Announcement
+import vip.kirakira.starcitizenlite.network.CirnoProperty.ClientInfo
+import vip.kirakira.starcitizenlite.network.CirnoProperty.RefugeInfo
 import vip.kirakira.starcitizenlite.network.shop.getCartSummary
 import vip.kirakira.starcitizenlite.ui.ScreenSlidePagerAdapter
+import vip.kirakira.starcitizenlite.ui.hangarlog.HangarLogBottomSheet
+import vip.kirakira.starcitizenlite.ui.hangarlog.HangarLogViewModel
 import vip.kirakira.starcitizenlite.ui.home.HomeFragment
 import vip.kirakira.starcitizenlite.ui.home.HomeViewModel
 import vip.kirakira.starcitizenlite.ui.loadUserAvatar
 import vip.kirakira.starcitizenlite.ui.main.MainFragment
 import vip.kirakira.starcitizenlite.ui.me.MeFragment
 import vip.kirakira.starcitizenlite.ui.shopping.ShopItemFilter
+import vip.kirakira.starcitizenlite.ui.widgets.RefugeVip
 import vip.kirakira.viewpagertest.ui.shopping.ShoppingFragment
 import vip.kirakira.viewpagertest.ui.shopping.ShoppingViewModel
 import java.util.*
@@ -59,7 +65,7 @@ import kotlin.concurrent.thread
 
 var  PAGE_NUM = 4;
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : RefugeBaseActivity() {
     private lateinit var mPager: ViewPager2
     private lateinit var mMovingBar: View
     private lateinit var bottomShopIcon: ImageView
@@ -79,6 +85,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var switchAccount: ConstraintLayout
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var shoppingViewModel: ShoppingViewModel
+    private lateinit var hangarLogViewModel: HangarLogViewModel
     private lateinit var feedbackButton: ConstraintLayout
     private lateinit var settingsButton: ConstraintLayout
     private lateinit var logoutButton: ConstraintLayout
@@ -107,6 +114,8 @@ class MainActivity : AppCompatActivity() {
 
         homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
 
+        hangarLogViewModel = ViewModelProvider(this).get(HangarLogViewModel::class.java)
+
         val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
 
         var primaryUserId = sharedPreferences.getInt(getString(R.string.primary_user_key), 0)
@@ -116,6 +125,11 @@ class MainActivity : AppCompatActivity() {
         val currentUser: LiveData<User> = database.userDao.getById(primaryUserId)
 
         val allUsers: LiveData<List<User>> = database.userDao.getAll()
+
+        var typedValue = TypedValue()
+        theme.resolveAttribute(R.attr.colorPrimary, typedValue, true)
+
+        val colorPrimary = typedValue.data
 
 
 
@@ -127,7 +141,6 @@ class MainActivity : AppCompatActivity() {
 //        QMUIStatusBarHelper.setStatusBarLightMode(this)
 //        QMUIStatusBarHelper.getStatusbarHeight(this)
          //设置状态栏透明
-        initStatusBar()
 
         mMovingBar = findViewById(R.id.bottom_moving_bar) //底部滑动条
         mPager = findViewById(R.id.pager) //ViewPager
@@ -161,8 +174,26 @@ class MainActivity : AppCompatActivity() {
         bottomShopIcon.setColorFilter(Color.GRAY)
         bottomHangerIcon.setColorFilter(Color.GRAY)
         if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
-        bottomMainIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
-        mMovingBar.setBackgroundColor(getColor(R.color.bottom_icon_selected_color))
+        bottomMainIcon.setColorFilter(colorPrimary)
+        mMovingBar.setBackgroundColor(colorPrimary)
+
+        currentUser.observe(this) {
+            if (it != null) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        CirnoApi.getShipDetail("https://image.biaoju.site/starcitizen/ship_detail.0.1.json")
+                        CirnoApi.retrofitService.updateClientInfo(
+                            ClientInfo(
+                                primaryUser = it.handle
+                            )
+                        )
+                    } catch (e: Exception) {
+                        Log.d("Cirno", "Error updating client info", e)
+                    }
+                }
+
+            }
+        }
 
         currentUser.observe(this) {
             if (it != null) {
@@ -186,6 +217,9 @@ class MainActivity : AppCompatActivity() {
                 drawerUserHangerValue.text = userHangerValue
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
+                        // Test here
+                        // RSIApi.getPledgeLog()
+
                         saveUserData(20085, it.rsi_device, it.rsi_token, "", "")
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -210,6 +244,8 @@ class MainActivity : AppCompatActivity() {
                                 }
                                 .show()
                         }
+
+
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -283,7 +319,7 @@ class MainActivity : AppCompatActivity() {
             override fun onPageSelected(position: Int) {
                 when(position) {
                     FragmentType.SHOPPING.value -> {
-                        bottomShopIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
+                        bottomShopIcon.setColorFilter(colorPrimary)
                         bottomHangerIcon.setColorFilter(Color.GRAY)
                         bottomMainIcon.setColorFilter(Color.GRAY)
                         if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
@@ -298,12 +334,13 @@ class MainActivity : AppCompatActivity() {
                             shipUpgradeButton.setColorFilter(getColor(R.color.upgrade_is_selected))
                         }
                         shipUpgradeButton.visibility = View.VISIBLE
+                        shipUpgradeButton.setImageDrawable(getDrawable(R.drawable.ic_ship_upgrade))
                         setAvatarLine(ColorStateList.valueOf(getColor(R.color.avatar_left_line)))
                         immersionBar.statusBarDarkFont(true).init()
                     }
                     FragmentType.HANGER.value -> {
                         bottomShopIcon.setColorFilter(Color.GRAY)
-                        bottomHangerIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
+                        bottomHangerIcon.setColorFilter(colorPrimary)
                         bottomMainIcon.setColorFilter(Color.GRAY)
                         if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
                         filterButton.setImageDrawable(getDrawable(R.drawable.ic_exchange))
@@ -311,7 +348,9 @@ class MainActivity : AppCompatActivity() {
                         filterButton.setColorFilter(getColor(R.color.avatar_left_line))
                         filterButton.visibility = View.VISIBLE
 
-                        shipUpgradeButton.visibility = View.GONE
+                        shipUpgradeButton.setImageDrawable(getDrawable(R.drawable.baseline_hangar_log_alt_24))
+                        shipUpgradeButton.setColorFilter(getColor(R.color.avatar_left_line))
+                        shipUpgradeButton.visibility = View.VISIBLE
 
                         setAvatarLine(ColorStateList.valueOf(getColor(R.color.avatar_left_line)))
                         immersionBar.statusBarDarkFont(true).init()
@@ -319,7 +358,7 @@ class MainActivity : AppCompatActivity() {
                     FragmentType.MAIN.value -> {
                         bottomShopIcon.setColorFilter(Color.GRAY)
                         bottomHangerIcon.setColorFilter(Color.GRAY)
-                        bottomMainIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
+                        bottomMainIcon.setColorFilter(colorPrimary)
                         if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
                         searchButton.setColorFilter(Color.WHITE)
                         setAvatarLine(ColorStateList.valueOf(Color.WHITE))
@@ -333,7 +372,7 @@ class MainActivity : AppCompatActivity() {
                         bottomShopIcon.setColorFilter(Color.GRAY)
                         bottomHangerIcon.setColorFilter(Color.GRAY)
                         bottomMainIcon.setColorFilter(Color.GRAY)
-                        if(primaryUserId == 0) bottomMeIcon.setColorFilter(getColor(R.color.bottom_icon_selected_color))
+                        if(primaryUserId == 0) bottomMeIcon.setColorFilter(colorPrimary)
                         filterButton.visibility = View.GONE
 
                         shipUpgradeButton.visibility = View.GONE
@@ -349,7 +388,6 @@ class MainActivity : AppCompatActivity() {
 
 //        val intent = Intent(this, LoginActivity::class.java)
 //        startActivity(intent)
-
 
 
 
@@ -397,16 +435,29 @@ class MainActivity : AppCompatActivity() {
         }
 
         shipUpgradeButton.setOnClickListener {
-            shoppingViewModel.isDetailShowing.value = false
-            if (shoppingViewModel.currentUpgradeStage.value == ShoppingViewModel.UpgradeStage.UNDEFINED) {
-                shoppingViewModel.setFilter(ShopItemFilter("", listOf("Upgrade"), onlyCanUpgradeTo = true))
-                shoppingViewModel.currentUpgradeStage.value = ShoppingViewModel.UpgradeStage.CHOOSE_TO_SHIP
-                shipUpgradeButton.setColorFilter(getColor(R.color.upgrade_is_selected))
-            } else {
-                shoppingViewModel.setFilter(ShopItemFilter("", listOf("Standalone Ship")))
-                shoppingViewModel.currentUpgradeStage.value = ShoppingViewModel.UpgradeStage.UNDEFINED
-                shipUpgradeButton.setColorFilter(getColor(R.color.avatar_left_line))
+            when(mPager.currentItem) {
+                FragmentType.SHOPPING.value -> {
+                    shoppingViewModel.isDetailShowing.value = false
+                    if (shoppingViewModel.currentUpgradeStage.value == ShoppingViewModel.UpgradeStage.UNDEFINED) {
+                        shoppingViewModel.setFilter(ShopItemFilter("", listOf("Upgrade"), onlyCanUpgradeTo = true))
+                        shoppingViewModel.currentUpgradeStage.value = ShoppingViewModel.UpgradeStage.CHOOSE_TO_SHIP
+                        shipUpgradeButton.setColorFilter(getColor(R.color.upgrade_is_selected))
+                    } else {
+                        shoppingViewModel.setFilter(ShopItemFilter("", listOf("Standalone Ship")))
+                        shoppingViewModel.currentUpgradeStage.value = ShoppingViewModel.UpgradeStage.UNDEFINED
+                        shipUpgradeButton.setColorFilter(getColor(R.color.avatar_left_line))
+                    }
+                }
+                FragmentType.HANGER.value -> {
+                    if(RefugeVip.isVip()){
+                        HangarLogBottomSheet.showDialog(supportFragmentManager)
+                    } else {
+                        RefugeVip.createWarningAlert(this)
+                    }
+
+                }
             }
+
         }
 
         switchAccount.setOnClickListener {
@@ -421,19 +472,16 @@ class MainActivity : AppCompatActivity() {
                         thread {
                             database.shopItemDao.deleteAll()
                             database.buybackItemDao.deleteAllOldItems(System.currentTimeMillis())
+                            database.hangarLogDao.deleteAll()
+                            sharedPreferences.edit().putInt(getString(R.string.crawled_page_key), 0).apply()
                         }
                         if(builder.checkedIndex == items.size - 1){
                             val intent = Intent(this, LoginActivity::class.java)
                             startActivity(intent)
                         } else {
+                            dialog.dismiss()
                             primaryUserId = allUsers.value!![builder.checkedIndex].id
                             sharedPreferences.edit().putInt(getString(R.string.primary_user_key), primaryUserId).apply()
-                            dialog.dismiss()
-                            Alerter.create(this)
-                                .setTitle("切换成功")
-                                .setText("当前账号为${allUsers.value!![builder.checkedIndex].handle}")
-                                .setBackgroundColorRes(R.color.alerter_default_success_background)
-                                .show()
                             val intent = Intent(this, MainActivity::class.java)
                             startActivity(intent)
                         }
@@ -480,12 +528,14 @@ class MainActivity : AppCompatActivity() {
                 .show()
         }
 
+
         if(sharedPreferences.getBoolean(getString(R.string.CHECK_UPDATE_KEY), true)) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     checkStartUp()
-                    checkAnnouncement(sharedPreferences.getInt(getString(R.string.CURRENT_ANNOUNCEMENT_ID), 0))
                     checkUpdate()
+                    checkSubscription()
+                    checkAnnouncement(sharedPreferences.getInt(getString(R.string.CURRENT_ANNOUNCEMENT_ID), 0))
                     sharedPreferences.edit().putBoolean(getString(R.string.CHECK_UPDATE_KEY), false).apply()
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -497,7 +547,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun checkUpdate() {
-        val latestVersion = CirnoApi.retrofitService.getVersion()
+        val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
+        val latestVersion = CirnoApi.retrofitService.getVersion(
+            RefugeInfo(
+                version = BuildConfig.VERSION_NAME,
+                androidVersion = android.os.Build.VERSION.RELEASE,
+                systemModel = android.os.Build.MODEL
+            )
+        )
+
         if(compareVersion(latestVersion.version, BuildConfig.VERSION_NAME)) {
             val manager = DownloadManager.Builder(this).run {
                 apkUrl(latestVersion.url)
@@ -508,6 +566,16 @@ class MainActivity : AppCompatActivity() {
                 build()
             }
             manager.download()
+        }
+        val shipDetailVersion = sharedPreferences.getString(getString(R.string.SHIP_DETAIL_VERSION_KEY), "0.0.0")
+        if(compareVersion(latestVersion.shipDetailVersion, shipDetailVersion!!)) {
+            Log.d("ShipDetail", "Updating ship detail...")
+            val shipDetails = CirnoApi.getShipDetail(latestVersion.shipDetailUrl)
+            if(shipDetails.isNotEmpty()) {
+                val database = getDatabase(application)
+                database.shipDetailDao.insertAll(shipDetails)
+                sharedPreferences.edit().putString(getString(R.string.SHIP_DETAIL_VERSION_KEY), latestVersion.shipDetailVersion).apply()
+            }
         }
     }
 
@@ -529,12 +597,12 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun checkStartUp() {
         val preference = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
-        if ((preference.getString(getString(R.string.UUID), "DEFAULT") ?: "DEFAULT") == "DEFAULT") {
+        if (preference.getString(getString(R.string.UUID), "DEFAULT")!! == "DEFAULT") {
             val uniqueID = UUID.randomUUID().toString()
             preference.edit().putString(getString(R.string.UUID), uniqueID).apply()
             uuid = uniqueID
         } else {
-            uuid = preference.getString(getString(R.string.UUID), "DEFAULT") ?: "DEFAULT"
+            uuid = preference.getString(getString(R.string.UUID), "DEFAULT")!!
         }
         if(preference.getBoolean(getString(R.string.FIRST_START_KEY), true)) {
             val startUpMessage = CirnoApi.retrofitService.getStartup()
@@ -545,6 +613,7 @@ class MainActivity : AppCompatActivity() {
                 putBoolean(getString(R.string.AUTO_ADD_CREDITS_KEY), true)
             }.apply()
             uuid = uniqueID
+
             this.runOnUiThread {
                 val builder = QMUIDialog.MessageDialogBuilder(this)
                 builder.setTitle(startUpMessage.title)
@@ -572,15 +641,6 @@ class MainActivity : AppCompatActivity() {
         secondLine.setStrokeData(4, colorStateList)
         thirdLine.setBgData(colorStateList)
         thirdLine.setStrokeData(4, colorStateList)
-    }
-
-    fun  initStatusBar(){
-        val mImmersionBar = ImmersionBar.with(this)
-        mImmersionBar.transparentBar()
-            .fullScreen(false)
-            .navigationBarColor(R.color.white)
-            .init()
-
     }
 
     override fun onBackPressed() {
@@ -634,5 +694,42 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private suspend fun checkSubscription() {
+            val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
+            val latestVersion = CirnoApi.retrofitService.getVersion(
+                RefugeInfo(
+                    version = BuildConfig.VERSION_NAME,
+                    androidVersion = android.os.Build.VERSION.RELEASE,
+                    systemModel = android.os.Build.MODEL
+                )
+            )
+            val isVip = sharedPreferences.getBoolean(getString(R.string.IS_VIP), false)
 
+            sharedPreferences.edit().apply {
+                putBoolean(getString(R.string.IS_VIP), latestVersion.isVip)
+                putInt(getString(R.string.VIP_EXPIRE), latestVersion.vipExpire)
+                putInt(getString(R.string.TOTAL_VIP_TIME), latestVersion.totalVipTime)
+                putInt(getString(R.string.REFUGE_CREDIT), latestVersion.credit)
+                apply()
+            }
+            if (isVip != latestVersion.isVip) {
+//            if (latestVersion.isVip) {
+//                Alerter.create(this)
+//                    .setTitle("星河避难所 Premium已激活")
+//                    .setText("有效期至${Date(Date().time + latestVersion.vipExpire.toLong() * 1000).toLocaleString()}")
+//                    .setBackgroundColorRes(R.color.alerter_default_success_background)
+//                    .show()
+//            } else {
+//                Alerter.create(this)
+//                    .setTitle("星河避难所 Premium已到期")
+//                    .setText("您的Premium有效期至${Date(Date().time + latestVersion.vipExpire.toLong() * 1000).toLocaleString()}")
+//                    .setBackgroundColorRes(R.color.alert_dialog_background_failure)
+//                    .show()
+//            }
+                //更新主界面
+                val intent = Intent(this@MainActivity, MainActivity::class.java)
+                startActivity(intent)
+            }
+
+    }
 }

@@ -1,5 +1,6 @@
 package vip.kirakira.starcitizenlite.ui.home
 
+import android.util.Log
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import vip.kirakira.starcitizenlite.database.BuybackItem
@@ -27,7 +28,9 @@ data class HangerItemProperty(
     val formShipId: Int = 0,
     val toShipId: Int = 0,
     val toSkuId: Int = 0,
-    val chineseAlsoContains: String? = null
+    val chineseAlsoContains: String? = null,
+    val savingString: String? = null,
+    val currentPrice: Int? = null
 ) {
     data class Tag(
         val name: String,
@@ -126,6 +129,23 @@ fun List<HangerPackageWithItems>.toItemPropertyList(): List<HangerItemProperty> 
                 status = "已礼物"
             }
 
+            var savingString: String? = null
+            if(packageWithItems.hangerPackage.currentPrice != 0){
+//                if((
+//                            (packageWithItems.hangerPackage.currentPrice - packageWithItems.hangerPackage.value).toFloat()
+//                                    / packageWithItems.hangerPackage.currentPrice.toFloat() * 100
+//                            ).toInt() > 100) {
+//                    Log.d("HangerItemProperty", "${packageWithItems.hangerPackage}")
+//                }
+                savingString = "-${
+                    (
+                            (packageWithItems.hangerPackage.currentPrice - packageWithItems.hangerPackage.value).toFloat()
+                                    / packageWithItems.hangerPackage.currentPrice.toFloat() * 100
+                            ).toInt()
+                }%"
+            }
+
+            val currentPrice = if(packageWithItems.hangerPackage.currentPrice == 0) null else packageWithItems.hangerPackage.currentPrice
 
 
             map[saveKey] = HangerItemProperty(
@@ -142,7 +162,9 @@ fun List<HangerPackageWithItems>.toItemPropertyList(): List<HangerItemProperty> 
                 insuranceString,
                 packageWithItems.hangerPackage.also_contains,
                 packageWithItems.hangerItems,
-                chineseAlsoContains = packageWithItems.hangerPackage.chineseContains
+                chineseAlsoContains = packageWithItems.hangerPackage.chineseContains,
+                savingString = savingString,
+                currentPrice = currentPrice
             )
         } else {
             map[saveKey]!!.number++

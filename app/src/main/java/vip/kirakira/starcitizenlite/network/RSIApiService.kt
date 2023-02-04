@@ -1,21 +1,13 @@
 package vip.kirakira.starcitizenlite.network
-
-import android.util.Log
-import com.google.gson.Gson
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.Headers
 import retrofit2.http.POST
+import vip.kirakira.starcitizenlite.database.HangarLog
 import vip.kirakira.starcitizenlite.network.account.PtuAccountBody
 import vip.kirakira.starcitizenlite.network.account.ResetCharacterBody
 import vip.kirakira.starcitizenlite.network.hanger.*
@@ -23,7 +15,6 @@ import vip.kirakira.starcitizenlite.network.shop.*
 import vip.kirakira.starcitizenlite.network.upgrades.InitUpgradeProperty
 import vip.kirakira.viewpagertest.network.graphql.*
 import java.net.URL
-import java.util.Currency
 
 //private const val BASE_URL = "http://100.70.59.3:6000"
 
@@ -83,7 +74,8 @@ val client: OkHttpClient = OkHttpClient
             return@addInterceptor chain.proceed(newRequest)
         } else if (
             request.url.toString() == "https://robertsspaceindustries.com/api/store/v2/cart/token" ||
-                    request.url.toString() == "https://robertsspaceindustries.com/api/store/buyBackPledge"
+            request.url.toString() == "https://robertsspaceindustries.com/api/store/buyBackPledge" ||
+            request.url.toString() == "https://robertsspaceindustries.com/api/account/pledgeLog"
         ) {
             val newRequest = request.newBuilder()
                 .addHeader("cookie", rsi_cookie)
@@ -204,6 +196,9 @@ interface RSIApiService {
     @POST("api/promo/redeemPromoCode")
     suspend fun redeemPromoCode(@Body body: ApplyPromoBody): ApplyPromoProperty
 
+    @POST("api/account/pledgeLog")
+    suspend fun getPledgeLog(@Body body: GetPledgeBody): HangarLogProperty
+
 }
 
 
@@ -288,6 +283,14 @@ object RSIApi {
 
     suspend fun redeemPromoCode(promo: String, code: String, currency: String): ApplyPromoProperty {
         return retrofitService.redeemPromoCode(ApplyPromoBody(promo, currency, code))
+    }
+
+    suspend fun getPledgeLog(page: Int): List<HangarLog> {
+        return HangarLogParser().parseLog(retrofitService.getPledgeLog(GetPledgeBody(page)).data!!.rendered)
+    }
+
+    suspend fun getPledgeLogCount(): Int {
+        return retrofitService.getPledgeLog(GetPledgeBody(1)).data!!.pagecount
     }
 
 }

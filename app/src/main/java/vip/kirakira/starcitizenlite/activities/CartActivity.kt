@@ -18,7 +18,7 @@ import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.network.rsi_cookie
 
 
-class CartActivity : AppCompatActivity() {
+class CartActivity : RefugeBaseActivity() {
     lateinit var loginWebView: WebView
     var recorder = WebLoginActivity.PayloadRecorder()
 

@@ -11,10 +11,14 @@ data class Announcement(
 )
 
 data class Version (
-    val id: Int,
     val version: String,
     val url: String,
-    val date: String
+    val shipDetailVersion: String,
+    val shipDetailUrl: String,
+    val isVip: Boolean,
+    val vipExpire: Int,
+    val credit: Int,
+    val totalVipTime: Int
 )
 
 data class StarUp(
@@ -24,8 +28,9 @@ data class StarUp(
 )
 
 data class RecaptchaList(
-    val captcha_list: List<ReCaptcha>? = null,
-    val error: String? = null
+    val captcha_list: List<ReCaptcha>,
+    val error: String? = null,
+    val message: String
 ) {
     data class ReCaptcha(
         val token: String
@@ -71,4 +76,16 @@ data class PromotionCode(
     val promo: String,
     val currency: String,
     val code: String
+)
+
+@JsonClass(generateAdapter = true)
+class RefugeInfo(
+    val version: String,
+    val androidVersion: String,
+    val systemModel: String
+)
+
+@JsonClass(generateAdapter = true)
+data class ClientInfo(
+    val primaryUser: String
 )

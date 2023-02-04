@@ -50,3 +50,6 @@ class ApplyPromoBody(
     private val currency: String,
     private val code: String
     )
+
+@JsonClass(generateAdapter = true)
+class GetPledgeBody(private val page: Int)
