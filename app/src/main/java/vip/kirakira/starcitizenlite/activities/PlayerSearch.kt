@@ -21,7 +21,7 @@ import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.network.search.getPlayerSearchResult
 import kotlin.concurrent.thread
 
-class PlayerSearch : AppCompatActivity() {
+class PlayerSearch : RefugeBaseActivity() {
 
     val scope = CoroutineScope(Job() + Dispatchers.Main)
     lateinit var avatar: AvatarView

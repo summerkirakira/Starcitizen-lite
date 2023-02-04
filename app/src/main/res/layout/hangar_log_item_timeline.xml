@@ -14,8 +14,8 @@
             android:layout_height="match_parent"
             app:markerSize="30dp"
             app:lineWidth="3dp"
-            app:startLineColor="?attr/colorSecondary"
-            app:endLineColor="?attr/colorSecondary"
+            app:startLineColor="?colorSecondaryVariant"
+            app:endLineColor="?attr/colorSecondaryVariant"
             app:lineStyle="dash"/>
 
     <androidx.cardview.widget.CardView

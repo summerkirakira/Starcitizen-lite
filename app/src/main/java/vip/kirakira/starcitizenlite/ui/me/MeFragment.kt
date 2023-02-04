@@ -5,6 +5,7 @@ import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.text.Html
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -121,7 +122,7 @@ class MeFragment : Fragment() {
         val credit = sharedPreferences.getInt(getString(R.string.REFUGE_CREDIT), 0)
 
         if (isVip) {
-            binding.refugeVipTotalTimeText.text = "已陪伴避难所${(totalVipTime - vipExpire) / (3600 * 24)}天"
+            binding.refugeVipTotalTimeText.text = Html.fromHtml("已陪伴避难所<b>${(totalVipTime - vipExpire) / (3600 * 24)}</b>天")
             binding.refugeVipTokenNumText.text = credit.toString()
             binding.refugeVipRemainDayText.text = (vipExpire / (3600 * 24) + 1).toString()
             binding.refugeVipProgressBar.progress = (totalVipTime.toFloat() - vipExpire.toFloat()) / totalVipTime.toFloat() * 100

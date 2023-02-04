@@ -77,10 +77,14 @@ class HangerViewAdapter(private val onClickListener: HangerViewAdapter.OnClickLi
                 binding.isWarbond.visibility = View.GONE
             }
 
-            if (item.savingString != null) {
+            if (item.savingString != null && item.savingString != "-0%") {
                 binding.savingButton.visibility = View.VISIBLE
+                binding.priceText2.visibility = View.VISIBLE
+                binding.dollarIcon2.visibility = View.VISIBLE
             } else {
                 binding.savingButton.visibility = View.GONE
+                binding.priceText2.visibility = View.GONE
+                binding.dollarIcon2.visibility = View.GONE
             }
 
             binding.executePendingBindings()

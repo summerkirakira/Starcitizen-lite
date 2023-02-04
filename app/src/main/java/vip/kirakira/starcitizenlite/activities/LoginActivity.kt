@@ -36,7 +36,7 @@ import vip.kirakira.viewpagertest.network.graphql.MultiStepLoginQuery
 import vip.kirakira.viewpagertest.network.graphql.RegisterBody
 import java.io.IOException
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : RefugeBaseActivity() {
 
     private lateinit var emailEditText: EditText
     private lateinit var passwordEditText: EditText

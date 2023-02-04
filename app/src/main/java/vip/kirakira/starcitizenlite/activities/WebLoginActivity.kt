@@ -53,7 +53,7 @@ XMLHttpRequest.prototype.send = function(body) {
     this.origSend(body);
 };"""
 
-class WebLoginActivity : AppCompatActivity() {
+class WebLoginActivity : RefugeBaseActivity() {
     var recorder = PayloadRecorder()
 
     lateinit var loginWebView: WebView

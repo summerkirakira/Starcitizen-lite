@@ -107,3 +107,11 @@ fun createMessageDialog(context: Context, title: String, message: String): QMUID
         .setTitle(title)
         .setMessage(message)
 }
+
+fun getThemeName(themeName: String): String{
+    return when(themeName){
+        "DEEP_BLUE" -> "Theme.StarcitizenLite"
+        "DEEP_RED" -> "Theme.StarcitizenLiteDeepRed"
+        else -> "Theme.StarcitizenLite"
+    }
+}

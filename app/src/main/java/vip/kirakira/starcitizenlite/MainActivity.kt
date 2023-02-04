@@ -37,6 +37,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import vip.kirakira.starcitizenlite.activities.LoginActivity
+import vip.kirakira.starcitizenlite.activities.RefugeBaseActivity
 import vip.kirakira.starcitizenlite.activities.SettingsActivity
 import vip.kirakira.starcitizenlite.database.HangarLog
 import vip.kirakira.starcitizenlite.database.User
@@ -63,7 +64,7 @@ import kotlin.concurrent.thread
 
 var  PAGE_NUM = 4;
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : RefugeBaseActivity() {
     private lateinit var mPager: ViewPager2
     private lateinit var mMovingBar: View
     private lateinit var bottomShopIcon: ImageView

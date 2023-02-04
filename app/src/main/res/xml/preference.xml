@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:theme="@style/Theme.StarcitizenLite">
     <PreferenceCategory android:title="@string/basic_settings">
         <SwitchPreferenceCompat
                 android:key="auto_add_credits"
                 android:title="@string/auto_add_credits_title"
+                android:defaultValue="false"
                 android:summary="@string/auto_add_credits_summary"/>
         <SwitchPreferenceCompat
-                android:key="auto_add_credits"
+                android:key="banned_reclaim"
                 android:title="@string/do_not_allow_reclaim"
+                android:defaultValue="false"
                 android:summary="@string/do_not_allow_reclaim_summary"/>
 <!--        <EditTextPreference-->
 <!--                android:key="edittext_preference"-->
@@ -18,39 +22,18 @@
         <SwitchPreferenceCompat
                 android:key="enable_localization"
                 android:title="@string/shop_chinese_localization"
+                android:defaultValue="true"
                 android:summary="@string/shop_localization_chinese_summary"/>
-<!--        <SwitchPreferenceCompat-->
-<!--                android:key="currency_chinese_yuan"-->
-<!--                android:title="货币本地化"-->
-<!--                android:summary="将货币单位转换为人民币"/>-->
-<!--        <PreferenceScreen-->
-<!--                android:key="intent_preference"-->
-<!--                android:title="Intent preference"-->
-<!--                android:summary="Launches an Activity from an Intent">-->
-<!--            <intent android:action="android.intent.action.VIEW"-->
-<!--                    android:data="http://www.android.com"/>-->
-<!--        </PreferenceScreen>-->
     </PreferenceCategory>
-<!--    <PreferenceCategory android:title="Launch preferences">-->
-<!--        <PreferenceScreen-->
-<!--                android:key="preference_screen"-->
-<!--                android:title="PreferenceScreen"-->
-<!--                android:summary="Shows a screen of preferences">-->
-<!--            <CheckBoxPreference-->
-<!--                    android:key="parent_checkbox_preference"-->
-<!--                    android:title="Toggle preference"-->
-<!--                    android:summary="Preference that is on the next screen but same hierarchy"/>-->
-<!--        </PreferenceScreen>-->
-<!--        <PreferenceScreen-->
-<!--                android:key="another_screen"-->
-<!--                android:title="Screen with children"-->
-<!--                android:summary="Shows a second screen of preferences">-->
-<!--            <CheckBoxPreference-->
-<!--                    android:key="child_checkbox_preference"-->
-<!--                    android:title="Toggle preference"-->
-<!--                    android:summary="Preference that is on the next screen but same hierarchy"/>-->
-<!--        </PreferenceScreen>-->
-<!--    </PreferenceCategory>-->
+    <PreferenceCategory android:title="避难所 Premium专属">
+        <ListPreference
+                android:key="theme_color"
+                android:title="主题"
+                android:summary="个性化设置避难所主题"
+                android:entries="@array/theme_entries"
+                android:entryValues="@array/theme_values"
+                android:defaultValue="DEEP_BLUE" />
+    </PreferenceCategory>
     <PreferenceCategory android:title="关于">
 
         <Preference

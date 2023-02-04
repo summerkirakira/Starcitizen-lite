@@ -11,7 +11,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import vip.kirakira.starcitizenlite.R
 
-class ThreePartySiteActivity : AppCompatActivity() {
+class ThreePartySiteActivity : RefugeBaseActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

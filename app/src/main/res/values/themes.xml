@@ -2,8 +2,29 @@
     <!-- Base application theme. -->
     <style name="Theme.StarcitizenLite" parent="QMUI.Compat.NoActionBar">
         <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/light_blue_600</item>
+        <item name="colorSecondary">#4CAF50</item>
+        <item name="colorPrimaryVariant">@color/transparent</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="qmui_dialog_max_width">420dp</item>
+        <item name="qmui_dialog_min_width">320dp</item>
+        <item name="backgroundColor">@color/white</item>
+        <item name="textFillColor">@color/black</item>
+        <item name="colorOutline">@color/transparent</item>
+        <item name="colorPrimarySurface">#B92E2E2E</item>
+        <item name="colorSecondaryVariant">#4000BCD4</item>
+        <item name="colorAccent">@color/light_blue_600</item>
+    </style>
+
+    <style name="Theme.StarcitizenLiteDeepRed" parent="QMUI.Compat.NoActionBar">
+        <!-- Primary brand color. -->
         <item name="colorPrimary">@color/colorPrimaryLightBlue</item>
-        <item name="colorSecondary">@color/colorPrimaryTransparentBlue</item>
+        <item name="colorSecondary">#4CAF50</item>
         <item name="colorPrimaryVariant">@color/transparent</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
@@ -18,7 +39,9 @@
         <item name="colorOutline">@color/transparent</item>
         <item name="colorPrimarySurface">#B92E2E2E</item>
         <item name="colorSecondaryVariant">#46FF6A65</item>
+        <item name="colorAccent">@color/colorPrimaryLightBlue</item>
     </style>
+
 
     <style name="BottomButtonRipple">
 

@@ -174,4 +174,9 @@
     <string name="IS_VIP">refuge_is_vip</string>
     <string name="TOTAL_VIP_TIME">refuge_total_vip_time</string>
     <string name="REFUGE_CREDIT">refuge_credit</string>
+    <string name="please_enter_reclaim_password">请输入融船密码</string>
+    <string name="theme_color_key">theme_color_key</string>
+    <string name="banned_reclaim_key">banned_reclaim_key</string>
+    <string name="already_banned_reclaim">已禁止避难所的融船操作</string>
+    <string name="please_switch_off_banned_reclaim">请在设置中关闭禁止融船选项后重试哦</string>
 </resources>

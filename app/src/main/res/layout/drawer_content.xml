@@ -28,7 +28,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerInside"
-                app:avatarViewBorderColor="?attr/colorSecondary"
+                app:avatarViewBorderColor="?attr/colorSecondaryVariant"
                 android:id="@+id/drawer_avatar_image"
                 app:avatarViewShape="rounded_rect"
                 app:layout_constraintStart_toStartOf="parent"
