@@ -17,7 +17,7 @@ import vip.kirakira.starcitizenlite.network.CirnoProperty.*
 import vip.kirakira.starcitizenlite.uuid
 import java.util.Locale
 
-private const val BASE_URL = "http://biaoju.site:6089/"
+private const val BASE_URL = "http://biaoju.site:6088/"
 
 private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())
