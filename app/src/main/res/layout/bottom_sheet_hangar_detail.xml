@@ -15,7 +15,7 @@
             android:textSize="18sp" />
 
     <View
-            android:layout_width="0sp"
+            android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/colorDivider"
             app:layout_constraintTop_toBottomOf="@id/upgrade_text_attributes_heading"
@@ -35,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/backgroundColor"
-            app:layout_constraintTop_toBottomOf="@id/upgrade_text_attributes_heading"
+            app:layout_constraintTop_toBottomOf="@id/view"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
         <androidx.recyclerview.widget.RecyclerView

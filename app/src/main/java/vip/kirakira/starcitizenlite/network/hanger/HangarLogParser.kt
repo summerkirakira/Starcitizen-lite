@@ -112,7 +112,7 @@ class HangarLogParser {
 
             logListResult.add(
                 HangarLog(
-                    id = "${type}#${target}#${time!!.time}",
+                    id = "${type}#${target}#${time!!.time}#${content}",
                     time = time!!.time,
                     operator = operator,
                     type = type,

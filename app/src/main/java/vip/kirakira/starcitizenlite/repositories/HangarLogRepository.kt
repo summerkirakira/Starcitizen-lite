@@ -36,7 +36,17 @@ class HangarLogRepository(private val application: Application) {
                             item.order = Translation(database).getTranslation(item.reason!!)
                         }
                     }
+                    val firstItem = data.firstOrNull()
+                    if (firstItem != null) {
+                        val oldIdList = firstItem.id.split("#")
+                        val oldId = oldIdList[0] + "#" + oldIdList[1] + "#" + oldIdList[2]
+                        if (database.hangarLogDao.getById(oldId) != null) {
+                            database.hangarLogDao.deleteAll()
+                            page = pageCount + 1
+                        }
+                    }
                     database.hangarLogDao.insertAll(data)
+
                     page--
                     Log.d("HangarLogRepository", "page: $page")
                     preference.edit().putInt(application.getString(R.string.crawled_page_key), pageCount - page).apply()

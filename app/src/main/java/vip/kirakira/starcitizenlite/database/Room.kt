@@ -136,7 +136,7 @@ interface HangarLogDao {
     fun deleteAll()
 
     @Query("SELECT * FROM hangar_log where id = :id")
-    fun getById(id: String): LiveData<HangarLog>
+    fun getById(id: String): HangarLog?
 
     @Query("SELECT * FROM hangar_log where target = :target")
     fun getByTarget(target: String): LiveData<List<HangarLog>>

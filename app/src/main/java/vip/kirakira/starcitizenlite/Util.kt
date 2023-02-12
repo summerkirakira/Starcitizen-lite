@@ -69,7 +69,7 @@ fun getVirtualBarHeigh(context: Context): Int {
 
 fun compareVersion(currentVersion: String, newVersion: String): Boolean {
     val currentVersionArray = currentVersion.split(".")
-    val newVersionArray = newVersion.split(".")
+    val newVersionArray = newVersion.replace("-debug", "").split(".")
     for (i in 0 until currentVersionArray.size) {
         if (newVersionArray.size <= i) {
             return false
