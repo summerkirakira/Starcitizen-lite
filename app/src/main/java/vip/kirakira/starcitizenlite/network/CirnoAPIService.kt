@@ -32,7 +32,10 @@ val cirnoClient: OkHttpClient = OkHttpClient
             .addHeader("cirno-token", uuid)
             .build()
         chain.proceed(newRequest)
-    }.build()
+    }
+    .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+    .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+    .build()
 
 private val retrofit = Retrofit.Builder()
     .addConverterFactory(MoshiConverterFactory.create(moshi))

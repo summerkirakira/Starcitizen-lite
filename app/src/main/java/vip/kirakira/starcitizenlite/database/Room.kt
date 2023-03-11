@@ -171,8 +171,8 @@ interface ShipUpgradeDao {
     @Query("SELECT * FROM ship_upgrade where name = :name and edition = :edition order by price desc limit 1")
     fun getByName(name: String, edition: String="Standard Edition"): ShipUpgrade?
 
-    @Query("SELECT * FROM ship_upgrade where name like '%' || :name || '%' and edition = :edition order by price desc limit 1")
-    fun getByNameLike(name: String, edition: String="Standard Edition"): ShipUpgrade?
+    @Query("SELECT * FROM ship_upgrade where name like '%' || :name || '%' order by price desc limit 1")
+    fun getByNameLike(name: String): ShipUpgrade?
 }
 
 @Dao
