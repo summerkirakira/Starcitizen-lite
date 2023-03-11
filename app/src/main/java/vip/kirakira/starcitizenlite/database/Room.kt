@@ -168,10 +168,10 @@ interface ShipUpgradeDao {
     @Query("UPDATE ship_upgrade SET isAvailable = :isAvailable WHERE skuId = :id")
     fun updateIsAvailable(id: Int, isAvailable: Boolean)
 
-    @Query("SELECT * FROM ship_upgrade where name = :name and edition = :edition")
+    @Query("SELECT * FROM ship_upgrade where name = :name and edition = :edition order by price desc limit 1")
     fun getByName(name: String, edition: String="Standard Edition"): ShipUpgrade?
 
-    @Query("SELECT * FROM ship_upgrade where name like '%' || :name || '%' and edition = :edition limit 1")
+    @Query("SELECT * FROM ship_upgrade where name like '%' || :name || '%' and edition = :edition order by price desc limit 1")
     fun getByNameLike(name: String, edition: String="Standard Edition"): ShipUpgrade?
 }
 

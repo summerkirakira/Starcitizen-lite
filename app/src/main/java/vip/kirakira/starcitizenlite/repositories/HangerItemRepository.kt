@@ -54,6 +54,11 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
                             for(hangerItem in data.hangerItems) {
                                 if (hangerItem.package_id == hangerPackage.id) {
                                     if(hangerItem.kind == "Ship") {
+                                        val shipUpgrade = database.shipUpgradeDao.getByNameLike(Parser.getFormattedShipName(hangerItem.title))
+                                        if (shipUpgrade != null) {
+                                            currentPrice += shipUpgrade.price
+                                            continue
+                                        }
                                         val shipDetail = database.shipDetailDao.getByName(Parser.getFormattedShipName(hangerItem.title))
                                         if (shipDetail?.lastPledgePrice != null) {
                                             currentPrice += (100 * shipDetail.lastPledgePrice).toInt()
@@ -65,16 +70,33 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
                                 val upgradeShips = Parser.getUpgradeOriginalName(hangerPackage.title)
                                 val upgradeFromShip = database.shipUpgradeDao.getByNameLike(upgradeShips[0].name)
                                 val upgradeToShip = database.shipUpgradeDao.getByNameLike(upgradeShips[1].name)
-                                if (upgradeFromShip != null && upgradeToShip != null) {
-                                    currentPrice += upgradeToShip.price - upgradeFromShip.price
-                                } else {
+                                var fromPrice = 0
+                                var toPrice = 0
+                                if (upgradeFromShip != null) {
+                                    fromPrice = upgradeFromShip.price
+                                }
+                                if (upgradeToShip != null) {
+                                    toPrice = upgradeToShip.price
+                                }
+                                if (fromPrice == 0 || toPrice == 0) {
                                     val fromShip = database.shipDetailDao.getByName(upgradeShips[0].name)
                                     val toShip = database.shipDetailDao.getByName(upgradeShips[1].name)
-                                    if (fromShip?.lastPledgePrice != null && toShip?.lastPledgePrice != null) {
-                                        currentPrice += (100 * (toShip.lastPledgePrice - fromShip.lastPledgePrice)).toInt()
+
+                                    if(fromShip?.lastPledgePrice != null && fromPrice == 0) {
+                                        fromPrice = (100 * fromShip.lastPledgePrice).toInt()
+                                    }
+                                    if(toShip?.lastPledgePrice != null && toPrice == 0) {
+                                        toPrice = (100 * toShip.lastPledgePrice).toInt()
+                                    }
+                                    if (fromPrice != 0 && toPrice != 0) {
+                                        currentPrice += toPrice - fromPrice
                                     } else {
                                         Log.d("HangerItemRepository", upgradeShips[0].name + " " + upgradeShips[1].name)
                                     }
+                                }
+
+                                if (upgradeFromShip != null && upgradeToShip != null) {
+                                    currentPrice += upgradeToShip.price - upgradeFromShip.price
                                 }
                             }
                             hangerPackage.currentPrice = currentPrice
