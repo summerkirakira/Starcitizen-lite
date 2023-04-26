@@ -595,12 +595,10 @@ class ShoppingFragment : Fragment() {
                     return@setOnLongClickListener true
                 }
 
-
-            val builder = QMUIDialog.CheckBoxMessageDialogBuilder(context)
+            val builder = QMUIDialog.MessageDialogBuilder(requireContext())
             val dialog = builder
                 .setTitle("是否进入抢船模式？即将添加${selectedItem!!.name}")
-                .setMessage("自动补全信用点")
-                .setChecked(true)
+                .setMessage("当前此功能为测试版, 不保证能正常运作~点击确定后将会扣除100Token点数~")
                 .addAction("取消") { dialog, _ ->
                     dialog.dismiss()
                 }
@@ -608,6 +606,26 @@ class ShoppingFragment : Fragment() {
                     dialog.dismiss()
                     scope.launch {
                         var canNextStep = false
+                        val token: RecaptchaList
+
+                        if (!RefugeVip.isVip()) {
+                            RefugeVip.createWarningAlert(activity = requireActivity())
+                            return@launch
+                        }
+
+                        try {
+                            token =
+                                CirnoApi.retrofitService.getReCaptchaV3(100)
+                        } catch (e: Exception) {
+                            createWarningAlerter(requireActivity(), "Token获取失败", getString(R.string.network_error)).show()
+                            return@launch
+                        }
+
+                        if (token.captcha_list.isEmpty()) {
+                            RefugeVip.createWarningAlert(title = "Token获取失败", detail = token.message, activity = requireActivity())
+                        }
+
+                        autoBuying = token.captcha_list.first().token
                         clearCart()
                         while (!canNextStep && isAdding) {
                             canNextStep = true
@@ -624,20 +642,19 @@ class ShoppingFragment : Fragment() {
                                 canNextStep = false
                             }
                             if(canNextStep) {
-                                if(builder.isChecked){
-                                    val applicableCredit: Int = cartInfo.data.store.cart.totals.credits.maxApplicable - cartInfo.data.store.cart.totals.credits.amount
-                                    val addCredits = addCredit(applicableCredit / 100f)
-                                    if(addCredits.errors == null) {
-                                        Toast.makeText(context, getString(R.string.credits_add_success), Toast.LENGTH_SHORT).show()
-                                    } else {
-                                        Toast.makeText(context, getString(R.string.credits_add_failed), Toast.LENGTH_SHORT).show()
-                                    }
+                                val applicableCredit: Int = cartInfo.data.store.cart.totals.credits.maxApplicable - cartInfo.data.store.cart.totals.credits.amount
+                                val addCredits = addCredit(applicableCredit / 100f)
+                                if(addCredits.errors == null) {
+                                    Toast.makeText(context, getString(R.string.credits_add_success), Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(context, getString(R.string.credits_add_failed), Toast.LENGTH_SHORT)
+                                        .show()
                                 }
                                 nextStep()
-                                if (autoBuying.isNotEmpty()) {
-                                    cartValidation(autoBuying)
-                                    autoBuying = ""
-                                }
+//                                if (autoBuying.isNotEmpty()) {
+                                cartValidation(autoBuying)
+//                                    autoBuying = ""
+//                                }
 //                            val address = cartAddressQuery()
 //                            val assignAddress = cartAddressAssign(address.data.store.addressBook.first().id)
                                val bundle = Bundle()
@@ -653,20 +670,20 @@ class ShoppingFragment : Fragment() {
                 }
                 .create()
             dialog.show()
-                val autoBuyBuilder = QMUIDialog.EditTextDialogBuilder(context)
-                autoBuyBuilder.setTitle("是否启用自动确认模式？")
-                    .setPlaceholder("请输入自动确认所需token")
-                    .setInputType(InputType.TYPE_CLASS_TEXT)
-                    .addAction(getString(R.string.cancel)) { dialog, _ ->
-                        dialog.dismiss()
-                        autoBuying = ""
-                    }
-                    .addAction(0, getString(R.string.confirm)) { dialog, index ->
-                        dialog.dismiss()
-                        autoBuying = autoBuyBuilder.editText.text.toString()
-                    }
-                    .create()
-                    .show()
+//                val autoBuyBuilder = QMUIDialog.EditTextDialogBuilder(context)
+//                autoBuyBuilder.setTitle("是否启用自动确认模式？")
+//                    .setPlaceholder("请输入自动确认所需token")
+//                    .setInputType(InputType.TYPE_CLASS_TEXT)
+//                    .addAction(getString(R.string.cancel)) { dialog, _ ->
+//                        dialog.dismiss()
+//                        autoBuying = ""
+//                    }
+//                    .addAction(0, getString(R.string.confirm)) { dialog, index ->
+//                        dialog.dismiss()
+//                        autoBuying = autoBuyBuilder.editText.text.toString()
+//                    }
+//                    .create()
+//                    .show()
         }
             return@setOnLongClickListener true
         }
