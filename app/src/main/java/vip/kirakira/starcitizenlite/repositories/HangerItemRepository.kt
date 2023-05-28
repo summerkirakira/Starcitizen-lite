@@ -16,6 +16,7 @@ import vip.kirakira.starcitizenlite.database.HangerPackageWithItems
 import vip.kirakira.starcitizenlite.database.ShopItemDatabase
 import vip.kirakira.starcitizenlite.network.CirnoApi
 import vip.kirakira.starcitizenlite.network.CirnoProperty.AddNotTranslationBody
+import vip.kirakira.starcitizenlite.network.CirnoProperty.AddShipAliasBody
 import vip.kirakira.starcitizenlite.network.hanger.HangerService
 import vip.kirakira.starcitizenlite.network.rsi_cookie
 import vip.kirakira.starcitizenlite.ui.home.Parser
@@ -43,6 +44,8 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
                 val getTime = System.currentTimeMillis()
                 try {
                     translationRepository.refreshTranslation(application)
+                    val unknownShipList: MutableList<String> = mutableListOf()
+                    val upgradesList: MutableList<HangerPackage> = mutableListOf()
                     while (true) {
                         val data = HangerService().getHangerInfo(page)
                         if (data.hangerPackages.isEmpty()) {
@@ -50,10 +53,28 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
                         }
 
                         for(hangerPackage in data.hangerPackages) {
+                            if(hangerPackage.is_upgrade) {
+                                upgradesList.add(hangerPackage)
+                            }
                             var currentPrice = 0
+                            for(alsoContains in hangerPackage.also_contains.split("#")) {
+                                if(alsoContains == "Squadron 42 Digital Download") {
+                                    currentPrice += 4500
+                                } else if(alsoContains == "Star Citizen Digital Download") {
+                                    currentPrice += 4500
+                                }
+                            }
+
                             for(hangerItem in data.hangerItems) {
                                 if (hangerItem.package_id == hangerPackage.id) {
                                     if(hangerItem.kind == "Ship") {
+                                        val shipAlias = RepoUtil.getShipAlias(hangerItem.title)
+                                        if (shipAlias != null) {
+                                            currentPrice += RepoUtil.getHighestAliasPrice(shipAlias)
+                                            continue
+                                        }
+                                        unknownShipList.add(hangerItem.title)
+
                                         val shipUpgrade = database.shipUpgradeDao.getByNameLike(Parser.getFormattedShipName(hangerItem.title))
                                         if (shipUpgrade != null) {
                                             currentPrice += shipUpgrade.price
@@ -67,6 +88,20 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
                                 }
                             }
                             if(hangerPackage.title.startsWith("Upgrade - ")) {
+                                val shipUpgradeAliasList = Parser.getFullUpgradeName(hangerPackage.title)
+                                val upgradeFromShipAlias = RepoUtil.getShipAlias(shipUpgradeAliasList[0])
+                                val upgradeToShipAlias = RepoUtil.getShipAlias(shipUpgradeAliasList[1])
+                                if(upgradeFromShipAlias != null && upgradeToShipAlias != null) {
+                                    hangerPackage.currentPrice = RepoUtil.getHighestAliasPrice(upgradeToShipAlias) - RepoUtil.getHighestAliasPrice(upgradeFromShipAlias)
+                                    continue
+                                }
+                                if(upgradeFromShipAlias == null) {
+                                    unknownShipList.add(shipUpgradeAliasList[0])
+                                }
+                                if(upgradeToShipAlias == null) {
+                                    unknownShipList.add(shipUpgradeAliasList[1])
+                                }
+
                                 val upgradeShips = Parser.getUpgradeOriginalName(hangerPackage.title)
                                 val upgradeFromShip = database.shipUpgradeDao.getByNameLike(upgradeShips[0].name)
                                 val upgradeToShip = database.shipUpgradeDao.getByNameLike(upgradeShips[1].name)
@@ -177,18 +212,20 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
 
                                 val packageTranslation = database.translationDao.getByEnglishTitle(translationKey)
                                 if (packageTranslation == null) {
-                                    notTranslatedItems.add(
-                                        AddNotTranslationBody(
-                                            product_id = hangerPackage.id + 300000,
-                                            type = "hanger",
-                                            english_title = translationKey,
-                                            content = content,
-                                            excerpt = "",
-                                            contains = contains,
-                                            from_ship = 0,
-                                            to_ship = 0
+                                    if (!hangerPackage.is_upgrade) {
+                                        notTranslatedItems.add(
+                                            AddNotTranslationBody(
+                                                product_id = hangerPackage.id + 300000,
+                                                type = "hanger",
+                                                english_title = translationKey,
+                                                content = content,
+                                                excerpt = "",
+                                                contains = contains,
+                                                from_ship = 0,
+                                                to_ship = 0
+                                            )
                                         )
-                                    )
+                                    }
                                 } else {
                                     hangerPackage.chineseTitle = packageTranslation.title
                                     if (hangerPackage.title.endsWith("Upgrades ")) {
@@ -214,7 +251,15 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
                         database.hangerItemDao.insertAllPackages(data.hangerPackages)
                         page++
                     }
-                    CirnoApi.retrofitService.addNotTranslation(notTranslatedItems)
+                    if (notTranslatedItems.size > 0) {
+                        CirnoApi.retrofitService.addNotTranslation(notTranslatedItems)
+                    }
+                    if (unknownShipList.size > 0) {
+                        CirnoApi.retrofitService.addShipAlias(AddShipAliasBody(unknownShipList.toSet().toList()))
+                    }
+                    if (upgradesList.size > 0) {
+                        CirnoApi.retrofitService.addUpgradeRecord(RepoUtil.generateAddUpgradeRecordPostBody(upgradesList))
+                    }
                     database.hangerItemDao.deleteAllOldPackage(getTime)
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -225,7 +270,7 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
         }
     }
     init {
-        allPackagesAndItems.observeForever(){
+        allPackagesAndItems.observeForever {
             hangerValue = getHangerValue(it)
         }
     }

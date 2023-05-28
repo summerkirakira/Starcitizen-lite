@@ -2,6 +2,13 @@ package vip.kirakira.starcitizenlite.ui.home
 
 class Parser {
     companion object {
+        fun getFullUpgradeName(upgradeTitle: String): List<String> {
+            val nameList = mutableListOf<String>()
+            for(shipName in upgradeTitle.replace("Upgrade - ", "").split(" to ")){
+                nameList.add(getFormattedShipName(shipName))
+            }
+            return nameList
+        }
         fun getUpgradeOriginalName(upgradeTitle: String): List<UpgradeShipName> {
             val nameList = mutableListOf<UpgradeShipName>()
             for(shipName in upgradeTitle.replace("Upgrade - ", "").split(" to ")){
@@ -62,5 +69,27 @@ class Parser {
                 .trim()
             return newShipName
         }
+
+        @JvmStatic fun priceFormatter(price: Int): String {
+            if(price < 0) {
+                return "0"
+            }
+            if(price.mod(100) == 0) {
+                return (price / 100).toString()
+            } else {
+                return (price / 100.0).toString()
+            }
+        }
+
+        @JvmStatic fun discountFormatter(price: Int, currentPrice: Int): String {
+            if(currentPrice <= price) {
+                return "-0%"
+            }
+            if(price == 0) {
+                return "-100%"
+            }
+            return "-${((currentPrice - price) / currentPrice.toDouble() * 100).toInt()}%"
+        }
+
     }
 }

@@ -70,6 +70,12 @@ interface CirnoApiService {
     @POST("translation/add")
     suspend fun addNotTranslation(@Body translations: List<AddNotTranslationBody>): AddTranslationResult
 
+    @POST("translation/ship_alias")
+    suspend fun addShipAlias(@Body shipAlias: AddShipAliasBody): AddTranslationResult
+
+    @POST("upgrade/add")
+    suspend fun addUpgradeRecord(@Body upgrade: AddUpgradeRecord): AddTranslationResult
+
     @GET("promotion/all")
     suspend fun getAllPromotion(): List<PromotionCode>
 }
@@ -89,6 +95,17 @@ object CirnoApi {
         val json = response.body?.string()
         val shipDetails = Gson().fromJson(json, Array<ShipDetail>::class.java)
         return shipDetails.toList()
+    }
+
+    fun getShipAliasFromUrl(url: String): List<ShipAlias> {
+        val request = Request.Builder()
+            .url(url)
+            .addHeader("cirno-token", uuid)
+            .build()
+        val response = client.newCall(request).execute()
+        val json = response.body?.string()
+        val shipAlias = Gson().fromJson(json, Array<ShipAlias>::class.java)
+        return shipAlias.toList()
     }
 
     fun getSubscribeUrl(): String {

@@ -15,6 +15,7 @@ data class Version (
     val url: String,
     val shipDetailVersion: String,
     val shipDetailUrl: String,
+    val shipAliasUrl: String,
     val isVip: Boolean,
     val vipExpire: Int,
     val credit: Int,
@@ -89,3 +90,32 @@ class RefugeInfo(
 data class ClientInfo(
     val primaryUser: String
 )
+
+data class ShipAlias(
+    val name: String,
+    val alias: List<String>,
+    val skus: List<Sku>
+) {
+    data class Sku(
+        val title: String,
+        val price: Int,
+    )
+}
+
+data class AddShipAliasBody(
+    val ship_alias: List<String>
+)
+
+data class AddUpgradeRecord(
+    val shipUpgrades: List<UpgradeRecord>
+) {
+    data class UpgradeRecord(
+        val name: String,
+        val upgrade_id: Int,
+        val price: Int,
+        val from_ship_id: Int,
+        val from_ship_name: String,
+        val target_ship_id: Int,
+        val target_ship_name: String
+    )
+}

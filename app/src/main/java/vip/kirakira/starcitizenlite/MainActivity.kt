@@ -27,6 +27,8 @@ import androidx.viewpager2.widget.ViewPager2
 import com.azhon.appupdate.manager.DownloadManager
 import com.azhon.appupdate.util.ApkUtil
 import com.github.vipulasri.timelineview.TimelineView
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.gyf.immersionbar.ImmersionBar
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog
 import com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
@@ -46,6 +48,7 @@ import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.network.*
 import vip.kirakira.starcitizenlite.network.CirnoProperty.ClientInfo
 import vip.kirakira.starcitizenlite.network.CirnoProperty.RefugeInfo
+import vip.kirakira.starcitizenlite.network.CirnoProperty.ShipAlias
 import vip.kirakira.starcitizenlite.network.shop.getCartSummary
 import vip.kirakira.starcitizenlite.ui.ScreenSlidePagerAdapter
 import vip.kirakira.starcitizenlite.ui.hangarlog.HangarLogBottomSheet
@@ -59,11 +62,14 @@ import vip.kirakira.starcitizenlite.ui.shopping.ShopItemFilter
 import vip.kirakira.starcitizenlite.ui.widgets.RefugeVip
 import vip.kirakira.viewpagertest.ui.shopping.ShoppingFragment
 import vip.kirakira.viewpagertest.ui.shopping.ShoppingViewModel
+import java.io.File
 import java.util.*
 import kotlin.concurrent.thread
 
 
 var  PAGE_NUM = 4;
+
+lateinit var shipAlias: List<ShipAlias>
 
 class MainActivity : RefugeBaseActivity() {
     private lateinit var mPager: ViewPager2
@@ -532,6 +538,7 @@ class MainActivity : RefugeBaseActivity() {
         if(sharedPreferences.getBoolean(getString(R.string.CHECK_UPDATE_KEY), true)) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
+                    loadInitialData()
                     checkStartUp()
                     checkUpdate()
                     checkSubscription()
@@ -543,6 +550,21 @@ class MainActivity : RefugeBaseActivity() {
             }
         } else {
             val result = ApkUtil.deleteOldApk(this, "${externalCacheDir?.path}/refuge_update.apk")
+        }
+    }
+
+    private fun loadInitialData() {
+        shipAlias = loadAliasFromStorage()
+    }
+
+    private fun loadAliasFromStorage(): List<ShipAlias> {
+        val file = File("${filesDir?.path}/ship_alias.json")
+        if(file.exists()) {
+            val json = file.readText()
+            val type = object : TypeToken<List<ShipAlias>>() {}.type
+            return Gson().fromJson(json, type)
+        } else {
+            return listOf()
         }
     }
 
@@ -576,6 +598,19 @@ class MainActivity : RefugeBaseActivity() {
                 database.shipDetailDao.insertAll(shipDetails)
                 sharedPreferences.edit().putString(getString(R.string.SHIP_DETAIL_VERSION_KEY), latestVersion.shipDetailVersion).apply()
             }
+        }
+        try {
+            updateAlias(latestVersion.shipAliasUrl)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun updateAlias(url: String) {
+        shipAlias = CirnoApi.getShipAliasFromUrl(url)
+        if (shipAlias.isNotEmpty()) {
+            val file = File("${filesDir?.path}/ship_alias.json")
+            file.writeText(Gson().toJson(shipAlias))
         }
     }
 
