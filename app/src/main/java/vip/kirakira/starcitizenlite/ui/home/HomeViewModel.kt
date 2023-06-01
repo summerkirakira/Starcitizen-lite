@@ -82,6 +82,7 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
             if(currentUser.value != null) {
                 val newUser = currentUser.value
                 newUser?.hanger_value = hangerItemRepository.getTotalValue()
+                preferences.edit().putInt(getApplication<Application>().getString(R.string.current_hanger_value_key), hangerItemRepository.getCurrentValue()).apply()
                 if (newUser != null) {
                     userRepository.insertUser(newUser)
                 }
