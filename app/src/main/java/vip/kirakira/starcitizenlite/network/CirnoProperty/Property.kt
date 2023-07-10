@@ -100,6 +100,15 @@ data class ShipAlias(
         val title: String,
         val price: Int,
     )
+    fun getHighestSku(): Int {
+        var highestPrice = this.skus[0].price
+        for (sku in this.skus) {
+            if (sku.price > highestPrice) {
+                highestPrice = sku.price
+            }
+        }
+        return highestPrice
+    }
 }
 
 data class AddShipAliasBody(
@@ -118,4 +127,39 @@ data class AddUpgradeRecord(
         val target_ship_id: Int,
         val target_ship_name: String
     )
+}
+
+data class ShipUpgradePathPostBody(
+    val from_ship_id: Int,
+    val to_ship_id: Int,
+    val banned_list: List<Int>,
+    val allow_zero_price: Boolean,
+    val allow_warbond: Boolean,
+    val must_have_list: List<MustHave>
+) {
+    data class MustHave(
+        val from_ship: Int,
+        val to_ship: Int,
+        val price: Int
+    )
+}
+
+data class ShipUpgradeResponse(
+    val code: Int,
+    val message: String,
+    val path: ShipUpgradePath
+) {
+    data class ShipUpgradePath(
+        val from_ship: Int,
+        val to_ship: Int,
+        val steps: List<Step>
+    ) {
+        data class Step(
+            val id: Int,
+            val from_ship: Int,
+            val to_ship: Int,
+            val price: Int,
+            val name: String
+        )
+    }
 }
