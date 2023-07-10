@@ -26,8 +26,9 @@ import vip.kirakira.starcitizenlite.util.Translation
 class HangerItemRepository(private val database: ShopItemDatabase) {
 //    val allItems: LiveData<List<HangerItem>> = database.hangerItemDao.getAllItems()
     val allPackagesAndItems: LiveData<List<HangerPackageWithItems>> = database.hangerItemDao.getAll()
-    var hangerValue: Int = 0
-    val translationRepository = TranslationRepository(database)
+    private var hangerValue: Int = 0
+    private val translationRepository = TranslationRepository(database)
+    private var currentHangerValue = 0
 
     var isRefreshing = MutableLiveData<Boolean>(false)
 
@@ -272,10 +273,11 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
     init {
         allPackagesAndItems.observeForever {
             hangerValue = getHangerValue(it)
+            currentHangerValue = getCurrentHangerValue(it)
         }
     }
 
-    fun getHangerValue(hangerPackageWithItems: List<HangerPackageWithItems>): Int {
+    private fun getHangerValue(hangerPackageWithItems: List<HangerPackageWithItems>): Int {
         var value = 0
         for (item in hangerPackageWithItems) {
             value += item.hangerPackage.value
@@ -283,8 +285,20 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
         return value
     }
 
+    private fun getCurrentHangerValue(hangerPackageWithItems: List<HangerPackageWithItems>): Int {
+        var value = 0
+        for (item in hangerPackageWithItems) {
+            value += item.hangerPackage.currentPrice
+        }
+        return value
+    }
+
     fun getTotalValue(): Int {
         return hangerValue
+    }
+
+    fun getCurrentValue(): Int {
+        return currentHangerValue
     }
 
 }

@@ -21,6 +21,9 @@ import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.databinding.MeFragmentBinding
 import vip.kirakira.starcitizenlite.network.CirnoApi
 import vip.kirakira.starcitizenlite.network.saveUserData
+import vip.kirakira.starcitizenlite.repositories.HangerItemRepository
+import vip.kirakira.starcitizenlite.repositories.RepoUtil
+import vip.kirakira.starcitizenlite.ui.home.Parser
 import kotlin.concurrent.thread
 
 class MeFragment : Fragment() {
@@ -44,6 +47,7 @@ class MeFragment : Fragment() {
         val database = getDatabase(requireContext())
         val sharedPreferences = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
         val primaryUserId = sharedPreferences.getInt(getString(R.string.primary_user_key), 0)
+        val currentHangerValue = sharedPreferences.getInt(getString(R.string.current_hanger_value_key), 0)
         val currentUser: LiveData<User> = database.userDao.getById(primaryUserId)
         println(primaryUserId)
         currentUser.observe(viewLifecycleOwner){
@@ -77,6 +81,8 @@ class MeFragment : Fragment() {
                     }
                 }
                 binding.swipeRefresh.isRefreshing = false
+                binding.currentHangerValueNumber.text = "${Parser.priceFormatter(currentHangerValue)} USD"
+
             }
 
             binding.errorBox.hide()
@@ -93,15 +99,17 @@ class MeFragment : Fragment() {
                 val positionValue = "${it.orgRankName}(${it.orgRank}级权限)"
                 binding.organizationPositionValue.text = positionValue
             }
-            val hangerValue = "${it.hanger_value.toFloat()/100f} USD"
-            val credits = "${it.store.toFloat()/100f} USD"
-            val totalSpent = "${it.total_spent.toFloat()/100f} USD"
+            val hangerValue = "${Parser.priceFormatter(it.hanger_value)} USD"
+            val credits = "${Parser.priceFormatter(it.store)} USD"
+            val totalSpent = "${Parser.priceFormatter(it.total_spent)} USD"
+            val currentHangerValueText = "${Parser.priceFormatter(currentHangerValue)} USD"
             val uecValue = "${it.uec} UEC"
             val recValue = "${it.rec} REC"
             val referralValue = "${it.referral_count} 人"
             val referralCode = it.referral_code
 
             binding.hangerValueNumber.text = hangerValue
+            binding.currentHangerValueNumber.text = currentHangerValueText
             binding.creditsValue.text = credits
             binding.totalSpendValue.text = totalSpent
             binding.uecValue.text = uecValue

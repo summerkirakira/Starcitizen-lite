@@ -55,6 +55,7 @@ import vip.kirakira.starcitizenlite.ui.hangarlog.HangarLogBottomSheet
 import vip.kirakira.starcitizenlite.ui.hangarlog.HangarLogViewModel
 import vip.kirakira.starcitizenlite.ui.home.HomeFragment
 import vip.kirakira.starcitizenlite.ui.home.HomeViewModel
+import vip.kirakira.starcitizenlite.ui.home.Parser
 import vip.kirakira.starcitizenlite.ui.loadUserAvatar
 import vip.kirakira.starcitizenlite.ui.main.MainFragment
 import vip.kirakira.starcitizenlite.ui.me.MeFragment
@@ -212,10 +213,10 @@ class MainActivity : RefugeBaseActivity() {
                     drawerUserAvatar.loadImage(it.profile_image)
                 }
 
-                val userCredit = "${it.store.toFloat() / 100.0f} USD"
+                val userCredit = "${Parser.priceFormatter(it.store)} USD"
                 val userUEC = "${it.uec} UEC"
                 val userREC = "${it.rec} REC"
-                val userHangerValue = "${it.hanger_value.toFloat() / 100.0f} USD"
+                val userHangerValue = "${Parser.priceFormatter(it.hanger_value)} USD"
                 drawerUserName.text = it.handle
                 drawerUserCredit.text = userCredit
                 drawerUserUEC.text = userUEC
@@ -480,6 +481,7 @@ class MainActivity : RefugeBaseActivity() {
                             database.buybackItemDao.deleteAllOldItems(System.currentTimeMillis())
                             database.hangarLogDao.deleteAll()
                             sharedPreferences.edit().putInt(getString(R.string.crawled_page_key), 0).apply()
+                            sharedPreferences.edit().putInt(getString(R.string.current_hanger_value_key), 0).apply()
                         }
                         if(builder.checkedIndex == items.size - 1){
                             val intent = Intent(this, LoginActivity::class.java)
