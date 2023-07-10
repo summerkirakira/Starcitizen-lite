@@ -120,7 +120,7 @@ data class BuybackItem constructor(
     val formShipId: Int = 0,
     val toShipId: Int = 0,
     val toSkuId: Int = 0,
-    val chinesName: String? = null,
+    var chinesName: String? = null,
     val chinese_contains: String? = null,
     val chineseAlsoContains: String? = null,
 )

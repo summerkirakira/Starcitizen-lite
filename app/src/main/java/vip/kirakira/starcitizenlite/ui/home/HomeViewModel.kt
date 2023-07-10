@@ -94,7 +94,7 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
         viewModelScope.launch {
             buybackItemFilter.value = ""
             try {
-                buybackItemRepository.refreshItems()
+                buybackItemRepository.refreshItems(getApplication())
             } catch (e: Exception) {
                 e.printStackTrace()
                 refreshBuybackError.value = true

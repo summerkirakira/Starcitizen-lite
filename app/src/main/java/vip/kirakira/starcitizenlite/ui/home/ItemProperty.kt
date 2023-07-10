@@ -55,7 +55,7 @@ fun List<BuybackItem>.toItemProperty(): List<HangerItemProperty> {
         if(map[item.title] == null){
             map[item.title] = HangerItemProperty(
                 id = item.id,
-                name = item.title,
+                name = item.chinesName?:item.title,
                 image = item.image,
                 number = 1,
                 status = "回购中",
