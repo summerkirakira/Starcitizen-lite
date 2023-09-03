@@ -226,6 +226,21 @@ interface ShipDetailDao {
     fun getByName(rsiName: String): ShipDetail?
 }
 
+@Dao
+interface GameTranslationDao {
+    @Query("SELECT * FROM game_translation")
+    fun getAll(): LiveData<List<GameTranslation>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(gameTranslations: List<GameTranslation>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(gameTranslation: GameTranslation)
+
+    @Query("Delete FROM game_translation")
+    fun deleteAll()
+}
+
 //@Database(entities = [ShopItem::class, HangerItem::class, HangerPackage::class, BuybackItem::class, User::class, BannerImage::class], version = 1)
 //abstract class ShopItemDatabase0: RoomDatabase() {
 //    abstract val shopItemDao: ShopItemDao
@@ -344,7 +359,8 @@ val MIGRATION_2_5 = object : Migration(2, 5) {
         HangarShip::class,
         HangarLog::class,
         ShipUpgrade::class,
-        ShipDetail::class
+        ShipDetail::class,
+        GameTranslation::class
                ],
 //    autoMigrations = [
 //        AutoMigration (
@@ -365,6 +381,7 @@ abstract class ShopItemDatabase: RoomDatabase() {
     abstract val hangarLogDao: HangarLogDao
     abstract val shipUpgradeDao: ShipUpgradeDao
     abstract val shipDetailDao: ShipDetailDao
+    abstract val gameTranslationDao: GameTranslationDao
 
     class MyAutoMigration : AutoMigrationSpec
 

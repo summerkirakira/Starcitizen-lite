@@ -29,8 +29,9 @@
                 android:padding="16dp"
                 android:textSize="16sp"
                 android:minHeight="200dp"
+                android:textStyle="bold"
                 android:background="@drawable/localization_search_textview_bg"
-                android:text="Resultsdjasljdasjfklsdajfklsdjklfjsdaklfjklsdajfklsdajfkldsjfkljdsklfjsdlkajfklsdajfkldsjfkljdsakfjklsadjfklsdajfklsadf"
-                android:textColor="@android:color/black"/>
+                android:text="@string/please_input_english_game_content"
+                android:textColor="#535252"/>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
