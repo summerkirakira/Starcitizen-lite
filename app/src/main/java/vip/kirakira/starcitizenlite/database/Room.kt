@@ -251,7 +251,7 @@ interface GameTranslationDao {
 //}
 
 
-val MIGRATION_2_5 = object : Migration(2, 5) {
+val MIGRATION_2_6 = object : Migration(2, 6) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
             """
@@ -344,6 +344,29 @@ val MIGRATION_2_5 = object : Migration(2, 5) {
                 PRIMARY KEY(`id`))
             """.trimIndent()
         )
+        database.execSQL(
+            """
+                CREATE TABLE `game_translation` 
+                (`key` TEXT NOT NULL,
+                `chinese` TEXT NOT NULL,
+                `english` TEXT NOT NULL,
+                PRIMARY KEY(`key`))
+            """.trimIndent()
+        )
+    }
+}
+
+val MIGRATION_5_6 = object : Migration(5, 6) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+                CREATE TABLE `game_translation` 
+                (`key` TEXT NOT NULL,
+                `chinese` TEXT NOT NULL,
+                `english` TEXT NOT NULL,
+                PRIMARY KEY(`key`))
+            """.trimIndent()
+        )
     }
 }
 
@@ -370,7 +393,7 @@ val MIGRATION_2_5 = object : Migration(2, 5) {
 //        )
 //    ],
     exportSchema = true,
-    version = 5)
+    version = 6)
 abstract class ShopItemDatabase: RoomDatabase() {
     abstract val shopItemDao: ShopItemDao
     abstract val hangerItemDao: HangerItemDao
@@ -395,7 +418,8 @@ fun getDatabase(context: Context): ShopItemDatabase {
             INSTANCE = Room.databaseBuilder(context.applicationContext,
                 ShopItemDatabase::class.java,
                 "shops")
-                .addMigrations(MIGRATION_2_5)
+                .addMigrations(MIGRATION_2_6)
+                .addMigrations(MIGRATION_5_6)
                 .fallbackToDestructiveMigration()
                 .build()
         }
