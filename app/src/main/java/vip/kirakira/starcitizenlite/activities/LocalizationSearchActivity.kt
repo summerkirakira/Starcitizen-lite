@@ -36,6 +36,11 @@ class LocalizationSearchActivity : AppCompatActivity() {
 
         gameTranslationList = database.gameTranslationDao.getAll()
         applyFilter("")
+        gameTranslationList.observe(this) {
+            if (it.isEmpty()) {
+                Toast.makeText(this, "未找到翻译数据，请等待翻译加载", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         searchView = findViewById(R.id.localizationSearchView)
         chineseContentTextview = findViewById(R.id.localizationSearchResult)

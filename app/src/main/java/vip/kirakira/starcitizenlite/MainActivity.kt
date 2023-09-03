@@ -605,12 +605,15 @@ class MainActivity : RefugeBaseActivity() {
                 val database = getDatabase(application)
                 database.gameTranslationDao.insertAll(gameTranslations)
                 sharedPreferences.edit().putBoolean(getString(R.string.GAME_TRANSLATION_KEY), true).apply()
+                Toast.makeText(this, "游戏翻译数据已更新", Toast.LENGTH_SHORT).show()
             }
-            if(sharedPreferences.getBoolean(getString(R.string.GAME_TRANSLATION_KEY), false)) {
-                val database = getDatabase(application)
-                database.gameTranslationDao.insertAll(gameTranslations)
-                sharedPreferences.edit().putBoolean(getString(R.string.GAME_TRANSLATION_KEY), true).apply()
-            }
+        }
+        if(!sharedPreferences.getBoolean(getString(R.string.GAME_TRANSLATION_KEY), false)) {
+            val database = getDatabase(application)
+            val gameTranslations = CirnoApi.getGameTranslation("https://image.biaoju.site/starcitizen/localization.${latestVersion.shipDetailVersion}.json")
+            database.gameTranslationDao.insertAll(gameTranslations)
+            sharedPreferences.edit().putBoolean(getString(R.string.GAME_TRANSLATION_KEY), true).apply()
+            Toast.makeText(this, "游戏翻译数据已更新", Toast.LENGTH_SHORT).show()
         }
         try {
             updateAlias(latestVersion.shipAliasUrl)
