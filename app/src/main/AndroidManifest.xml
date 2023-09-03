@@ -14,6 +14,9 @@
             android:supportsRtl="true"
             android:theme="@style/Theme.StarcitizenLite">
         <activity
+                android:name=".activities.LocalizationSearchActivity"
+                android:exported="false"/>
+        <activity
                 android:name=".activities.HangarLogActivity"
                 android:exported="false"/>
         <activity

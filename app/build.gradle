@@ -129,6 +129,8 @@ dependencies {
 
     implementation 'com.akexorcist:round-corner-progress-bar:2.1.2'
 
+    implementation "com.paulrybitskyi.persistentsearchview:persistentsearchview:1.1.4"
+
     androidTestImplementation "androidx.room:room-testing:2.5.0"
 
 //    implementation 'com.github.Hitomis.transferee:Transferee:1.6.1'

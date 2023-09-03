@@ -20,6 +20,7 @@ import com.youth.banner.indicator.CircleIndicator
 import kotlinx.coroutines.*
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.activities.CartActivity
+import vip.kirakira.starcitizenlite.activities.LocalizationSearchActivity
 import vip.kirakira.starcitizenlite.activities.PlayerSearch
 import vip.kirakira.starcitizenlite.activities.ThreePartySiteActivity
 import vip.kirakira.starcitizenlite.createSuccessAlerter
@@ -200,8 +201,8 @@ class MainFragment : Fragment() {
         }
 
         binding.upgradeLayout.setOnClickListener {
-            val intent: Intent = Intent(activity, CartActivity::class.java)
-            intent.putExtra("url", "https://biaoju.site/star-refuge/docs/install-localization")
+            val intent: Intent = Intent(activity, LocalizationSearchActivity::class.java)
+//            intent.putExtra("url", "https://biaoju.site/star-refuge/docs/install-localization")
             startActivity(intent)
         }
 
