@@ -226,6 +226,21 @@ interface ShipDetailDao {
     fun getByName(rsiName: String): ShipDetail?
 }
 
+@Dao
+interface GameTranslationDao {
+    @Query("SELECT * FROM game_translation")
+    fun getAll(): LiveData<List<GameTranslation>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(gameTranslations: List<GameTranslation>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(gameTranslation: GameTranslation)
+
+    @Query("Delete FROM game_translation")
+    fun deleteAll()
+}
+
 //@Database(entities = [ShopItem::class, HangerItem::class, HangerPackage::class, BuybackItem::class, User::class, BannerImage::class], version = 1)
 //abstract class ShopItemDatabase0: RoomDatabase() {
 //    abstract val shopItemDao: ShopItemDao
@@ -236,7 +251,7 @@ interface ShipDetailDao {
 //}
 
 
-val MIGRATION_2_5 = object : Migration(2, 5) {
+val MIGRATION_2_6 = object : Migration(2, 6) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
             """
@@ -329,6 +344,29 @@ val MIGRATION_2_5 = object : Migration(2, 5) {
                 PRIMARY KEY(`id`))
             """.trimIndent()
         )
+        database.execSQL(
+            """
+                CREATE TABLE `game_translation` 
+                (`key` TEXT NOT NULL,
+                `chinese` TEXT NOT NULL,
+                `english` TEXT NOT NULL,
+                PRIMARY KEY(`key`))
+            """.trimIndent()
+        )
+    }
+}
+
+val MIGRATION_5_6 = object : Migration(5, 6) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+                CREATE TABLE `game_translation` 
+                (`key` TEXT NOT NULL,
+                `chinese` TEXT NOT NULL,
+                `english` TEXT NOT NULL,
+                PRIMARY KEY(`key`))
+            """.trimIndent()
+        )
     }
 }
 
@@ -344,7 +382,8 @@ val MIGRATION_2_5 = object : Migration(2, 5) {
         HangarShip::class,
         HangarLog::class,
         ShipUpgrade::class,
-        ShipDetail::class
+        ShipDetail::class,
+        GameTranslation::class
                ],
 //    autoMigrations = [
 //        AutoMigration (
@@ -354,7 +393,7 @@ val MIGRATION_2_5 = object : Migration(2, 5) {
 //        )
 //    ],
     exportSchema = true,
-    version = 5)
+    version = 6)
 abstract class ShopItemDatabase: RoomDatabase() {
     abstract val shopItemDao: ShopItemDao
     abstract val hangerItemDao: HangerItemDao
@@ -365,6 +404,7 @@ abstract class ShopItemDatabase: RoomDatabase() {
     abstract val hangarLogDao: HangarLogDao
     abstract val shipUpgradeDao: ShipUpgradeDao
     abstract val shipDetailDao: ShipDetailDao
+    abstract val gameTranslationDao: GameTranslationDao
 
     class MyAutoMigration : AutoMigrationSpec
 
@@ -378,7 +418,8 @@ fun getDatabase(context: Context): ShopItemDatabase {
             INSTANCE = Room.databaseBuilder(context.applicationContext,
                 ShopItemDatabase::class.java,
                 "shops")
-                .addMigrations(MIGRATION_2_5)
+                .addMigrations(MIGRATION_2_6)
+                .addMigrations(MIGRATION_5_6)
                 .fallbackToDestructiveMigration()
                 .build()
         }

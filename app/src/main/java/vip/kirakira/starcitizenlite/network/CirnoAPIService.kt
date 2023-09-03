@@ -12,6 +12,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
+import vip.kirakira.starcitizenlite.database.GameTranslation
 import vip.kirakira.starcitizenlite.database.ShipDetail
 import vip.kirakira.starcitizenlite.network.CirnoProperty.*
 import vip.kirakira.starcitizenlite.uuid
@@ -95,6 +96,17 @@ object CirnoApi {
         val json = response.body?.string()
         val shipDetails = Gson().fromJson(json, Array<ShipDetail>::class.java)
         return shipDetails.toList()
+    }
+
+    fun getGameTranslation(url: String): List<GameTranslation> {
+        val request = Request.Builder()
+            .url(url)
+            .addHeader("cirno-token", uuid)
+            .build()
+        val response = client.newCall(request).execute()
+        val json = response.body?.string()
+        val gameTranslations = Gson().fromJson(json, Array<GameTranslation>::class.java)
+        return gameTranslations.toList()
     }
 
     fun getShipAliasFromUrl(url: String): List<ShipAlias> {

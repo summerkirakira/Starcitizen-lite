@@ -183,4 +183,6 @@
     <string name="invalid_validation_code">校验码错误</string>
     <string name="current_hanger_value_key">CURRENT_HANGER_VALUE</string>
     <string name="current_hanger_value">当前机库价值</string>
+    <string name="GAME_TRANSLATION_KEY">game_translation_key</string>
+    <string name="please_input_english_game_content">请在输入框中填入要翻译的文本</string>
 </resources>

@@ -244,6 +244,14 @@ data class ShipDetail constructor(
     val storeImageLarge: String
 )
 
+@Entity(tableName = "game_translation")
+data class GameTranslation constructor(
+    @PrimaryKey
+    val key: String,
+    val chinese: String,
+    val english: String
+)
+
 fun List<ShopItem>.toCatalogProperty(): List<CatalogProperty> {
     return map {
         CatalogProperty(

@@ -595,11 +595,25 @@ class MainActivity : RefugeBaseActivity() {
         if(compareVersion(latestVersion.shipDetailVersion, shipDetailVersion!!)) {
             Log.d("ShipDetail", "Updating ship detail...")
             val shipDetails = CirnoApi.getShipDetail(latestVersion.shipDetailUrl)
+            val gameTranslations = CirnoApi.getGameTranslation("https://image.biaoju.site/starcitizen/localization.${latestVersion.shipDetailVersion}.json")
             if(shipDetails.isNotEmpty()) {
                 val database = getDatabase(application)
                 database.shipDetailDao.insertAll(shipDetails)
                 sharedPreferences.edit().putString(getString(R.string.SHIP_DETAIL_VERSION_KEY), latestVersion.shipDetailVersion).apply()
             }
+            if (gameTranslations.isNotEmpty()) {
+                val database = getDatabase(application)
+                database.gameTranslationDao.insertAll(gameTranslations)
+                sharedPreferences.edit().putBoolean(getString(R.string.GAME_TRANSLATION_KEY), true).apply()
+                Toast.makeText(this, "游戏翻译数据已更新", Toast.LENGTH_SHORT).show()
+            }
+        }
+        if(!sharedPreferences.getBoolean(getString(R.string.GAME_TRANSLATION_KEY), false)) {
+            val database = getDatabase(application)
+            val gameTranslations = CirnoApi.getGameTranslation("https://image.biaoju.site/starcitizen/localization.${latestVersion.shipDetailVersion}.json")
+            database.gameTranslationDao.insertAll(gameTranslations)
+            sharedPreferences.edit().putBoolean(getString(R.string.GAME_TRANSLATION_KEY), true).apply()
+            Toast.makeText(this, "游戏翻译数据已更新", Toast.LENGTH_SHORT).show()
         }
         try {
             updateAlias(latestVersion.shipAliasUrl)

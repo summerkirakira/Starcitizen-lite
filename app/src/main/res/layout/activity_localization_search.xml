@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".activities.LocalizationSearchActivity">
+    <com.paulrybitskyi.persistentsearchview.PersistentSearchView
+            android:id="@+id/localizationSearchView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:paddingTop="40dp"
+            android:paddingLeft="4dp"
+            android:paddingStart="4dp"
+            android:paddingRight="4dp"
+            android:paddingEnd="4dp"/>
+    <ScrollView
+            app:layout_constraintTop_toBottomOf="@+id/localizationSearchView"
+            android:padding="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <TextView
+                android:id="@+id/localizationSearchResult"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:textSize="16sp"
+                android:minHeight="200dp"
+                android:textStyle="bold"
+                android:background="@drawable/localization_search_textview_bg"
+                android:text="@string/please_input_english_game_content"
+                android:textColor="#535252"/>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
