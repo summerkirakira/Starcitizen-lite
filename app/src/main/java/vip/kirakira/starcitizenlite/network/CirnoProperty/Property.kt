@@ -133,11 +133,13 @@ data class ShipUpgradePathPostBody(
     val from_ship_id: Int,
     val to_ship_id: Int,
     val banned_list: List<Int>,
-    val allow_zero_price: Boolean,
-    val allow_warbond: Boolean,
-    val must_have_list: List<MustHave>
+    val hangar_upgrade_list: List<HangarUpgrade>,
+    val buyback_upgrade_list: List<HangarUpgrade>,
+    val use_history_ccu: Boolean,
+    val only_can_buy_ships: Boolean,
+    val upgrade_multiplier: Float
 ) {
-    data class MustHave(
+    data class HangarUpgrade(
         val from_ship: Int,
         val to_ship: Int,
         val price: Int
@@ -156,6 +158,7 @@ data class ShipUpgradeResponse(
     ) {
         data class Step(
             val id: Int,
+            val type: Int,
             val from_ship: Int,
             val to_ship: Int,
             val price: Int,

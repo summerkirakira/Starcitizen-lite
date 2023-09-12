@@ -185,4 +185,7 @@
     <string name="current_hanger_value">当前机库价值</string>
     <string name="GAME_TRANSLATION_KEY">game_translation_key</string>
     <string name="please_input_english_game_content">请在输入框中填入要翻译的文本</string>
+    <string name="localization_search">汉化查询</string>
+    <string name="upgrade_to">升级到</string>
+    <string name="ship_upgrade_calculator">舰船升级路径规划器</string>
 </resources>
