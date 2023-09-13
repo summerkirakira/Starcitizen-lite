@@ -92,6 +92,7 @@ data class ClientInfo(
 )
 
 data class ShipAlias(
+    val id: Int,
     val name: String,
     val alias: List<String>,
     val skus: List<Sku>
@@ -140,6 +141,7 @@ data class ShipUpgradePathPostBody(
     val upgrade_multiplier: Float
 ) {
     data class HangarUpgrade(
+        val id: Int,
         val from_ship: Int,
         val to_ship: Int,
         val price: Int

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.vipulasri.timelineview.TimelineView
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.databinding.UpgradeSearchListItemBinding
+import vip.kirakira.starcitizenlite.network.CirnoProperty.ShipUpgradePathPostBody
 
 class ShipUpgradePathAdapter: ListAdapter<UpgradeItemProperty, ShipUpgradePathAdapter.ViewHolder>(DiffCallback) {
 
@@ -95,7 +96,7 @@ class ShipUpgradePathAdapter: ListAdapter<UpgradeItemProperty, ShipUpgradePathAd
 
     }
 
-    public val testUpgradeList = mutableListOf(
+    val testUpgradeList = mutableListOf(
         UpgradeItemProperty(1, "name1", "极光", "克拉克", "1", true, true, UpgradeItemProperty.OriginType.HANGAR, "1", 10000, 8000, 2000, false, "upgrade", 10000, 34000),
         UpgradeItemProperty(2, "name2", "极光", "克拉克", "1", false, true, UpgradeItemProperty.OriginType.BUYBACK, "1", 10000, 8000, 2000, false, "upgrade", 10000, 34000),
         UpgradeItemProperty(3, "name3", "极光", "克拉克", "1", true, true, UpgradeItemProperty.OriginType.HISTORY, "1", 10000, 8000, 2000, false, "upgrade", 10000, 34000),
@@ -105,4 +106,5 @@ class ShipUpgradePathAdapter: ListAdapter<UpgradeItemProperty, ShipUpgradePathAd
         UpgradeItemProperty(3, "name3", "极光", "克拉克", "1", true, true, UpgradeItemProperty.OriginType.HISTORY, "1", 10000, 8000, 2000, false, "upgrade", 10000, 34000),
         UpgradeItemProperty(4, "name4", "极光", "克拉克", "1", false, true, UpgradeItemProperty.OriginType.NORMAL, "1", 10000, 8000, 2000, false, "upgrade", 10000, 34000),
     )
+    val testShipUpgradePathPostBody = ShipUpgradePathPostBody(1, 37, listOf(1, 2, 3), listOf(ShipUpgradePathPostBody.HangarUpgrade(10001, 1, 37, 0)), listOf(), true, true, 1.5f)
 }

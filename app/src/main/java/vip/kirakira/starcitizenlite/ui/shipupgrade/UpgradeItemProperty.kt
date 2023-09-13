@@ -22,3 +22,7 @@ data class UpgradeItemProperty(
         BUYBACK, NORMAL, HISTORY, HANGAR, NOT_AVAILABLE
     }
 }
+
+data class OwnedUpgrade(
+    val id: Int
+)

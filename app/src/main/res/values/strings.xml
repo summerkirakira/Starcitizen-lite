@@ -188,4 +188,7 @@
     <string name="localization_search">汉化查询</string>
     <string name="upgrade_to">升级到</string>
     <string name="ship_upgrade_calculator">舰船升级路径规划器</string>
+    <string name="total_cost">总花费: </string>
+    <string name="credit_cost">信用点消耗</string>
+    <string name="cash_cost">现金开销</string>
 </resources>
