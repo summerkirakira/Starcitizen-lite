@@ -102,6 +102,7 @@ data class ShipAlias(
         val price: Int,
     )
     fun getHighestSku(): Int {
+        if (this.skus.isEmpty()) return 0
         var highestPrice = this.skus[0].price
         for (sku in this.skus) {
             if (sku.price > highestPrice) {
@@ -164,7 +165,8 @@ data class ShipUpgradeResponse(
             val from_ship: Int,
             val to_ship: Int,
             val price: Int,
-            val name: String
+            val name: String,
+            val available: Boolean
         )
     }
 }

@@ -24,6 +24,15 @@ class RepoUtil {
             return null
         }
 
+        fun getShipAlias(id: Int): ShipAlias? {
+            for(ship in shipAlias) {
+                if(ship.id == id) {
+                    return ship
+                }
+            }
+            return null
+        }
+
         private fun compareShipName(name1: String, name2: String): Boolean {
             return name1.lowercase() == name2.lowercase()
         }

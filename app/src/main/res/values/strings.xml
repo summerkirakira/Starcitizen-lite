@@ -191,4 +191,16 @@
     <string name="total_cost">总花费: </string>
     <string name="credit_cost">信用点消耗</string>
     <string name="cash_cost">现金开销</string>
+    <string name="ccu_calculator_settings">舰船升级规划器设置</string>
+    <string name="upgrade_choose_from_ship">选择待升级舰船</string>
+    <string name="apply">应用</string>
+    <string name="upgrade_choose_to_ship">选择目标舰船</string>
+    <string name="upgrade_preference">升级链自定义</string>
+    <string name="use_history_ccu">使用历史CCU</string>
+    <string name="only_can_buy_ships">优先选择可购买舰船</string>
+    <string name="use_buyback_upgrade">使用回购中的升级包</string>
+    <string name="history_ccu_weight">历史升级包权重</string>
+    <string name="history_ccu_weight_explain">
+        历史升级包权重决定了历史CCU在升级链中所占的比重，权重越大，避难所更倾向于选择历史CCU，权重越低，避难所更倾向于使用机库、回购或是商店里的CCU来替代历史省钱CCU，即使这样会花费更多现金或信用点。
+    </string>
 </resources>

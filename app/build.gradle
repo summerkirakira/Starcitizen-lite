@@ -131,6 +131,8 @@ dependencies {
 
     implementation "com.paulrybitskyi.persistentsearchview:persistentsearchview:1.1.4"
 
+    implementation "org.adw.library:discrete-seekbar:1.0.1"
+
     androidTestImplementation "androidx.room:room-testing:2.5.0"
 
 //    implementation 'com.github.Hitomis.transferee:Transferee:1.6.1'

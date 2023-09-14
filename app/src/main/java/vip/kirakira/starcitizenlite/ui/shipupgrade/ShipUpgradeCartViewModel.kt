@@ -6,7 +6,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import vip.kirakira.starcitizenlite.database.BuybackItem
+import vip.kirakira.starcitizenlite.database.HangerPackage
 import vip.kirakira.starcitizenlite.database.ShipDetail
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.network.CirnoApi
@@ -20,32 +24,147 @@ import vip.kirakira.starcitizenlite.ui.home.Parser
 
 class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(application) {
     private val TAG = "ShipUpgradeCartViewModel"
-    private val shipUpgradePath: MutableLiveData<List<UpgradeItemProperty>> = MutableLiveData()
+    val shipUpgradePathList: MutableLiveData<List<UpgradeItemProperty>> = MutableLiveData()
     private val translationDao = getDatabase(application).translationDao
     private val shipDetailDao = getDatabase(application).shipDetailDao
-    private val allHangarItems = getDatabase(application).hangerItemDao.getAll()
+    private val allHangarPackageWithItems = getDatabase(application).hangerItemDao.getAll()
     private val allBuyBacks = getDatabase(application).buybackItemDao.getAll()
+    private val ownedUpgradeList = mutableListOf<OwnedUpgrade>()
+    private val ownedBuybackUpgradeList = mutableListOf<OwnedUpgrade>()
+    private val preferences = application.getSharedPreferences(
+        application.getString(vip.kirakira.starcitizenlite.R.string.preference_file_key),
+        android.content.Context.MODE_PRIVATE
+    )
 
     init {
-        fetchShipUpgradePath()
+//        fetchShipUpgradePath()
+        allHangarPackageWithItems.observeForever {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    updateOwnedHangarUpgradeList()
+                }
+            }
+        }
+        allBuyBacks.observeForever {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    updateOwnedBuybackUpgradeList()
+                }
+            }
+        }
     }
 
     fun fetchShipUpgradePath() {
         viewModelScope.launch {
             try {
-                val a = CirnoApi.retrofitService.getUpgradePath(
-                    ShipUpgradePathPostBody(1, 37, listOf(1, 2, 3), listOf(
-                        ShipUpgradePathPostBody.HangarUpgrade(10001,1, 2, 100)), listOf(), true, true, 1.5f)
+                val fromShipId = preferences.getInt("upgrade_search_from_ship_id", 1)
+                val toShipId = preferences.getInt("upgrade_search_to_ship_id", 37)
+                val bannedList: List<Int> = preferences.getString("upgrade_search_banned_list", "")!!.split(",").mapNotNull {
+                    if (it == "") {
+                        null
+                    } else {
+                        it.toInt()
+                    }
+                }
+                val useHistoryCcu = preferences.getBoolean("upgrade_search_use_history_ccu", false)
+                val onlyCanBuyShips = preferences.getBoolean("upgrade_search_only_can_buy_ships", true)
+                val upgradeMultiplier = preferences.getFloat("upgrade_search_upgrade_multiplier", 1.5f)
+
+
+                val result = CirnoApi.retrofitService.getUpgradePath(
+                    ShipUpgradePathPostBody(
+                        from_ship_id = fromShipId,
+                        to_ship_id = toShipId,
+                        banned_list = bannedList,
+                        hangar_upgrade_list = ownedUpgradeList.toHangarUpgrade(),
+                        buyback_upgrade_list = ownedBuybackUpgradeList.toHangarUpgrade(),
+                        use_history_ccu = useHistoryCcu,
+                        only_can_buy_ships = onlyCanBuyShips,
+                        upgrade_multiplier = upgradeMultiplier)
                 )
-                Log.d(TAG, a.toString())
+                if (result.code == 0) {
+                    withContext(Dispatchers.IO) {
+                        val upgradePathList = mutableListOf<UpgradeItemProperty>()
+                        for (step in result.path.steps) {
+                            convertPathResponseToUpgradeItem(step)?.let {
+                                upgradePathList.add(it)
+                            }
+                        }
+                        shipUpgradePathList.postValue(upgradePathList)
+                    }
+                }
             } catch (e: Exception) {
                 Log.d(TAG, e.toString())
             }
         }
     }
 
-    private fun convertPathResponseToUpgradeItem(step: ShipUpgradeResponse.ShipUpgradePath.Step): UpgradeItemProperty {
+    private fun convertPathResponseToUpgradeItem(step: ShipUpgradeResponse.ShipUpgradePath.Step): UpgradeItemProperty? {
+        when(step.type) {
+            1 -> {
+                return convertNormalStepToUpgradeItem(step)
+            }
+            2 -> {
+                return convertHistoryStepToUpgradeItem(step)
+            }
+            3 -> {
+                return getHangarUpgradeItem(step.id)
+            }
+            4 -> {
+                return getBuybackUpgradeItem(step.id)
+            }
+        }
+        return null
+    }
 
+    private fun convertNormalStepToUpgradeItem(step: ShipUpgradeResponse.ShipUpgradePath.Step): UpgradeItemProperty? {
+        val fromShip = getShipAliasById(step.from_ship)
+        val toShip = getShipAliasById(step.to_ship)
+        if (fromShip == null || toShip == null) {
+            return null
+        }
+        return UpgradeItemProperty(
+            id = step.id,
+            name = "${fromShip.name} to ${toShip.name} Upgrade",
+            fromShipName = translateShipName(fromShip.name),
+            toShipName = translateShipName(toShip.name),
+            image = "",
+            isAvailable = step.available,
+            isWarbond = false,
+            origin = UpgradeItemProperty.OriginType.NORMAL,
+            price = step.price,
+            originalPrice = toShip.getHighestSku() - fromShip.getHighestSku(),
+            saving = toShip.getHighestSku() - fromShip.getHighestSku() - step.price,
+            isLimitedTime = step.available,
+            type = "",
+            currentPrice = toShip.getHighestSku() - fromShip.getHighestSku(),
+            shipPrice = toShip.getHighestSku()
+        )
+    }
+
+    private fun convertHistoryStepToUpgradeItem(step: ShipUpgradeResponse.ShipUpgradePath.Step): UpgradeItemProperty? {
+        val fromShip = getShipAliasById(step.from_ship)
+        val toShip = getShipAliasById(step.to_ship)
+        if (fromShip == null || toShip == null) {
+            return null
+        }
+        return UpgradeItemProperty(
+            id = step.id,
+            name = step.name,
+            fromShipName = translateShipName(fromShip.name),
+            toShipName = translateShipName(toShip.name),
+            image = "",
+            isAvailable = false,
+            isWarbond = step.name.contains("Warbond"),
+            origin = UpgradeItemProperty.OriginType.HISTORY,
+            price = step.price,
+            originalPrice = step.price,
+            saving = toShip.getHighestSku() - fromShip.getHighestSku() - step.price,
+            isLimitedTime = step.available,
+            type = "",
+            currentPrice = toShip.getHighestSku() - fromShip.getHighestSku(),
+            shipPrice = toShip.getHighestSku()
+        )
     }
 
     private fun translateShipName(name: String): String {
@@ -57,6 +176,10 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
 
     private fun getShipAliasByName(name: String): ShipAlias? {
         return RepoUtil.getShipAlias(name)
+    }
+
+    private fun getShipAliasById(id: Int): ShipAlias? {
+        return RepoUtil.getShipAlias(id)
     }
 
     private fun getCurrentPrice(shipAlias: ShipAlias): Int {
@@ -71,4 +194,154 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
         return nameList
     }
 
+    fun getOwnedUpgradeByHangarPackage(hangarPackage: HangerPackage): OwnedUpgrade? {
+        val shipNameList = getFullUpgradeName(hangarPackage.title)
+        if (shipNameList.isEmpty()) {
+            return null
+        }
+        val fromShip = getShipAliasByName(shipNameList[0])
+        val toShip = getShipAliasByName(shipNameList[1])
+        if (fromShip == null || toShip == null) {
+            return null
+        }
+        val fromShipName = translateShipName(fromShip.name)
+        val toShipName = translateShipName(toShip.name)
+        return OwnedUpgrade(
+            id = hangarPackage.id,
+            fromShip = fromShip,
+            toShip = toShip,
+            type = UpgradeItemProperty.OriginType.HANGAR,
+            name = hangarPackage.title,
+            fromShipName = fromShipName,
+            toShipName = toShipName,
+            price = hangarPackage.value
+        )
+    }
+
+    fun getOwnedUpgradeByBuyBackItem(buybackItem: BuybackItem): OwnedUpgrade? {
+        val shipNameList = getFullUpgradeName(buybackItem.title)
+        if (shipNameList.isEmpty()) {
+            return null
+        }
+        val fromShip = getShipAliasByName(shipNameList[0])
+        val toShip = getShipAliasByName(shipNameList[1])
+        if (fromShip == null || toShip == null) {
+            return null
+        }
+        if (fromShip.getHighestSku() >= toShip.getHighestSku()) {
+            return null
+        }
+        val fromShipName = translateShipName(fromShip.name)
+        val toShipName = translateShipName(toShip.name)
+        return OwnedUpgrade(
+            id = buybackItem.id,
+            fromShip = fromShip,
+            toShip = toShip,
+            type = UpgradeItemProperty.OriginType.BUYBACK,
+            name = buybackItem.title,
+            fromShipName = fromShipName,
+            toShipName = toShipName,
+            price = toShip.getHighestSku() - fromShip.getHighestSku()
+        )
+    }
+
+    private fun updateOwnedHangarUpgradeList() {
+        ownedUpgradeList.clear()
+        val hangarUpgradeNameList = mutableListOf<String>()
+        for (hangerPackageWithItem in allHangarPackageWithItems.value!!) {
+            if (hangarUpgradeNameList.contains(hangerPackageWithItem.hangerPackage.title)) continue
+            hangarUpgradeNameList.add(hangerPackageWithItem.hangerPackage.title)
+            if (hangerPackageWithItem.hangerPackage.is_upgrade) {
+                getOwnedUpgradeByHangarPackage(hangerPackageWithItem.hangerPackage)?.let {
+                    ownedUpgradeList.add(it)
+                }
+            }
+        }
+//        Log.d(TAG, ownedUpgradeList.toString())
+    }
+
+    private fun updateOwnedBuybackUpgradeList() {
+        ownedBuybackUpgradeList.clear()
+        val buybackUpgradeNameList = mutableListOf<String>()
+        for (buybackItem in allBuyBacks.value!!) {
+            if (buybackUpgradeNameList.contains(buybackItem.title)) continue
+            buybackUpgradeNameList.add(buybackItem.title)
+            if (buybackItem.title.contains("Upgrade")) {
+                getOwnedUpgradeByBuyBackItem(buybackItem)?.let {
+                    ownedBuybackUpgradeList.add(it)
+                }
+            }
+        }
+    }
+
+    private fun getOwnedHangarUpgradeById(id: Int): OwnedUpgrade? {
+        for (ownedUpgrade in ownedUpgradeList) {
+            if (ownedUpgrade.id == id) {
+                return ownedUpgrade
+            }
+        }
+        return null
+    }
+
+    private fun getOwnedBuybackUpgradeById(id: Int): OwnedUpgrade? {
+        for (ownedUpgrade in ownedBuybackUpgradeList) {
+            if (ownedUpgrade.id == id) {
+                return ownedUpgrade
+            }
+        }
+        return null
+    }
+
+    private fun getHangarUpgradeItem(id: Int): UpgradeItemProperty {
+        val upgradeItem = getOwnedHangarUpgradeById(id)
+        return UpgradeItemProperty(
+            id = upgradeItem!!.id,
+            name = upgradeItem.name,
+            fromShipName = upgradeItem.fromShipName,
+            toShipName = upgradeItem.toShipName,
+            image = "",
+            isAvailable = true,
+            isWarbond = upgradeItem.name.contains("Warbond"),
+            origin = UpgradeItemProperty.OriginType.HANGAR,
+            price = upgradeItem.price,
+            originalPrice = upgradeItem.price,
+            saving = upgradeItem.toShip.getHighestSku() - upgradeItem.fromShip.getHighestSku() - upgradeItem.price,
+            isLimitedTime = false,
+            type = "",
+            currentPrice = upgradeItem.toShip.getHighestSku() - upgradeItem.fromShip.getHighestSku(),
+            shipPrice = upgradeItem.toShip.getHighestSku()
+        )
+    }
+
+    private fun getBuybackUpgradeItem(id: Int): UpgradeItemProperty {
+        val upgradeItem = getOwnedBuybackUpgradeById(id)
+        return UpgradeItemProperty(
+            id = upgradeItem!!.id,
+            name = upgradeItem.name,
+            fromShipName = upgradeItem.fromShipName,
+            toShipName = upgradeItem.toShipName,
+            image = "",
+            isAvailable = false,
+            isWarbond = upgradeItem.name.contains("Warbond"),
+            origin = UpgradeItemProperty.OriginType.BUYBACK,
+            price = upgradeItem.price,
+            originalPrice = upgradeItem.price,
+            saving = upgradeItem.toShip.getHighestSku() - upgradeItem.fromShip.getHighestSku() - upgradeItem.price,
+            isLimitedTime = false,
+            type = "",
+            currentPrice = upgradeItem.toShip.getHighestSku() - upgradeItem.fromShip.getHighestSku(),
+            shipPrice = upgradeItem.toShip.getHighestSku()
+        )
+    }
+
+    fun List<OwnedUpgrade>.toHangarUpgrade(): List<ShipUpgradePathPostBody.HangarUpgrade> {
+        return this.map {
+            ShipUpgradePathPostBody.HangarUpgrade(
+                id = it.id,
+                from_ship = it.fromShip.id,
+                to_ship = it.toShip.id,
+                price = it.price
+            )
+        }
+    }
 }

@@ -90,7 +90,7 @@
                               android:textSize="20sp"
                               android:textStyle="bold"
                               android:layout_marginEnd="5dp"
-                              android:id="@+id/total_cost"/>
+                              android:id="@+id/total_cash_cost"/>
                 </LinearLayout>
                 <LinearLayout android:layout_width="match_parent"
                               android:gravity="end"
@@ -108,7 +108,7 @@
                               android:textColor="@color/hangar_log_giveaway_icon"
                               android:textSize="35sp"
                               android:textStyle="bold"
-                              android:id="@+id/total_credit_cost"/>
+                              android:id="@+id/total_cost"/>
                 </LinearLayout>
 
             </LinearLayout>

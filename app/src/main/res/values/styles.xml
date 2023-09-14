@@ -91,4 +91,30 @@
         <item name="android:background">@color/black_overlay</item>
         <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
     </style>
+
+    <style name="Heading" parent="Base.TextAppearance.AppCompat.Body2">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">20dp</item>
+    </style>
+    <style name="Label" parent="Base.TextAppearance.AppCompat.Caption">
+        <item name="android:layout_width">140dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingRight">@dimen/padding</item>
+    </style>
+    <style name="DiscreteSeekBar">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingLeft">-5dp</item>
+        <item name="dsb_scrubberHeight">3dp</item>
+        <item name="dsb_progressColor">@color/colorAccent</item>
+        <item name="dsb_indicatorColor">@color/colorAccent</item>
+    </style>
+
+    <style name="Label.Subtitle" >
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textStyle">italic</item>
+    </style>
 </resources>

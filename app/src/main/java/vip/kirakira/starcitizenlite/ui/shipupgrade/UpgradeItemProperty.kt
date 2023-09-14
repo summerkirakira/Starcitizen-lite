@@ -1,5 +1,7 @@
 package vip.kirakira.starcitizenlite.ui.shipupgrade
 
+import vip.kirakira.starcitizenlite.network.CirnoProperty.ShipAlias
+
 data class UpgradeItemProperty(
     val id: Int,
     val name: String,
@@ -9,7 +11,6 @@ data class UpgradeItemProperty(
     val isAvailable: Boolean,
     val isWarbond: Boolean,
     val origin: OriginType,
-    val originTextColor: String,
     val price: Int,
     val originalPrice: Int,
     val saving: Int,
@@ -24,5 +25,24 @@ data class UpgradeItemProperty(
 }
 
 data class OwnedUpgrade(
-    val id: Int
+    val id: Int,
+    val fromShip: ShipAlias,
+    val toShip: ShipAlias,
+    val type: UpgradeItemProperty.OriginType,
+    val name: String,
+    val fromShipName: String,
+    val toShipName: String,
+    val price: Int
+)
+
+data class UpgradeOptions(
+    val fromShipId: Int,
+    val fromShipName: String,
+    val toShipId: Int,
+    val toShipName: String,
+    val useHistoryCcu: Boolean,
+    val onlyCanBuyShips: Boolean,
+    val upgradeMultiplier: Int,
+    val bannedList: List<String>,
+    val useBuyBack: Boolean
 )
