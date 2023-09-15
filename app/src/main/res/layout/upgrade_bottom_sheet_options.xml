@@ -29,9 +29,9 @@
                 app:layout_constraintEnd_toEndOf="parent"/>
 
         <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/image_toggle"
+                android:layout_width="20dp"
+                android:layout_height="17dp"
+                android:id="@+id/image_close_btn"
                 android:layout_marginRight="@dimen/padding"
                 app:srcCompat="@drawable/ic_expand_more_black_24dp"
                 app:layout_constraintTop_toTopOf="@id/text_attributes_heading"
@@ -39,7 +39,7 @@
                 app:layout_constraintBottom_toBottomOf="@id/text_attributes_heading"/>
         <androidx.core.widget.NestedScrollView
                 android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:id="@+id/nestedScrollView"
                 android:fillViewport="true"
                 android:padding="@dimen/padding"
@@ -180,7 +180,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/nestedScrollView"/>
 
-        <com.google.android.material.button.MaterialButton
+        <Button
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:id="@+id/button_apply"

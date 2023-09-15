@@ -6,7 +6,7 @@ import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import com.gyf.immersionbar.ImmersionBar
 import com.paulrybitskyi.persistentsearchview.PersistentSearchView
 import com.paulrybitskyi.persistentsearchview.adapters.model.SuggestionItem
@@ -109,7 +109,7 @@ class LocalizationSearchActivity : AppCompatActivity() {
     }
 
     private fun filterGameTranslations(gameTranslationLIst: LiveData<List<GameTranslation>>, query: String) {
-        filteredGameTranslations = Transformations.map(gameTranslationLIst) { gameTranslations ->
+        filteredGameTranslations = gameTranslationLIst.map { gameTranslations ->
             gameTranslations.filter {
                 it.english.contains(query, true) && query.isNotEmpty()
             }

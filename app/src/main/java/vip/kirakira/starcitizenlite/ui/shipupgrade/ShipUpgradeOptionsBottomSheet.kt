@@ -77,6 +77,10 @@ class ShipUpgradeOptionsBottomSheet: RoundedCornerBottomSheet() {
             bannedList=bannedList
         )
 
+        binding.imageCloseBtn.setOnClickListener {
+            dismiss()
+        }
+
     }
 
     private fun setCallback(callbacks: Callbacks) {

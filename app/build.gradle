@@ -135,6 +135,8 @@ dependencies {
 
     androidTestImplementation "androidx.room:room-testing:2.5.0"
 
+    implementation "com.github.skydoves:powerspinner:1.2.7"
+
 //    implementation 'com.github.Hitomis.transferee:Transferee:1.6.1'
 }
 repositories {

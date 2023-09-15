@@ -59,11 +59,11 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
 //        refreshBuybackItems()
         refresh()
 
-        hangerItems = Transformations.switchMap(hangerItemFilter){
+        hangerItems = hangerItemFilter.switchMap {
             filterHangerByTitle(it)
         }
 
-        buybackItems = Transformations.switchMap(buybackItemFilter){
+        buybackItems = buybackItemFilter.switchMap {
             filterBuybackByTitle(it)
         }
 
@@ -106,17 +106,17 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
     private fun filterHangerByTitle(filter: String):  LiveData<List<HangerPackageWithItems>> {
         return when (filter) {
             "Subscribe" -> {
-                Transformations.map(originHangerItems) {
+                originHangerItems.map {
                     it.filter { item -> item.hangerPackage.can_gift && item.hangerPackage.currentPrice == 0 }
                 }
             }
             "Ship" -> {
-                Transformations.map(originHangerItems) {
+                originHangerItems.map {
                     it.filter { item -> !item.hangerPackage.is_upgrade && item.hangerPackage.currentPrice >= 15 }
                 }
             }
             "Trash" -> {
-                Transformations.map(originHangerItems) {
+                originHangerItems.map {
                     it.filter { item -> !item.hangerPackage.is_upgrade &&
                             item.hangerPackage.currentPrice == 0 &&
                             !item.hangerPackage.can_gift
@@ -124,7 +124,7 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
                 }
             }
             else -> {
-                Transformations.map(originHangerItems) {
+                originHangerItems.map {
                     it.filter { item -> item.hangerPackage.title.contains(filter, true) }
                 }
             }
@@ -133,7 +133,7 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
     }
 
     private fun filterBuybackByTitle(filter: String):  LiveData<List<BuybackItem>> {
-        return Transformations.map(originBuyBackItems) {
+        return originBuyBackItems.map {
             it.filter {
                 item -> item.title.contains(filter, true)
             }
