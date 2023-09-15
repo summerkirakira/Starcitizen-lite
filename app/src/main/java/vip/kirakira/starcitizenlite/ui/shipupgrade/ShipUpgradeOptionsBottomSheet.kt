@@ -13,8 +13,12 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import com.github.vipulasri.timelineview.sample.widgets.RoundedCornerBottomSheet
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet
 import vip.kirakira.starcitizenlite.R
+import vip.kirakira.starcitizenlite.createWarningAlerter
 import vip.kirakira.starcitizenlite.databinding.UpgradeBottomSheetOptionsBinding
+import vip.kirakira.starcitizenlite.network.CirnoProperty.ShipAlias
+import vip.kirakira.starcitizenlite.shipAlias
 import java.util.prefs.Preferences
 
 class ShipUpgradeOptionsBottomSheet: RoundedCornerBottomSheet() {
@@ -22,6 +26,12 @@ class ShipUpgradeOptionsBottomSheet: RoundedCornerBottomSheet() {
     private lateinit var binding: UpgradeBottomSheetOptionsBinding
     private lateinit var preferences: SharedPreferences
     private var mCallbacks: Callbacks? = null
+    private lateinit var fromShipAliasList: List<ShipAlias>
+    private lateinit var toShipAliasList: List<ShipAlias>
+    private var fromShipAlias: ShipAlias? = null
+    private var toShipAlias: ShipAlias? = null
+
+
     companion object {
 
         fun showDialog(fragmentManager: FragmentManager, callbacks: Callbacks) {
@@ -32,7 +42,7 @@ class ShipUpgradeOptionsBottomSheet: RoundedCornerBottomSheet() {
     }
 
     interface Callbacks {
-        fun onAttributesChanged(attributes: UpgradeOptions)
+        fun onApplyButtonClicked()
     }
 
 
@@ -41,15 +51,15 @@ class ShipUpgradeOptionsBottomSheet: RoundedCornerBottomSheet() {
         return binding.root
     }
 
-    override fun onStart() {
-        super.onStart()
-    }
-
     @SuppressLint("UseRequireInsteadOfGet")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        preferences = requireActivity().getPreferences(Context.MODE_PRIVATE)
+        preferences = requireActivity().getSharedPreferences("vip.kirakira.starcitizenlite.kirakira",
+        Context.MODE_PRIVATE
+        )
         setOptions()
+        fromShipAliasList = shipAlias.filter { it.getHighestSku() != 0 }.sortedBy { it.getHighestSku() }
+        toShipAliasList = shipAlias.filter { it.getHighestSku() != 0 }.sortedBy { it.getHighestSku() }
     }
 
     private fun setOptions() {
@@ -62,14 +72,12 @@ class ShipUpgradeOptionsBottomSheet: RoundedCornerBottomSheet() {
                 it.toInt()
             }
         }
-        val useHistoryCcu = preferences.getBoolean("upgrade_search_use_history_ccu", false)
+        val useHistoryCcu = preferences.getBoolean("upgrade_search_use_history_ccu", true)
         val onlyCanBuyShips = preferences.getBoolean("upgrade_search_only_can_buy_ships", true)
         val upgradeMultiplier = preferences.getFloat("upgrade_search_upgrade_multiplier", 1.5f) // A float value ranging form 1 to 20
         val useBuyback = preferences.getBoolean("upgrade_search_use_buyback", false)
 
         binding.upgradeOption = UpgradeOptions(
-            fromShipId=fromShipId,
-            toShipId=toShipId,
             useHistoryCcu=useHistoryCcu,
             onlyCanBuyShips=onlyCanBuyShips,
             upgradeMultiplier=upgradeMultiplier,
@@ -81,10 +89,77 @@ class ShipUpgradeOptionsBottomSheet: RoundedCornerBottomSheet() {
             dismiss()
         }
 
+        binding.selectFromShipBtn.setOnClickListener {
+            val builder = QMUIBottomSheet.BottomListSheetBuilder(context)
+            for (ship in fromShipAliasList) builder.addItem(ship.chineseName)
+
+            builder.setOnSheetItemClickListener { dialog, _, position, _ ->
+                fromShipAlias = fromShipAliasList[position]
+                toShipAliasList = shipAlias.filter {
+                    it.getHighestSku() > fromShipAlias!!.getHighestSku() && it.getHighestSku() != 0
+                }.sortedBy { it.getHighestSku() }
+                binding.textviewFromShip.text = fromShipAlias!!.chineseName
+                dialog.dismiss()
+            }.build().show()
+        }
+
+        binding.selectToShipBtn.setOnClickListener {
+            val builder = QMUIBottomSheet.BottomListSheetBuilder(context)
+            for (ship in toShipAliasList) builder.addItem(ship.chineseName)
+
+            builder.setOnSheetItemClickListener { dialog, _, position, _ ->
+                toShipAlias = toShipAliasList[position]
+                fromShipAliasList = shipAlias.filter {
+                    it.getHighestSku() < toShipAlias!!.getHighestSku() && it.getHighestSku() != 0
+                }.sortedBy { it.getHighestSku() }
+                binding.textviewToShip.text = toShipAlias!!.chineseName
+                dialog.dismiss()
+            }.build().show()
+        }
+        fromShipAlias = getShipAliasById(fromShipId)
+        toShipAlias = getShipAliasById(toShipId)
+        binding.textviewFromShip.text = fromShipAlias!!.chineseName
+        binding.textviewToShip.text = toShipAlias!!.chineseName
+
+        binding.buttonApply.setOnClickListener {
+            if (fromShipAlias!!.getHighestSku() >= toShipAlias!!.getHighestSku()) {
+                createWarningAlerter(requireActivity(), "设置错误", "待升级舰船的价格要小于目标舰船哦~").show()
+                return@setOnClickListener
+            }
+            preferences.edit().apply {
+                putInt("upgrade_search_to_ship_id", toShipAlias!!.id)
+                putInt("upgrade_search_from_ship_id", fromShipAlias!!.id)
+                putBoolean("upgrade_search_use_history_ccu", binding.checkboxUseHistoryCcu.isChecked)
+                putBoolean("upgrade_search_only_can_buy_ships", binding.checkboxOnlyCanBuyShips.isChecked)
+                putFloat("upgrade_search_upgrade_multiplier", convertBarValueToMultiplier(binding.seekUpgradeMultiplier.progress))
+                commit()
+            }
+            mCallbacks?.onApplyButtonClicked()
+            dismiss()
+        }
+
+        binding.seekUpgradeMultiplier.progress = convertMultiplierToBarValue(upgradeMultiplier)
+
+
     }
 
     private fun setCallback(callbacks: Callbacks) {
         mCallbacks = callbacks
+    }
+
+    private fun convertBarValueToMultiplier(value: Int): Float {
+        return -0.04f * value.toFloat() + 5.0f
+    }
+
+    private fun convertMultiplierToBarValue(value: Float): Int {
+        return (125f - 25 * value).toInt()
+    }
+
+    private fun getShipAliasById(id: Int): ShipAlias? {
+        for (ship in shipAlias) {
+            if (ship.id == id) return ship
+        }
+        return null
     }
 
 

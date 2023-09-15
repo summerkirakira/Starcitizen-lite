@@ -34,12 +34,9 @@ class ShipUpgradeCart : Fragment() {
 //        shipUpgradePathAdapter.notifyDataSetChanged()
         binding.upgradeSettingsBtn.setOnClickListener {
 //            viewModel.fetchShipUpgradePath()
-            ShipUpgradeOptionsBottomSheet.showDialog(parentFragmentManager, object: ShipUpgradeOptionsBottomSheet.Callbacks {
-                override fun onAttributesChanged(attributes: UpgradeOptions) {
-                    TODO()
-                }
-            })
+            showSettingsBottomSheet()
         }
+        showSettingsBottomSheet()
         return binding.root
     }
 
@@ -79,6 +76,13 @@ class ShipUpgradeCart : Fragment() {
             binding.totalCashCost.text = "${"$"}${Parser.priceFormatter(cashPrice)}"
             binding.totalCost.text = "${"$"}${Parser.priceFormatter(totalPrice)}"
         }
+    }
+    private fun showSettingsBottomSheet() {
+        ShipUpgradeOptionsBottomSheet.showDialog(parentFragmentManager, object: ShipUpgradeOptionsBottomSheet.Callbacks {
+            override fun onApplyButtonClicked() {
+                viewModel.fetchShipUpgradePath()
+            }
+        })
     }
 
 }

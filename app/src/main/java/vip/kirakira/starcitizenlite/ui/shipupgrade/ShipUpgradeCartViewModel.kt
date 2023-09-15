@@ -26,7 +26,6 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
     private val TAG = "ShipUpgradeCartViewModel"
     val shipUpgradePathList: MutableLiveData<List<UpgradeItemProperty>> = MutableLiveData()
     private val translationDao = getDatabase(application).translationDao
-    private val shipDetailDao = getDatabase(application).shipDetailDao
     private val allHangarPackageWithItems = getDatabase(application).hangerItemDao.getAll()
     private val allBuyBacks = getDatabase(application).buybackItemDao.getAll()
     private val ownedUpgradeList = mutableListOf<OwnedUpgrade>()

@@ -94,6 +94,7 @@ data class ClientInfo(
 data class ShipAlias(
     val id: Int,
     val name: String,
+    var chineseName: String?,
     val alias: List<String>,
     val skus: List<Sku>
 ) {

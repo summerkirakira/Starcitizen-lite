@@ -36,8 +36,6 @@ data class OwnedUpgrade(
 )
 
 data class UpgradeOptions(
-    val fromShipId: Int,
-    val toShipId: Int,
     val useHistoryCcu: Boolean,
     val onlyCanBuyShips: Boolean,
     val upgradeMultiplier: Float,

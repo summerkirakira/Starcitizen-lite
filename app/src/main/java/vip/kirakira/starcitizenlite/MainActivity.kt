@@ -30,6 +30,7 @@ import com.github.vipulasri.timelineview.TimelineView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.gyf.immersionbar.ImmersionBar
+import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog
 import com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
 import com.tapadoo.alerter.Alerter
@@ -558,6 +559,7 @@ class MainActivity : RefugeBaseActivity() {
 
     private fun loadInitialData() {
         shipAlias = loadAliasFromStorage()
+        translateShipName(shipAlias)
     }
 
     private fun loadAliasFromStorage(): List<ShipAlias> {
@@ -569,6 +571,21 @@ class MainActivity : RefugeBaseActivity() {
         } else {
             return listOf()
         }
+    }
+
+    private fun translateShipName(shipAlias: List<ShipAlias>) {
+        for (ship in shipAlias) {
+            if (ship.chineseName == null) {
+                ship.chineseName = translateShipName(ship.name)
+            }
+        }
+    }
+
+    private fun translateShipName(name: String): String {
+        getDatabase(application).translationDao.getByEnglishTitle(name)?.let {
+            return it.title
+        }
+        return name
     }
 
     private suspend fun checkUpdate() {
@@ -629,6 +646,7 @@ class MainActivity : RefugeBaseActivity() {
             val file = File("${filesDir?.path}/ship_alias.json")
             file.writeText(Gson().toJson(shipAlias))
         }
+        translateShipName(shipAlias)
     }
 
     private suspend fun checkAnnouncement(currentAnnouncementId: Int = 0) {

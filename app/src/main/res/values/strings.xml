@@ -203,4 +203,6 @@
     <string name="history_ccu_weight_explain">
         历史升级包权重决定了历史CCU在升级链中所占的比重，权重越大，避难所更倾向于选择历史CCU，权重越低，避难所更倾向于使用机库、回购或是商店里的CCU来替代历史省钱CCU，即使这样会花费更多现金或信用点。
     </string>
+    <string name="select_from_ship">选择起始舰船</string>
+    <string name="select_to_ship">选择目标舰船</string>
 </resources>
