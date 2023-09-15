@@ -58,7 +58,7 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
         viewModelScope.launch {
             try {
                 val fromShipId = preferences.getInt("upgrade_search_from_ship_id", 1)
-                val toShipId = preferences.getInt("upgrade_search_to_ship_id", 37)
+                val toShipId = preferences.getInt("upgrade_search_to_ship_id", 98)
                 val bannedList: List<Int> = preferences.getString("upgrade_search_banned_list", "")!!.split(",").mapNotNull {
                     if (it == "") {
                         null
@@ -66,9 +66,10 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
                         it.toInt()
                     }
                 }
-                val useHistoryCcu = preferences.getBoolean("upgrade_search_use_history_ccu", false)
-                val onlyCanBuyShips = preferences.getBoolean("upgrade_search_only_can_buy_ships", true)
+                val useHistoryCcu = preferences.getBoolean("upgrade_search_use_history_ccu", true)
+                val onlyCanBuyShips = preferences.getBoolean("upgrade_search_only_can_buy_ships", false)
                 val upgradeMultiplier = preferences.getFloat("upgrade_search_upgrade_multiplier", 1.5f)
+                val useBuyback = preferences.getBoolean("upgrade_search_use_buyback", true)
 
 
                 val result = CirnoApi.retrofitService.getUpgradePath(

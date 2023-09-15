@@ -148,7 +148,6 @@
                             android:layout_marginTop="5dp"
                             app:dsb_max="100"
                             app:dsb_min="0"
-                            app:dsb_value="@{upgradeOption.upgradeMultiplier}"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/option_use_history_ccu_text"
                             app:layout_constraintTop_toBottomOf="@+id/checkbox_use_buyback_upgrade" />

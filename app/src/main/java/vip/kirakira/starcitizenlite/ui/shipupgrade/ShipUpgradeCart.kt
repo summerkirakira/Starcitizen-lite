@@ -33,7 +33,12 @@ class ShipUpgradeCart : Fragment() {
 //        shipUpgradePathAdapter.submitList(shipUpgradePathAdapter.testUpgradeList)
 //        shipUpgradePathAdapter.notifyDataSetChanged()
         binding.upgradeSettingsBtn.setOnClickListener {
-            viewModel.fetchShipUpgradePath()
+//            viewModel.fetchShipUpgradePath()
+            ShipUpgradeOptionsBottomSheet.showDialog(parentFragmentManager, object: ShipUpgradeOptionsBottomSheet.Callbacks {
+                override fun onAttributesChanged(attributes: UpgradeOptions) {
+                    TODO()
+                }
+            })
         }
         return binding.root
     }
