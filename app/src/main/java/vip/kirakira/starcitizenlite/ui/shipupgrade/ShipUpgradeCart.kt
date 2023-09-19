@@ -11,8 +11,9 @@ import androidx.databinding.DataBindingUtil
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.databinding.FragmentShipUpgradeCartBinding
 import vip.kirakira.starcitizenlite.ui.home.Parser
+import vip.kirakira.starcitizenlite.ui.widgets.RefugeVip
 
-class ShipUpgradeCart : Fragment() {
+class  ShipUpgradeCart : Fragment() {
 
     companion object {
         fun newInstance() = ShipUpgradeCart()
@@ -75,6 +76,10 @@ class ShipUpgradeCart : Fragment() {
             binding.totalCreditCostTitle.text = "${"$"}${Parser.priceFormatter(creditPrice)}"
             binding.totalCashCost.text = "${"$"}${Parser.priceFormatter(cashPrice)}"
             binding.totalCost.text = "${"$"}${Parser.priceFormatter(totalPrice)}"
+            binding.summaryLayout.visibility = View.VISIBLE
+        }
+        viewModel.warningMessage.observe(viewLifecycleOwner) {
+            showWarningLog(it)
         }
     }
     private fun showSettingsBottomSheet() {
@@ -83,6 +88,14 @@ class ShipUpgradeCart : Fragment() {
                 viewModel.fetchShipUpgradePath()
             }
         })
+    }
+
+    private fun showWarningLog(message: WarningMessage) {
+        if (message.type == 2) {
+            RefugeVip.createWarningAlert(requireActivity(), title = message.message)
+        } else if (message.type == 1) {
+            RefugeVip.createWarningAlert(requireActivity(), title = message.message)
+        }
     }
 
 }

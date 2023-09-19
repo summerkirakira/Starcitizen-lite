@@ -205,4 +205,9 @@
     </string>
     <string name="select_from_ship">选择起始舰船</string>
     <string name="select_to_ship">选择目标舰船</string>
+    <string name="use_hangar_upgrade">使用机库中的升级包</string>
+    <string name="only_can_buy_ship_explain">
+        勾选此项后避难所将会尝试优先使用当前可购买的CCU，即使这样会消耗更多的现金或信用点。
+    </string>
+    <string name="check_banned_ccu">查看禁用CCU</string>
 </resources>

@@ -42,3 +42,8 @@ data class UpgradeOptions(
     val bannedList: List<Int>,
     val useBuyBack: Boolean
 )
+
+data class WarningMessage(
+    val message: String,
+    val type: Int
+)

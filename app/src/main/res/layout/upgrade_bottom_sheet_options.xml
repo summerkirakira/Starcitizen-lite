@@ -147,6 +147,14 @@
                             app:layout_constraintBottom_toBottomOf="@+id/checkbox_only_can_buy_ships"
                             android:text="@string/only_can_buy_ships"
                             app:layout_constraintStart_toStartOf="parent"/>
+                    <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/Label.Subtitle"
+                            android:layout_width="0dp"
+                            android:id="@+id/only_can_buy_ships_explain_text"
+                            app:layout_constraintTop_toBottomOf="@+id/checkbox_only_can_buy_ships"
+                            app:layout_constraintStart_toStartOf="@+id/seek_upgrade_multiplier"
+                            app:layout_constraintEnd_toEndOf="@+id/seek_upgrade_multiplier"
+                            android:text="@string/only_can_buy_ship_explain"/>
                     <androidx.appcompat.widget.AppCompatCheckBox
                             android:id="@+id/checkbox_use_buyback_upgrade"
                             android:layout_width="wrap_content"
@@ -154,7 +162,7 @@
                             android:layout_marginTop="5dp"
                             android:checked="@{upgradeOption.useBuyBack}"
                             app:layout_constraintStart_toEndOf="@id/option_use_history_ccu_text"
-                            app:layout_constraintTop_toBottomOf="@+id/checkbox_only_can_buy_ships" />
+                            app:layout_constraintTop_toBottomOf="@+id/only_can_buy_ships_explain_text" />
                     <androidx.appcompat.widget.AppCompatTextView
                             style="@style/Label"
                             android:textStyle="bold"
@@ -163,6 +171,23 @@
                             app:layout_constraintBottom_toBottomOf="@+id/checkbox_use_buyback_upgrade"
                             android:text="@string/use_buyback_upgrade"
                             app:layout_constraintStart_toStartOf="parent"/>
+                    <androidx.appcompat.widget.AppCompatCheckBox
+                            android:id="@+id/checkbox_use_hangar_upgrade"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:checked="@{upgradeOption.useBuyBack}"
+                            app:layout_constraintStart_toEndOf="@id/option_use_history_ccu_text"
+                            app:layout_constraintTop_toBottomOf="@+id/checkbox_use_buyback_upgrade" />
+                    <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/Label"
+                            android:textStyle="bold"
+                            android:id="@+id/option_use_hangar_upgrade_text"
+                            app:layout_constraintTop_toTopOf="@+id/checkbox_use_hangar_upgrade"
+                            app:layout_constraintBottom_toBottomOf="@+id/checkbox_use_hangar_upgrade"
+                            android:text="@string/use_hangar_upgrade"
+                            app:layout_constraintStart_toStartOf="parent"/>
+
                     <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
                             android:id="@+id/seek_upgrade_multiplier"
                             style="@style/DiscreteSeekBar"
@@ -171,7 +196,7 @@
                             app:dsb_min="0"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/option_use_history_ccu_text"
-                            app:layout_constraintTop_toBottomOf="@+id/checkbox_use_buyback_upgrade" />
+                            app:layout_constraintTop_toBottomOf="@+id/checkbox_use_hangar_upgrade" />
                     <androidx.appcompat.widget.AppCompatTextView
                             style="@style/Label"
                             android:textStyle="bold"
@@ -188,6 +213,21 @@
                             app:layout_constraintStart_toStartOf="@+id/seek_upgrade_multiplier"
                             app:layout_constraintEnd_toEndOf="@+id/seek_upgrade_multiplier"
                             android:text="@string/history_ccu_weight_explain"/>
+                    <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/Label"
+                            android:textStyle="bold"
+                            android:id="@+id/textview_banned_ccu"
+                            app:layout_constraintTop_toTopOf="@+id/select_banned_ccu_btn"
+                            app:layout_constraintBottom_toBottomOf="@+id/select_banned_ccu_btn"
+                            android:text="@string/use_history_ccu"
+                            tools:text="克拉克"
+                            app:layout_constraintStart_toStartOf="parent"/>
+                    <Button android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/select_banned_ccu_btn"
+                            android:text="@string/check_banned_ccu"
+                            app:layout_constraintTop_toBottomOf="@+id/upgrade_multiplier_explain_text"
+                            app:layout_constraintStart_toEndOf="@+id/option_upgrade_multiplier_text" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>

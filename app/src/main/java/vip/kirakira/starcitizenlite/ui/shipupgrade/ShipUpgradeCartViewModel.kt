@@ -4,34 +4,32 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import vip.kirakira.starcitizenlite.database.BuybackItem
 import vip.kirakira.starcitizenlite.database.HangerPackage
-import vip.kirakira.starcitizenlite.database.ShipDetail
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.network.CirnoApi
 import vip.kirakira.starcitizenlite.network.CirnoProperty.ShipAlias
 import vip.kirakira.starcitizenlite.network.CirnoProperty.ShipUpgradePathPostBody
 import vip.kirakira.starcitizenlite.network.CirnoProperty.ShipUpgradeResponse
-import vip.kirakira.starcitizenlite.repositories.HangerItemRepository
 import vip.kirakira.starcitizenlite.repositories.RepoUtil
-import vip.kirakira.starcitizenlite.repositories.TranslationRepository
 import vip.kirakira.starcitizenlite.ui.home.Parser
+import vip.kirakira.starcitizenlite.R
 
 class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(application) {
     private val TAG = "ShipUpgradeCartViewModel"
     val shipUpgradePathList: MutableLiveData<List<UpgradeItemProperty>> = MutableLiveData()
+    val warningMessage: MutableLiveData<WarningMessage> = MutableLiveData()
     private val translationDao = getDatabase(application).translationDao
     private val allHangarPackageWithItems = getDatabase(application).hangerItemDao.getAll()
     private val allBuyBacks = getDatabase(application).buybackItemDao.getAll()
     private val ownedUpgradeList = mutableListOf<OwnedUpgrade>()
     private val ownedBuybackUpgradeList = mutableListOf<OwnedUpgrade>()
     private val preferences = application.getSharedPreferences(
-        application.getString(vip.kirakira.starcitizenlite.R.string.preference_file_key),
+        application.getString(R.string.preference_file_key),
         android.content.Context.MODE_PRIVATE
     )
 
@@ -70,7 +68,9 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
                 val upgradeMultiplier = preferences.getFloat("upgrade_search_upgrade_multiplier", 1.5f)
                 val useBuyback = preferences.getBoolean("upgrade_search_use_buyback", true)
 
+                if (useBuyback) {
 
+                }
                 val result = CirnoApi.retrofitService.getUpgradePath(
                     ShipUpgradePathPostBody(
                         from_ship_id = fromShipId,
@@ -92,6 +92,8 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
                         }
                         shipUpgradePathList.postValue(upgradePathList)
                     }
+                } else {
+                    warningMessage.postValue(WarningMessage(result.message, result.code))
                 }
             } catch (e: Exception) {
                 Log.d(TAG, e.toString())

@@ -140,7 +140,9 @@ data class ShipUpgradePathPostBody(
     val buyback_upgrade_list: List<HangarUpgrade>,
     val use_history_ccu: Boolean,
     val only_can_buy_ships: Boolean,
-    val upgrade_multiplier: Float
+    val upgrade_multiplier: Float,
+    val use_hangar_ccu: Boolean,
+    val use_buyback_ccu: Boolean,
 ) {
     data class HangarUpgrade(
         val id: Int,
