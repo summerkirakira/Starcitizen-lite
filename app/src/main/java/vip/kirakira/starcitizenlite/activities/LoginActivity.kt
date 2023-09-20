@@ -202,8 +202,7 @@ class LoginActivity : RefugeBaseActivity() {
 
                                     } catch (e: Exception) {
                                         stopLoading()
-                                        createWarningAlerter(
-                                            this@LoginActivity,
+                                        createWarningAlerter(this@LoginActivity,
                                             getString(R.string.error),
                                             getString(R.string.network_error)
                                         ).show()

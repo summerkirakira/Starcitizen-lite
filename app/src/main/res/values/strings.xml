@@ -189,8 +189,8 @@
     <string name="upgrade_to">升级到</string>
     <string name="ship_upgrade_calculator">舰船升级路径规划器</string>
     <string name="total_cost">总花费: </string>
-    <string name="credit_cost">信用点消耗</string>
-    <string name="cash_cost">现金开销</string>
+    <string name="credit_cost">信用点</string>
+    <string name="cash_cost">现金</string>
     <string name="ccu_calculator_settings">舰船升级规划器设置</string>
     <string name="upgrade_choose_from_ship">选择待升级舰船</string>
     <string name="apply">应用</string>
@@ -210,4 +210,7 @@
         勾选此项后避难所将会尝试优先使用当前可购买的CCU，即使这样会消耗更多的现金或信用点。
     </string>
     <string name="check_banned_ccu">查看禁用CCU</string>
+    <string name="hangar_upgrade">机库升级</string>
+    <string name="hangar_upgrade_cost">机库消耗</string>
+    <string name="other_upgrade_cost">其他消耗</string>
 </resources>

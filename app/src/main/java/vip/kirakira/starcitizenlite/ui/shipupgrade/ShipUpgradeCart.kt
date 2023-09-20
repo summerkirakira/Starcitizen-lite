@@ -51,31 +51,49 @@ class  ShipUpgradeCart : Fragment() {
             var creditPrice = 0
             var cashPrice = 0
             var totalPrice = 0
+            var hangarPrice = 0
+            var otherPrice = 0
             for (item in it) {
                 when (item.origin) {
                     UpgradeItemProperty.OriginType.NORMAL -> {
                         creditPrice += item.price
                         totalPrice += item.price
+                        otherPrice += item.price
                     }
                     UpgradeItemProperty.OriginType.HANGAR -> {
                         totalPrice += item.price
+                        hangarPrice += item.price
                     }
                     UpgradeItemProperty.OriginType.HISTORY -> {
                         cashPrice += item.price
                         totalPrice += item.price
+                        otherPrice += item.price
                     }
                     UpgradeItemProperty.OriginType.BUYBACK -> {
                         cashPrice += item.price
                         totalPrice += item.price
+                        otherPrice += item.price
                     }
                     UpgradeItemProperty.OriginType.NOT_AVAILABLE -> {
                         TODO()
                     }
                 }
             }
+            if (viewModel.isFromShipInHangar) {
+                hangarPrice += viewModel.fromShipAlias.getHighestSku()
+                binding.textviewIsContainFromShip.text = "机库中存在起始舰船"
+            } else {
+                otherPrice += viewModel.fromShipAlias.getHighestSku()
+                creditPrice += viewModel.fromShipAlias.getHighestSku()
+                totalPrice += viewModel.fromShipAlias.getHighestSku()
+                binding.textviewIsContainFromShip.text = "机库中不存在起始舰船"
+            }
+
             binding.totalCreditCostTitle.text = "${"$"}${Parser.priceFormatter(creditPrice)}"
             binding.totalCashCost.text = "${"$"}${Parser.priceFormatter(cashPrice)}"
             binding.totalCost.text = "${"$"}${Parser.priceFormatter(totalPrice)}"
+            binding.textviewHangarUpgradeCost.text = "${"$"}${Parser.priceFormatter(hangarPrice)}"
+            binding.textviewOtherUpgradeCost.text = "${"$"}${Parser.priceFormatter(otherPrice)}"
             binding.summaryLayout.visibility = View.VISIBLE
         }
         viewModel.warningMessage.observe(viewLifecycleOwner) {

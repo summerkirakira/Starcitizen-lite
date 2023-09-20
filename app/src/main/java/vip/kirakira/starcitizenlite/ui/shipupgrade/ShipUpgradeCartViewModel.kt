@@ -28,10 +28,13 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
     private val allBuyBacks = getDatabase(application).buybackItemDao.getAll()
     private val ownedUpgradeList = mutableListOf<OwnedUpgrade>()
     private val ownedBuybackUpgradeList = mutableListOf<OwnedUpgrade>()
+    private val ownedHangarShip = mutableListOf<ShipAlias>()
     private val preferences = application.getSharedPreferences(
         application.getString(R.string.preference_file_key),
         android.content.Context.MODE_PRIVATE
     )
+    lateinit var fromShipAlias: ShipAlias
+    var isFromShipInHangar = false
 
     init {
 //        fetchShipUpgradePath()
@@ -67,10 +70,14 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
                 val onlyCanBuyShips = preferences.getBoolean("upgrade_search_only_can_buy_ships", false)
                 val upgradeMultiplier = preferences.getFloat("upgrade_search_upgrade_multiplier", 1.5f)
                 val useBuyback = preferences.getBoolean("upgrade_search_use_buyback", true)
-
-                if (useBuyback) {
-
+                val useHangar = preferences.getBoolean("upgrade_search_use_hangar", true)
+                if (getHangarShipById(fromShipId) != null) {
+                    isFromShipInHangar = true
+                } else {
+                    isFromShipInHangar = false
                 }
+                fromShipAlias = getShipAliasById(fromShipId)!!
+
                 val result = CirnoApi.retrofitService.getUpgradePath(
                     ShipUpgradePathPostBody(
                         from_ship_id = fromShipId,
@@ -79,6 +86,8 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
                         hangar_upgrade_list = ownedUpgradeList.toHangarUpgrade(),
                         buyback_upgrade_list = ownedBuybackUpgradeList.toHangarUpgrade(),
                         use_history_ccu = useHistoryCcu,
+                        use_buyback_ccu = useBuyback,
+                        use_hangar_ccu = useHangar,
                         only_can_buy_ships = onlyCanBuyShips,
                         upgrade_multiplier = upgradeMultiplier)
                 )
@@ -249,6 +258,7 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
 
     private fun updateOwnedHangarUpgradeList() {
         ownedUpgradeList.clear()
+        ownedHangarShip.clear()
         val hangarUpgradeNameList = mutableListOf<String>()
         for (hangerPackageWithItem in allHangarPackageWithItems.value!!) {
             if (hangarUpgradeNameList.contains(hangerPackageWithItem.hangerPackage.title)) continue
@@ -256,6 +266,12 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
             if (hangerPackageWithItem.hangerPackage.is_upgrade) {
                 getOwnedUpgradeByHangarPackage(hangerPackageWithItem.hangerPackage)?.let {
                     ownedUpgradeList.add(it)
+                }
+            } else {
+                hangerPackageWithItem.hangerItems.forEach {
+                    if (it.kind == "Ship") {
+                        getShipAliasByName(it.title)?.let { it1 -> ownedHangarShip.add(it1) }
+                    }
                 }
             }
         }
@@ -313,6 +329,15 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
             currentPrice = upgradeItem.toShip.getHighestSku() - upgradeItem.fromShip.getHighestSku(),
             shipPrice = upgradeItem.toShip.getHighestSku()
         )
+    }
+
+    private fun getHangarShipById(id: Int): ShipAlias? {
+        for (ship in ownedHangarShip) {
+            if (ship.id == id) {
+                return ship
+            }
+        }
+        return null
     }
 
     private fun getBuybackUpgradeItem(id: Int): UpgradeItemProperty {

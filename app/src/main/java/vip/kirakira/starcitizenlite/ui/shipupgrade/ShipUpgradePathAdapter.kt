@@ -95,7 +95,4 @@ class ShipUpgradePathAdapter: ListAdapter<UpgradeItemProperty, ShipUpgradePathAd
         }
 
     }
-
-    val testUpgradeList = mutableListOf<UpgradeItemProperty>()
-    val testShipUpgradePathPostBody = ShipUpgradePathPostBody(1, 37, listOf(1, 2, 3), listOf(ShipUpgradePathPostBody.HangarUpgrade(10001, 1, 37, 0)), listOf(), true, true, 1.5f)
 }

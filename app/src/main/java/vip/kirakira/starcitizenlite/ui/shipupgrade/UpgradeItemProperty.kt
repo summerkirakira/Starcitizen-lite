@@ -37,6 +37,7 @@ data class OwnedUpgrade(
 
 data class UpgradeOptions(
     val useHistoryCcu: Boolean,
+    val useHangarCcu: Boolean,
     val onlyCanBuyShips: Boolean,
     val upgradeMultiplier: Float,
     val bannedList: List<Int>,

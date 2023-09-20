@@ -176,7 +176,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="5dp"
-                            android:checked="@{upgradeOption.useBuyBack}"
+                            android:checked="@{upgradeOption.useHangarCcu}"
                             app:layout_constraintStart_toEndOf="@id/option_use_history_ccu_text"
                             app:layout_constraintTop_toBottomOf="@+id/checkbox_use_buyback_upgrade" />
                     <androidx.appcompat.widget.AppCompatTextView

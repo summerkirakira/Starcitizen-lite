@@ -75,14 +75,16 @@ class ShipUpgradeOptionsBottomSheet: RoundedCornerBottomSheet() {
         val useHistoryCcu = preferences.getBoolean("upgrade_search_use_history_ccu", true)
         val onlyCanBuyShips = preferences.getBoolean("upgrade_search_only_can_buy_ships", true)
         val upgradeMultiplier = preferences.getFloat("upgrade_search_upgrade_multiplier", 1.5f) // A float value ranging form 1 to 20
-        val useBuyback = preferences.getBoolean("upgrade_search_use_buyback", false)
+        val useBuyback = preferences.getBoolean("upgrade_search_use_buyback", true)
+        val useHangar = preferences.getBoolean("upgrade_search_use_hangar", true)
 
         binding.upgradeOption = UpgradeOptions(
             useHistoryCcu=useHistoryCcu,
             onlyCanBuyShips=onlyCanBuyShips,
             upgradeMultiplier=upgradeMultiplier,
             useBuyBack=useBuyback,
-            bannedList=bannedList
+            bannedList=bannedList,
+            useHangarCcu = useHangar
         )
 
         binding.imageCloseBtn.setOnClickListener {
@@ -131,6 +133,8 @@ class ShipUpgradeOptionsBottomSheet: RoundedCornerBottomSheet() {
                 putInt("upgrade_search_from_ship_id", fromShipAlias!!.id)
                 putBoolean("upgrade_search_use_history_ccu", binding.checkboxUseHistoryCcu.isChecked)
                 putBoolean("upgrade_search_only_can_buy_ships", binding.checkboxOnlyCanBuyShips.isChecked)
+                putBoolean("upgrade_search_use_buyback", binding.checkboxUseBuybackUpgrade.isChecked)
+                putBoolean("upgrade_search_use_hangar", binding.checkboxUseHangarUpgrade.isChecked)
                 putFloat("upgrade_search_upgrade_multiplier", convertBarValueToMultiplier(binding.seekUpgradeMultiplier.progress))
                 commit()
             }
