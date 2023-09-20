@@ -73,6 +73,7 @@
                         app:layout_constraintStart_toStartOf="parent"/>
                 <Button android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        style="@style/AlertButton"
                         android:id="@+id/select_from_ship_btn"
                         android:text="@string/select_from_ship"
                         app:layout_constraintTop_toBottomOf="@+id/upgrade_choose_from_ship_heading"
@@ -99,6 +100,7 @@
                 <Button android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/select_to_ship_btn"
+                        style="@style/AlertButton"
                         android:text="@string/select_to_ship"
                         app:layout_constraintTop_toBottomOf="@+id/upgrade_choose_to_ship_heading"
                         app:layout_constraintStart_toEndOf="@+id/textview_from_ship" />
@@ -194,6 +196,8 @@
                             android:layout_marginTop="5dp"
                             app:dsb_max="100"
                             app:dsb_min="0"
+                            app:dsb_progressColor="@color/bottom_icon_selected_color"
+                            app:dsb_indicatorColor="@color/hangar_log_buyback_icon"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/option_use_history_ccu_text"
                             app:layout_constraintTop_toBottomOf="@+id/checkbox_use_hangar_upgrade" />
@@ -225,6 +229,7 @@
                     <Button android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:id="@+id/select_banned_ccu_btn"
+                            style="@style/AlertButton"
                             android:text="@string/check_banned_ccu"
                             app:layout_constraintTop_toBottomOf="@+id/upgrade_multiplier_explain_text"
                             app:layout_constraintStart_toEndOf="@+id/option_upgrade_multiplier_text" />
@@ -245,6 +250,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:id="@+id/button_apply"
+                style="@style/AlertButton"
                 android:layout_margin="@dimen/padding"
                 android:text="@string/apply"
                 android:insetTop="0dp"

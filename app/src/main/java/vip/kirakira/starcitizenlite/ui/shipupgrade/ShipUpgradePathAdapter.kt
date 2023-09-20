@@ -11,9 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.vipulasri.timelineview.TimelineView
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.databinding.UpgradeSearchListItemBinding
-import vip.kirakira.starcitizenlite.network.CirnoProperty.ShipUpgradePathPostBody
 
-class ShipUpgradePathAdapter: ListAdapter<UpgradeItemProperty, ShipUpgradePathAdapter.ViewHolder>(DiffCallback) {
+class ShipUpgradePathAdapter(private val onDeleteBtnClickListener: OnClickListener): ListAdapter<UpgradeItemProperty, ShipUpgradePathAdapter.ViewHolder>(DiffCallback) {
 
     class ViewHolder private constructor(val binding: UpgradeSearchListItemBinding, viewType: Int) : RecyclerView.ViewHolder(binding.root) {
 
@@ -78,12 +77,20 @@ class ShipUpgradePathAdapter: ListAdapter<UpgradeItemProperty, ShipUpgradePathAd
         } else {
             holder.binding.timeline.marker = ContextCompat.getDrawable(holder.itemView.context, R.drawable.baseline_highlight_off_24)
         }
+        holder.binding.deleteUpgradeBtn.setOnClickListener {
+            onDeleteBtnClickListener.onClick(item)
+        }
         return holder.bind(item = item)
     }
 
     override fun getItemViewType(position: Int): Int {
         return TimelineView.getTimeLineViewType(position, itemCount)
     }
+
+    class OnClickListener(val clickListener: (hangerListProperty: UpgradeItemProperty) -> Unit) {
+        fun onClick(upgradeItemProperty: UpgradeItemProperty) = clickListener(upgradeItemProperty)
+    }
+
 
     companion object DiffCallback : DiffUtil.ItemCallback<UpgradeItemProperty>() {
         override fun areItemsTheSame(oldItem: UpgradeItemProperty, newItem: UpgradeItemProperty): Boolean {

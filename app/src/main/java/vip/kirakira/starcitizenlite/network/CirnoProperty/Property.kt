@@ -1,6 +1,7 @@
 package vip.kirakira.starcitizenlite.network.CirnoProperty
 
 import com.squareup.moshi.JsonClass
+import vip.kirakira.starcitizenlite.ui.shipupgrade.BannedUpgrade
 import java.util.Currency
 
 data class Announcement(

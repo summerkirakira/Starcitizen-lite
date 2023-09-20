@@ -8,6 +8,7 @@ import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
@@ -65,13 +66,6 @@ class ShipUpgradeOptionsBottomSheet: RoundedCornerBottomSheet() {
     private fun setOptions() {
         val fromShipId = preferences.getInt("upgrade_search_from_ship_id", 1)
         val toShipId = preferences.getInt("upgrade_search_to_ship_id", 37)
-        val bannedList: List<Int> = preferences.getString("upgrade_search_banned_list", "")!!.split(",").mapNotNull {
-            if (it == "") {
-                null
-            } else {
-                it.toInt()
-            }
-        }
         val useHistoryCcu = preferences.getBoolean("upgrade_search_use_history_ccu", true)
         val onlyCanBuyShips = preferences.getBoolean("upgrade_search_only_can_buy_ships", true)
         val upgradeMultiplier = preferences.getFloat("upgrade_search_upgrade_multiplier", 1.5f) // A float value ranging form 1 to 20
@@ -83,7 +77,7 @@ class ShipUpgradeOptionsBottomSheet: RoundedCornerBottomSheet() {
             onlyCanBuyShips=onlyCanBuyShips,
             upgradeMultiplier=upgradeMultiplier,
             useBuyBack=useBuyback,
-            bannedList=bannedList,
+            bannedList= listOf(),
             useHangarCcu = useHangar
         )
 
@@ -103,6 +97,29 @@ class ShipUpgradeOptionsBottomSheet: RoundedCornerBottomSheet() {
                 binding.textviewFromShip.text = fromShipAlias!!.chineseName
                 dialog.dismiss()
             }.build().show()
+        }
+
+        binding.selectBannedCcuBtn.setOnClickListener {
+            val bannedCcuList = getBannedUpgradeList()
+            if (bannedCcuList.size == 0) {
+                createWarningAlerter(requireActivity(), "没有屏蔽任何升级哦", "在规划器中点击升级包右上方的删除按钮可以屏蔽升级包~").show()
+                return@setOnClickListener
+            }
+            val builder = QMUIBottomSheet.BottomListSheetBuilder(context, false)
+            for (upgrade in bannedCcuList) builder.addItem(upgrade.name)
+            builder.setOnSheetItemClickListener { dialog, _, position, _ ->
+                removeBannedUpgrade(position)
+                Toast.makeText(context, "已将${bannedCcuList.get(position).name}移出CCU链黑名单哦~", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+            }
+                .setAddCancelBtn(true)
+                .addContentHeaderView(
+                    LayoutInflater.from(context).inflate(
+                        R.layout.remove_banned_ccu_bottomsheet_header,
+                        null
+                    )
+                )
+                .build().show()
         }
 
         binding.selectToShipBtn.setOnClickListener {
@@ -164,6 +181,42 @@ class ShipUpgradeOptionsBottomSheet: RoundedCornerBottomSheet() {
             if (ship.id == id) return ship
         }
         return null
+    }
+
+    private fun getBannedUpgradeList(): MutableList<BannedUpgrade> {
+        val bannedUpgradeList = mutableListOf<BannedUpgrade>()
+        val bannedUpgradeString = preferences.getString("upgrade_search_banned_list", "")
+        if (bannedUpgradeString == "") return bannedUpgradeList
+
+        bannedUpgradeString!!.split(",").map {
+            bannedUpgradeList.add(ShipUpgradeCartViewModel.convertStringToBannedUpgrade(it))
+        }
+        return bannedUpgradeList
+    }
+
+    private fun removeBannedUpgrade(index: Int) {
+        val bannedUpgradeList = getBannedUpgradeList()
+        bannedUpgradeList.removeAt(index)
+        val bannedUpgradeString = bannedUpgradeList.joinToString(",") {
+            when (it.type) {
+                UpgradeItemProperty.OriginType.NORMAL -> {
+                    "${it.id}#1#${it.name}"
+                }
+                UpgradeItemProperty.OriginType.HANGAR -> {
+                    "${it.id}#3#${it.name}"
+                }
+                UpgradeItemProperty.OriginType.HISTORY -> {
+                    "${it.id}#2#${it.name}"
+                }
+                UpgradeItemProperty.OriginType.BUYBACK -> {
+                    "${it.id}#4#${it.name}"
+                }
+                UpgradeItemProperty.OriginType.NOT_AVAILABLE -> {
+                    TODO()
+                }
+            }
+        }
+        preferences.edit().putString("upgrade_search_banned_list", bannedUpgradeString).commit()
     }
 
 

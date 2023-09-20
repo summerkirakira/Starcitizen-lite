@@ -1,6 +1,7 @@
 package vip.kirakira.starcitizenlite.ui.shipupgrade
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -8,7 +9,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog
 import vip.kirakira.starcitizenlite.R
+import vip.kirakira.starcitizenlite.createWarningAlerter
 import vip.kirakira.starcitizenlite.databinding.FragmentShipUpgradeCartBinding
 import vip.kirakira.starcitizenlite.ui.home.Parser
 import vip.kirakira.starcitizenlite.ui.widgets.RefugeVip
@@ -22,13 +25,32 @@ class  ShipUpgradeCart : Fragment() {
     private lateinit var viewModel: ShipUpgradeCartViewModel
     private lateinit var binding: FragmentShipUpgradeCartBinding
     private lateinit var shipUpgradePathAdapter: ShipUpgradePathAdapter
+    private lateinit var bannedUpgradeList: MutableList<BannedUpgrade>
+    private lateinit var preferences: SharedPreferences
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_ship_upgrade_cart, container, false)
-        shipUpgradePathAdapter = ShipUpgradePathAdapter()
+        shipUpgradePathAdapter = ShipUpgradePathAdapter(ShipUpgradePathAdapter.OnClickListener {
+            if (it.id == 0) {
+                createWarningAlerter(requireActivity(), "无法删除基础CCU哦", "删除后会导致CCU链断裂").show()
+                return@OnClickListener
+            }
+            val builder = QMUIDialog.MessageDialogBuilder(requireContext())
+            builder.setTitle("屏蔽升级包")
+                .setMessage("确定要将升级: ${it.fromShipName} -> ${it.toShipName} (${"$"}${it.originalPrice}) 加入黑名单吗？之后可以在规划器菜单中手动移出黑名单哦")
+                .addAction("取消") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .addAction("确定") { dialog, _ ->
+                    addBannedUpgrade(BannedUpgrade(it.id, it.origin, "${it.fromShipName} -> ${it.toShipName} (${"$"}${Parser.priceFormatter(it.originalPrice)})"))
+                    viewModel.fetchShipUpgradePath()
+                    dialog.dismiss()
+                }
+                .show()
+        })
         binding.shipUpgradePathRecyclerview.adapter = shipUpgradePathAdapter
         binding.shipUpgradePathRecyclerview.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
 //        shipUpgradePathAdapter.submitList(shipUpgradePathAdapter.testUpgradeList)
@@ -38,6 +60,22 @@ class  ShipUpgradeCart : Fragment() {
             showSettingsBottomSheet()
         }
         showSettingsBottomSheet()
+        bannedUpgradeList = mutableListOf()
+
+        preferences = requireActivity().getSharedPreferences("vip.kirakira.starcitizenlite.kirakira",
+            android.content.Context.MODE_PRIVATE
+        )
+
+        val bannedUpgradeString = preferences.getString("upgrade_search_banned_list", "")
+        if (bannedUpgradeString != "") {
+            bannedUpgradeString!!.split(",").map {
+                bannedUpgradeList.add(ShipUpgradeCartViewModel.convertStringToBannedUpgrade(it))
+            }
+        }
+
+
+
+
         return binding.root
     }
 
@@ -94,6 +132,9 @@ class  ShipUpgradeCart : Fragment() {
             binding.totalCost.text = "${"$"}${Parser.priceFormatter(totalPrice)}"
             binding.textviewHangarUpgradeCost.text = "${"$"}${Parser.priceFormatter(hangarPrice)}"
             binding.textviewOtherUpgradeCost.text = "${"$"}${Parser.priceFormatter(otherPrice)}"
+            binding.textviewOriginalCost.text = "${"$"}${Parser.priceFormatter(viewModel.toShipAlias.getHighestSku() - viewModel.fromShipAlias.getHighestSku())}"
+            binding.textviewFromShip.text = viewModel.fromShipAlias.chineseName
+            binding.textviewToShip.text = viewModel.toShipAlias.chineseName
             binding.summaryLayout.visibility = View.VISIBLE
         }
         viewModel.warningMessage.observe(viewLifecycleOwner) {
@@ -114,6 +155,35 @@ class  ShipUpgradeCart : Fragment() {
         } else if (message.type == 1) {
             RefugeVip.createWarningAlert(requireActivity(), title = message.message)
         }
+    }
+
+    private fun addBannedUpgrade(upgrade: BannedUpgrade) {
+        for (item in bannedUpgradeList) {
+            if (item.id == upgrade.id && item.type == upgrade.type) {
+                return
+            }
+        }
+        bannedUpgradeList.add(upgrade)
+        val bannedUpgradeString = bannedUpgradeList.joinToString(",") {
+            when (it.type) {
+                UpgradeItemProperty.OriginType.NORMAL -> {
+                    "${it.id}#1#${it.name}"
+                }
+                UpgradeItemProperty.OriginType.HANGAR -> {
+                    "${it.id}#3#[机库中] ${it.name}"
+                }
+                UpgradeItemProperty.OriginType.HISTORY -> {
+                    "${it.id}#2#[历史升级] ${it.name}"
+                }
+                UpgradeItemProperty.OriginType.BUYBACK -> {
+                    "${it.id}#4#${it.name}"
+                }
+                UpgradeItemProperty.OriginType.NOT_AVAILABLE -> {
+                    TODO()
+                }
+            }
+        }
+        preferences.edit().putString("upgrade_search_banned_list", bannedUpgradeString).apply()
     }
 
 }

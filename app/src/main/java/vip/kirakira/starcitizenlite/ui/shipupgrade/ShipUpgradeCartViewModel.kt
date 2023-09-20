@@ -34,7 +34,11 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
         android.content.Context.MODE_PRIVATE
     )
     lateinit var fromShipAlias: ShipAlias
+    lateinit var toShipAlias: ShipAlias
     var isFromShipInHangar = false
+
+    private val bannedUpgradeList = mutableListOf<BannedUpgrade>()
+    var originalUpgradePrice = 0
 
     init {
 //        fetchShipUpgradePath()
@@ -59,13 +63,15 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
             try {
                 val fromShipId = preferences.getInt("upgrade_search_from_ship_id", 1)
                 val toShipId = preferences.getInt("upgrade_search_to_ship_id", 98)
-                val bannedList: List<Int> = preferences.getString("upgrade_search_banned_list", "")!!.split(",").mapNotNull {
-                    if (it == "") {
-                        null
-                    } else {
-                        it.toInt()
+
+                bannedUpgradeList.clear()
+                val bannedUpgradeString = preferences.getString("upgrade_search_banned_list", "")
+                if (bannedUpgradeString != "") {
+                    bannedUpgradeString!!.split(",").map {
+                        bannedUpgradeList.add(convertStringToBannedUpgrade(it))
                     }
                 }
+
                 val useHistoryCcu = preferences.getBoolean("upgrade_search_use_history_ccu", true)
                 val onlyCanBuyShips = preferences.getBoolean("upgrade_search_only_can_buy_ships", false)
                 val upgradeMultiplier = preferences.getFloat("upgrade_search_upgrade_multiplier", 1.5f)
@@ -77,12 +83,13 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
                     isFromShipInHangar = false
                 }
                 fromShipAlias = getShipAliasById(fromShipId)!!
+                toShipAlias = getShipAliasById(toShipId)!!
 
                 val result = CirnoApi.retrofitService.getUpgradePath(
                     ShipUpgradePathPostBody(
                         from_ship_id = fromShipId,
                         to_ship_id = toShipId,
-                        banned_list = bannedList,
+                        banned_list = bannedUpgradeList.toIdList(),
                         hangar_upgrade_list = ownedUpgradeList.toHangarUpgrade(),
                         buyback_upgrade_list = ownedBuybackUpgradeList.toHangarUpgrade(),
                         use_history_ccu = useHistoryCcu,
@@ -193,11 +200,7 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
         return RepoUtil.getShipAlias(id)
     }
 
-    private fun getCurrentPrice(shipAlias: ShipAlias): Int {
-        return RepoUtil.getHighestAliasPrice(shipAlias)
-    }
-
-    fun getFullUpgradeName(upgradeTitle: String): List<String> {
+    private fun getFullUpgradeName(upgradeTitle: String): List<String> {
         val nameList = mutableListOf<String>()
         for(shipName in upgradeTitle.replace("Upgrade - ", "").replace(" Upgrade", "").split(" to ")){
             nameList.add(Parser.getFormattedShipName(shipName))
@@ -205,7 +208,7 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
         return nameList
     }
 
-    fun getOwnedUpgradeByHangarPackage(hangarPackage: HangerPackage): OwnedUpgrade? {
+    private fun getOwnedUpgradeByHangarPackage(hangarPackage: HangerPackage): OwnedUpgrade? {
         val shipNameList = getFullUpgradeName(hangarPackage.title)
         if (shipNameList.isEmpty()) {
             return null
@@ -229,7 +232,7 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
         )
     }
 
-    fun getOwnedUpgradeByBuyBackItem(buybackItem: BuybackItem): OwnedUpgrade? {
+    private fun getOwnedUpgradeByBuyBackItem(buybackItem: BuybackItem): OwnedUpgrade? {
         val shipNameList = getFullUpgradeName(buybackItem.title)
         if (shipNameList.isEmpty()) {
             return null
@@ -362,13 +365,50 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
     }
 
     fun List<OwnedUpgrade>.toHangarUpgrade(): List<ShipUpgradePathPostBody.HangarUpgrade> {
-        return this.map {
-            ShipUpgradePathPostBody.HangarUpgrade(
-                id = it.id,
-                from_ship = it.fromShip.id,
-                to_ship = it.toShip.id,
-                price = it.price
-            )
+        val bannedIdList = bannedUpgradeList.toIdList()
+        return this
+            .filter {
+                it.id !in bannedIdList
+            }
+            .map {
+                ShipUpgradePathPostBody.HangarUpgrade(
+                    id = it.id,
+                    from_ship = it.fromShip.id,
+                    to_ship = it.toShip.id,
+                    price = it.price
+                )
         }
     }
+
+    companion object {
+        fun convertStringToBannedUpgrade(string: String): BannedUpgrade {
+            val type = when(string.split("#")[1]) {
+                "1" -> UpgradeItemProperty.OriginType.NORMAL
+                "2" -> UpgradeItemProperty.OriginType.HISTORY
+                "3" -> UpgradeItemProperty.OriginType.HANGAR
+                "4" -> UpgradeItemProperty.OriginType.BUYBACK
+                else -> UpgradeItemProperty.OriginType.NOT_AVAILABLE
+            }
+            return BannedUpgrade(
+                id = string.split("#")[0].toInt(),
+                type = type,
+                name = string.split("#")[2]
+            )
+//            return BannedUpgrade(
+//                id = 1,
+//                type = UpgradeItemProperty.OriginType.NOT_AVAILABLE,
+//                name =  ""
+//            )
+        }
+    }
+
+
+    fun List<BannedUpgrade>.toIdList(): List<Int> {
+        val idList = mutableListOf<Int>()
+        for (bannedUpgrade in this) {
+            idList.add(bannedUpgrade.id)
+        }
+        return idList
+    }
+
 }

@@ -48,3 +48,9 @@ data class WarningMessage(
     val message: String,
     val type: Int
 )
+
+data class BannedUpgrade(
+    val id: Int,
+    val type: UpgradeItemProperty.OriginType,
+    val name: String
+)
