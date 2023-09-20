@@ -119,12 +119,14 @@ class  ShipUpgradeCart : Fragment() {
             }
             if (viewModel.isFromShipInHangar) {
                 hangarPrice += viewModel.fromShipAlias.getHighestSku()
-                binding.textviewIsContainFromShip.text = "拥有起始舰船"
+                binding.shipFromCheckSuccess.visibility = View.VISIBLE
+                binding.shipFromCheckFailed.visibility = View.INVISIBLE
             } else {
                 otherPrice += viewModel.fromShipAlias.getHighestSku()
                 creditPrice += viewModel.fromShipAlias.getHighestSku()
                 totalPrice += viewModel.fromShipAlias.getHighestSku()
-                binding.textviewIsContainFromShip.text = "无起始舰船"
+                binding.shipFromCheckSuccess.visibility = View.INVISIBLE
+                binding.shipFromCheckFailed.visibility = View.VISIBLE
             }
 
             binding.totalCreditCostTitle.text = "${"$"}${Parser.priceFormatter(creditPrice)}"
