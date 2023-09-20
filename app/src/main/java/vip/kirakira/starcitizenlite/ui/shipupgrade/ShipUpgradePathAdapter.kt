@@ -39,7 +39,7 @@ class ShipUpgradePathAdapter(private val onDeleteBtnClickListener: OnClickListen
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
-        if (item.isAvailable) {
+        if (item.isAvailable && item.origin != UpgradeItemProperty.OriginType.HANGAR) {
             holder.binding.isAvailableTag.text = "可购买"
             holder.binding.isAvailableTag.visibility = View.VISIBLE
         } else {

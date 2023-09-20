@@ -635,6 +635,8 @@ class MainActivity : RefugeBaseActivity() {
         }
         try {
             updateAlias(latestVersion.shipAliasUrl)
+            homeViewModel.refresh()
+            homeViewModel.refreshBuybackItems()
         } catch (e: Exception) {
             e.printStackTrace()
         }

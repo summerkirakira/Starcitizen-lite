@@ -119,12 +119,12 @@ class  ShipUpgradeCart : Fragment() {
             }
             if (viewModel.isFromShipInHangar) {
                 hangarPrice += viewModel.fromShipAlias.getHighestSku()
-                binding.textviewIsContainFromShip.text = "机库中存在起始舰船"
+                binding.textviewIsContainFromShip.text = "拥有起始舰船"
             } else {
                 otherPrice += viewModel.fromShipAlias.getHighestSku()
                 creditPrice += viewModel.fromShipAlias.getHighestSku()
                 totalPrice += viewModel.fromShipAlias.getHighestSku()
-                binding.textviewIsContainFromShip.text = "机库中不存在起始舰船"
+                binding.textviewIsContainFromShip.text = "无起始舰船"
             }
 
             binding.totalCreditCostTitle.text = "${"$"}${Parser.priceFormatter(creditPrice)}"
@@ -157,7 +157,18 @@ class  ShipUpgradeCart : Fragment() {
         }
     }
 
+    private fun updateBannedUpgradeList() {
+        bannedUpgradeList.clear()
+        val bannedUpgradeString = preferences.getString("upgrade_search_banned_list", "")
+        if (bannedUpgradeString != "") {
+            bannedUpgradeString!!.split(",").map {
+                bannedUpgradeList.add(ShipUpgradeCartViewModel.convertStringToBannedUpgrade(it))
+            }
+        }
+    }
+
     private fun addBannedUpgrade(upgrade: BannedUpgrade) {
+        updateBannedUpgradeList()
         for (item in bannedUpgradeList) {
             if (item.id == upgrade.id && item.type == upgrade.type) {
                 return
@@ -176,7 +187,7 @@ class  ShipUpgradeCart : Fragment() {
                     "${it.id}#2#[历史升级] ${it.name}"
                 }
                 UpgradeItemProperty.OriginType.BUYBACK -> {
-                    "${it.id}#4#${it.name}"
+                    "${it.id}#4#[回购中]${it.name}"
                 }
                 UpgradeItemProperty.OriginType.NOT_AVAILABLE -> {
                     TODO()
