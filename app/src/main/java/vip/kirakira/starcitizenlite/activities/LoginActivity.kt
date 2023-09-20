@@ -100,6 +100,7 @@ class LoginActivity : RefugeBaseActivity() {
                     if (token.captcha_list.isEmpty()) {
                         stopLoading()
                         RefugeVip.createWarningAlert(this@LoginActivity, getString(R.string.no_cirno_token), token.message)
+                        return@launchWhenCreated
                     }
                     val loginDetail: LoginProperty
                     try {
