@@ -10,7 +10,7 @@ import org.junit.runner.RunWith
 
 import org.junit.Assert.*
 import org.junit.Rule
-import vip.kirakira.starcitizenlite.database.MIGRATION_2_5
+import vip.kirakira.starcitizenlite.database.MIGRATION_2_6
 import vip.kirakira.starcitizenlite.database.ShopItemDatabase
 import java.io.IOException
 
@@ -44,7 +44,7 @@ class MigrationTest {
 
         // Re-open the database with version 2 and provide
         // MIGRATION_1_2 as the migration process.
-        db = helper.runMigrationsAndValidate(TEST_DB, 5, true, MIGRATION_2_5)
+        db = helper.runMigrationsAndValidate(TEST_DB, 5, true, MIGRATION_2_6)
 
         // MigrationTestHelper automatically verifies the schema changes,
         // but you need to validate that the data was migrated properly.

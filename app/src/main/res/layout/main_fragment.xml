@@ -205,7 +205,7 @@
                         android:src="@drawable/ic_idea"
                         style="@style/main_page_image"/>
                 <TextView
-                        android:text="@string/tutorial"
+                        android:text="升级规划"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         style="@style/main_page_icon"/>
@@ -222,7 +222,7 @@
                         android:src="@drawable/ic_upgrade_icon"
                         style="@style/main_page_image"/>
                 <TextView
-                        android:text="@string/localization_tutorial"
+                        android:text="@string/localization_search"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         style="@style/main_page_icon"/>

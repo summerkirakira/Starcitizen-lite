@@ -45,7 +45,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         getCatalog()
         sortByName()
         sortByPriceDesc()
-        itemsAfterFilter = Transformations.switchMap(filter) {
+        itemsAfterFilter = filter.switchMap {
             filterBySubtitle(filter.value!!, false)
         }
 
@@ -57,7 +57,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun filterBySubtitle(filter: ShopItemFilter, canBuy: Boolean = false): LiveData<List<ShopItem>> {
-        return Transformations.map(dataResource) {
+        return dataResource.map {
             it.filter {
                     item -> ((
                         filter.name.isEmpty() &&
@@ -75,7 +75,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     }
 
     private fun filterBySearch(search: String, canBuy: Boolean = false) {
-        itemsAfterFilter = Transformations.map(dataResource) {
+        itemsAfterFilter = dataResource.map {
             it.filter {
                     item -> item.name.contains(search, true) ||
                     item.subtitle.contains(search, true) &&
@@ -87,19 +87,19 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun sortByName() {
-        catalog = Transformations.map(itemsAfterFilter) {
+        catalog = itemsAfterFilter.map {
             it.sortedBy { it.name }
         }
     }
 
     private  fun sortByPriceAsc() {
-        catalog = Transformations.map(itemsAfterFilter) {
+        catalog = itemsAfterFilter.map {
             it.sortedBy { it.price }
         }
     }
 
     private fun sortByPriceDesc() {
-        catalog = Transformations.map(itemsAfterFilter) {
+        catalog = itemsAfterFilter.map {
             it.sortedByDescending { it.price }
         }
     }

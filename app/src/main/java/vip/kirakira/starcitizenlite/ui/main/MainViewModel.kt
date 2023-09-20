@@ -15,7 +15,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val bannerItems = bannerRepository.allItems
 
-    val takeBanners = Transformations.map(bannerItems) {
+    val takeBanners = bannerItems.map {
         it.shuffled().take(6)
     }
 

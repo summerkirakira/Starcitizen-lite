@@ -19,10 +19,7 @@ import com.youth.banner.holder.BannerImageHolder
 import com.youth.banner.indicator.CircleIndicator
 import kotlinx.coroutines.*
 import vip.kirakira.starcitizenlite.R
-import vip.kirakira.starcitizenlite.activities.CartActivity
-import vip.kirakira.starcitizenlite.activities.LocalizationSearchActivity
-import vip.kirakira.starcitizenlite.activities.PlayerSearch
-import vip.kirakira.starcitizenlite.activities.ThreePartySiteActivity
+import vip.kirakira.starcitizenlite.activities.*
 import vip.kirakira.starcitizenlite.createSuccessAlerter
 import vip.kirakira.starcitizenlite.createWarningAlerter
 import vip.kirakira.starcitizenlite.database.BannerImage
@@ -30,6 +27,7 @@ import vip.kirakira.starcitizenlite.database.ShopItemDatabase
 import vip.kirakira.starcitizenlite.databinding.MainFragmentBinding
 import vip.kirakira.starcitizenlite.network.CirnoApi
 import vip.kirakira.starcitizenlite.network.RSIApi
+import vip.kirakira.starcitizenlite.ui.shipupgrade.ShipUpgradeCart
 
 
 class MainFragment : Fragment() {
@@ -195,8 +193,9 @@ class MainFragment : Fragment() {
         }
 
         binding.tutorialLayout.setOnClickListener {
-            val intent: Intent = Intent(activity, ThreePartySiteActivity::class.java)
-            intent.putExtra("url", "https://www.biaoju.site/")
+            // 修改为升级查询
+            val intent: Intent = Intent(activity, ShipUpgradeSearchActivity::class.java)
+//            intent.putExtra("url", "https://www.biaoju.site/")
             startActivity(intent)
         }
 

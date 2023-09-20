@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+                name="upgradeOption"
+                type="vip.kirakira.starcitizenlite.ui.shipupgrade.UpgradeOptions" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
+                                                       android:layout_height="match_parent">
+        <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="@dimen/bottom_sheet_peek_height"
+                android:id="@+id/text_attributes_heading"
+                android:gravity="center"
+                android:paddingStart="@dimen/padding"
+                android:text="@string/ccu_calculator_settings"
+                android:textSize="18sp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        <View
+                android:layout_width="0sp"
+                android:layout_height="1dp"
+                android:background="@color/colorDivider"
+                app:layout_constraintTop_toBottomOf="@id/text_attributes_heading"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="20dp"
+                android:layout_height="17dp"
+                android:id="@+id/image_close_btn"
+                android:layout_marginRight="@dimen/padding"
+                app:srcCompat="@drawable/ic_expand_more_black_24dp"
+                app:layout_constraintTop_toTopOf="@id/text_attributes_heading"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/text_attributes_heading"/>
+        <androidx.core.widget.NestedScrollView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/nestedScrollView"
+                android:fillViewport="true"
+                android:padding="@dimen/padding"
+                android:clipToPadding="false"
+                app:layout_constraintTop_toBottomOf="@id/text_attributes_heading"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/button_apply">
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/Heading"
+                        android:textStyle="bold"
+                        android:id="@+id/upgrade_choose_from_ship_heading"
+                        android:text="@string/upgrade_choose_from_ship"
+                        android:layout_marginTop="0dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+                <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/Label"
+                        android:textStyle="bold"
+                        android:id="@+id/textview_from_ship"
+                        app:layout_constraintTop_toTopOf="@+id/select_from_ship_btn"
+                        app:layout_constraintBottom_toBottomOf="@+id/select_from_ship_btn"
+                        android:text="@string/use_history_ccu"
+                        tools:text="克拉克"
+                        app:layout_constraintStart_toStartOf="parent"/>
+                <Button android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/AlertButton"
+                        android:id="@+id/select_from_ship_btn"
+                        android:text="@string/select_from_ship"
+                        app:layout_constraintTop_toBottomOf="@+id/upgrade_choose_from_ship_heading"
+                        app:layout_constraintStart_toEndOf="@+id/textview_from_ship" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/Heading"
+                        android:textStyle="bold"
+                        android:id="@+id/upgrade_choose_to_ship_heading"
+                        android:text="@string/upgrade_choose_to_ship"
+                        android:layout_marginTop="10dp"
+                        app:layout_constraintTop_toBottomOf="@+id/textview_from_ship"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+                <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/Label"
+                        android:textStyle="bold"
+                        android:id="@+id/textview_to_ship"
+                        app:layout_constraintTop_toTopOf="@+id/select_to_ship_btn"
+                        app:layout_constraintBottom_toBottomOf="@+id/select_to_ship_btn"
+                        android:text="@string/use_history_ccu"
+                        tools:text="克拉克"
+                        app:layout_constraintStart_toStartOf="parent"/>
+                <Button android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/select_to_ship_btn"
+                        style="@style/AlertButton"
+                        android:text="@string/select_to_ship"
+                        app:layout_constraintTop_toBottomOf="@+id/upgrade_choose_to_ship_heading"
+                        app:layout_constraintStart_toEndOf="@+id/textview_from_ship" />
+                <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/Heading"
+                        android:textStyle="bold"
+                        android:id="@+id/upgrade_preference_heading"
+                        android:text="@string/upgrade_preference"
+                        android:layout_marginTop="10dp"
+                        app:layout_constraintTop_toBottomOf="@+id/select_to_ship_btn"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+                <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toBottomOf="@id/upgrade_preference_heading">
+                    <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/Label"
+                            android:textStyle="bold"
+                            android:id="@+id/option_use_history_ccu_text"
+                            app:layout_constraintTop_toTopOf="@+id/checkbox_use_history_ccu"
+                            app:layout_constraintBottom_toBottomOf="@+id/checkbox_use_history_ccu"
+                            android:text="@string/use_history_ccu"
+                            app:layout_constraintStart_toStartOf="parent"/>
+                    <androidx.appcompat.widget.AppCompatCheckBox
+                            android:id="@+id/checkbox_use_history_ccu"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/padding"
+                            android:checked="@{upgradeOption.useHistoryCcu}"
+                            app:layout_constraintStart_toEndOf="@id/option_use_history_ccu_text"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    <androidx.appcompat.widget.AppCompatCheckBox
+                            android:id="@+id/checkbox_only_can_buy_ships"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:checked="@{upgradeOption.onlyCanBuyShips}"
+                            app:layout_constraintStart_toEndOf="@id/option_use_history_ccu_text"
+                            app:layout_constraintTop_toBottomOf="@+id/checkbox_use_history_ccu" />
+                    <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/Label"
+                            android:textStyle="bold"
+                            android:id="@+id/option_only_can_buy_ships_text"
+                            app:layout_constraintTop_toTopOf="@+id/checkbox_only_can_buy_ships"
+                            app:layout_constraintBottom_toBottomOf="@+id/checkbox_only_can_buy_ships"
+                            android:text="@string/only_can_buy_ships"
+                            app:layout_constraintStart_toStartOf="parent"/>
+                    <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/Label.Subtitle"
+                            android:layout_width="0dp"
+                            android:id="@+id/only_can_buy_ships_explain_text"
+                            app:layout_constraintTop_toBottomOf="@+id/checkbox_only_can_buy_ships"
+                            app:layout_constraintStart_toStartOf="@+id/seek_upgrade_multiplier"
+                            app:layout_constraintEnd_toEndOf="@+id/seek_upgrade_multiplier"
+                            android:text="@string/only_can_buy_ship_explain"/>
+                    <androidx.appcompat.widget.AppCompatCheckBox
+                            android:id="@+id/checkbox_use_buyback_upgrade"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:checked="@{upgradeOption.useBuyBack}"
+                            app:layout_constraintStart_toEndOf="@id/option_use_history_ccu_text"
+                            app:layout_constraintTop_toBottomOf="@+id/only_can_buy_ships_explain_text" />
+                    <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/Label"
+                            android:textStyle="bold"
+                            android:id="@+id/option_use_buyback_upgrade_text"
+                            app:layout_constraintTop_toTopOf="@+id/checkbox_use_buyback_upgrade"
+                            app:layout_constraintBottom_toBottomOf="@+id/checkbox_use_buyback_upgrade"
+                            android:text="@string/use_buyback_upgrade"
+                            app:layout_constraintStart_toStartOf="parent"/>
+                    <androidx.appcompat.widget.AppCompatCheckBox
+                            android:id="@+id/checkbox_use_hangar_upgrade"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:checked="@{upgradeOption.useHangarCcu}"
+                            app:layout_constraintStart_toEndOf="@id/option_use_history_ccu_text"
+                            app:layout_constraintTop_toBottomOf="@+id/checkbox_use_buyback_upgrade" />
+                    <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/Label"
+                            android:textStyle="bold"
+                            android:id="@+id/option_use_hangar_upgrade_text"
+                            app:layout_constraintTop_toTopOf="@+id/checkbox_use_hangar_upgrade"
+                            app:layout_constraintBottom_toBottomOf="@+id/checkbox_use_hangar_upgrade"
+                            android:text="@string/use_hangar_upgrade"
+                            app:layout_constraintStart_toStartOf="parent"/>
+
+                    <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
+                            android:id="@+id/seek_upgrade_multiplier"
+                            style="@style/DiscreteSeekBar"
+                            android:layout_marginTop="5dp"
+                            app:dsb_max="100"
+                            app:dsb_min="0"
+                            app:dsb_progressColor="@color/bottom_icon_selected_color"
+                            app:dsb_indicatorColor="@color/hangar_log_buyback_icon"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/option_use_history_ccu_text"
+                            app:layout_constraintTop_toBottomOf="@+id/checkbox_use_hangar_upgrade" />
+                    <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/Label"
+                            android:textStyle="bold"
+                            android:id="@+id/option_upgrade_multiplier_text"
+                            app:layout_constraintTop_toTopOf="@+id/seek_upgrade_multiplier"
+                            app:layout_constraintBottom_toBottomOf="@+id/seek_upgrade_multiplier"
+                            android:text="@string/history_ccu_weight"
+                            app:layout_constraintStart_toStartOf="parent"/>
+                    <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/Label.Subtitle"
+                            android:layout_width="0dp"
+                            android:id="@+id/upgrade_multiplier_explain_text"
+                            app:layout_constraintTop_toBottomOf="@+id/seek_upgrade_multiplier"
+                            app:layout_constraintStart_toStartOf="@+id/seek_upgrade_multiplier"
+                            app:layout_constraintEnd_toEndOf="@+id/seek_upgrade_multiplier"
+                            android:text="@string/history_ccu_weight_explain"/>
+                    <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/Label"
+                            android:textStyle="bold"
+                            android:id="@+id/textview_banned_ccu"
+                            app:layout_constraintTop_toTopOf="@+id/select_banned_ccu_btn"
+                            app:layout_constraintBottom_toBottomOf="@+id/select_banned_ccu_btn"
+                            android:text="@string/use_history_ccu"
+                            tools:text="克拉克"
+                            app:layout_constraintStart_toStartOf="parent"/>
+                    <Button android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/select_banned_ccu_btn"
+                            style="@style/AlertButton"
+                            android:text="@string/check_banned_ccu"
+                            app:layout_constraintTop_toBottomOf="@+id/upgrade_multiplier_explain_text"
+                            app:layout_constraintStart_toEndOf="@+id/option_upgrade_multiplier_text" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@color/colorDivider"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/nestedScrollView"/>
+
+        <Button
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:id="@+id/button_apply"
+                style="@style/AlertButton"
+                android:layout_margin="@dimen/padding"
+                android:text="@string/apply"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:stateListAnimator="@null"
+                app:cornerRadius="5dp"
+                app:layout_constraintTop_toBottomOf="@id/nestedScrollView"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

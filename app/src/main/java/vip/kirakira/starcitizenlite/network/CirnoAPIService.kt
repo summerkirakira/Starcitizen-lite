@@ -79,6 +79,9 @@ interface CirnoApiService {
 
     @GET("promotion/all")
     suspend fun getAllPromotion(): List<PromotionCode>
+
+    @POST("ship/upgrade/path")
+    suspend fun getUpgradePath(@Body upgradePath: ShipUpgradePathPostBody): ShipUpgradeResponse
 }
 
 

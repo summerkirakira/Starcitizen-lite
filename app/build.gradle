@@ -101,7 +101,7 @@ dependencies {
 
     implementation "org.jsoup:jsoup:1.13.1"
 
-    implementation 'com.qmuiteam:qmui:2.0.0-alpha10'
+    implementation 'com.qmuiteam:qmui:2.1.0'
 
     implementation 'com.github.tapadoo:alerter:7.2.4'
 
@@ -131,7 +131,11 @@ dependencies {
 
     implementation "com.paulrybitskyi.persistentsearchview:persistentsearchview:1.1.4"
 
+    implementation "org.adw.library:discrete-seekbar:1.0.1"
+
     androidTestImplementation "androidx.room:room-testing:2.5.0"
+
+    implementation "com.github.skydoves:powerspinner:1.2.7"
 
 //    implementation 'com.github.Hitomis.transferee:Transferee:1.6.1'
 }

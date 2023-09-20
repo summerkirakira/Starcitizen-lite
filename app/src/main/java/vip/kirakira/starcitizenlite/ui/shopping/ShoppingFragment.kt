@@ -17,7 +17,6 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.preference.PreferenceManager
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog
 import com.tapadoo.alerter.Alerter

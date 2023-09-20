@@ -1,6 +1,7 @@
 package vip.kirakira.starcitizenlite.network.CirnoProperty
 
 import com.squareup.moshi.JsonClass
+import vip.kirakira.starcitizenlite.ui.shipupgrade.BannedUpgrade
 import java.util.Currency
 
 data class Announcement(
@@ -92,7 +93,9 @@ data class ClientInfo(
 )
 
 data class ShipAlias(
+    val id: Int,
     val name: String,
+    var chineseName: String?,
     val alias: List<String>,
     val skus: List<Sku>
 ) {
@@ -101,6 +104,7 @@ data class ShipAlias(
         val price: Int,
     )
     fun getHighestSku(): Int {
+        if (this.skus.isEmpty()) return 0
         var highestPrice = this.skus[0].price
         for (sku in this.skus) {
             if (sku.price > highestPrice) {
@@ -133,11 +137,16 @@ data class ShipUpgradePathPostBody(
     val from_ship_id: Int,
     val to_ship_id: Int,
     val banned_list: List<Int>,
-    val allow_zero_price: Boolean,
-    val allow_warbond: Boolean,
-    val must_have_list: List<MustHave>
+    val hangar_upgrade_list: List<HangarUpgrade>,
+    val buyback_upgrade_list: List<HangarUpgrade>,
+    val use_history_ccu: Boolean,
+    val only_can_buy_ships: Boolean,
+    val upgrade_multiplier: Float,
+    val use_hangar_ccu: Boolean,
+    val use_buyback_ccu: Boolean,
 ) {
-    data class MustHave(
+    data class HangarUpgrade(
+        val id: Int,
         val from_ship: Int,
         val to_ship: Int,
         val price: Int
@@ -156,10 +165,12 @@ data class ShipUpgradeResponse(
     ) {
         data class Step(
             val id: Int,
+            val type: Int,
             val from_ship: Int,
             val to_ship: Int,
             val price: Int,
-            val name: String
+            val name: String,
+            val available: Boolean
         )
     }
 }

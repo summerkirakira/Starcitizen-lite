@@ -1,0 +1,15 @@
+<!-- res/drawable/button_background.xml -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#2196F3" /> <!-- 按下时的背景颜色 -->
+            <corners android:radius="12dp" /> <!-- 圆角半径 -->
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#FF4081" /> <!-- 默认背景颜色 -->
+            <corners android:radius="12dp" /> <!-- 圆角半径 -->
+        </shape>
+    </item>
+</selector>

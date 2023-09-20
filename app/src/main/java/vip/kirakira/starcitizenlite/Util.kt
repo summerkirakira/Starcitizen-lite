@@ -13,6 +13,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
 import vip.kirakira.starcitizenlite.database.User
+import vip.kirakira.starcitizenlite.network.CirnoProperty.ShipAlias
 import vip.kirakira.starcitizenlite.network.RSI_COOKIE_CONSTENT
 import vip.kirakira.starcitizenlite.network.search.getPlayerSearchResult
 import java.lang.reflect.Method
@@ -118,4 +119,13 @@ fun getThemeName(themeName: String): String{
         "LIGHT_GREEN" -> "Theme.StarcitizenLiteLightGreen"
         else -> "Theme.StarcitizenLite"
     }
+}
+
+fun getShipAliasById(id: Int): ShipAlias? {
+    for (ship in shipAlias) {
+        if (ship.id == id) {
+            return ship
+        }
+    }
+    return null
 }

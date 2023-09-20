@@ -31,7 +31,7 @@ class HangarLogParser {
             val timeText = messagePart[0].trim()
             val time = inputFormat.parse(timeText)
             val content = messagePart[1].trim().substring(name.length).trim()
-            var type = "UNKNOWN"
+            var type = "UNKNOWN" 
             var price: Int? = null
             var order: String? = null
             var source: String? = null

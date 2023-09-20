@@ -30,6 +30,7 @@ import com.github.vipulasri.timelineview.TimelineView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.gyf.immersionbar.ImmersionBar
+import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog
 import com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
 import com.tapadoo.alerter.Alerter
@@ -49,6 +50,7 @@ import vip.kirakira.starcitizenlite.network.*
 import vip.kirakira.starcitizenlite.network.CirnoProperty.ClientInfo
 import vip.kirakira.starcitizenlite.network.CirnoProperty.RefugeInfo
 import vip.kirakira.starcitizenlite.network.CirnoProperty.ShipAlias
+import vip.kirakira.starcitizenlite.network.CirnoProperty.ShipUpgradePathPostBody
 import vip.kirakira.starcitizenlite.network.shop.getCartSummary
 import vip.kirakira.starcitizenlite.ui.ScreenSlidePagerAdapter
 import vip.kirakira.starcitizenlite.ui.hangarlog.HangarLogBottomSheet
@@ -355,7 +357,7 @@ class MainActivity : RefugeBaseActivity() {
                         filterButton.setColorFilter(getColor(R.color.avatar_left_line))
                         filterButton.visibility = View.VISIBLE
 
-                        shipUpgradeButton.setImageDrawable(getDrawable(R.drawable.baseline_hangar_log_alt_24))
+                        shipUpgradeButton.setImageDrawable(getDrawable(R.drawable.baseline_history_24))
                         shipUpgradeButton.setColorFilter(getColor(R.color.avatar_left_line))
                         shipUpgradeButton.visibility = View.VISIBLE
 
@@ -557,6 +559,7 @@ class MainActivity : RefugeBaseActivity() {
 
     private fun loadInitialData() {
         shipAlias = loadAliasFromStorage()
+        translateShipName(shipAlias)
     }
 
     private fun loadAliasFromStorage(): List<ShipAlias> {
@@ -568,6 +571,21 @@ class MainActivity : RefugeBaseActivity() {
         } else {
             return listOf()
         }
+    }
+
+    private fun translateShipName(shipAlias: List<ShipAlias>) {
+        for (ship in shipAlias) {
+            if (ship.chineseName == null) {
+                ship.chineseName = translateShipName(ship.name)
+            }
+        }
+    }
+
+    private fun translateShipName(name: String): String {
+        getDatabase(application).translationDao.getByEnglishTitle(name)?.let {
+            return it.title
+        }
+        return name
     }
 
     private suspend fun checkUpdate() {
@@ -617,6 +635,8 @@ class MainActivity : RefugeBaseActivity() {
         }
         try {
             updateAlias(latestVersion.shipAliasUrl)
+            homeViewModel.refresh()
+            homeViewModel.refreshBuybackItems()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -628,10 +648,24 @@ class MainActivity : RefugeBaseActivity() {
             val file = File("${filesDir?.path}/ship_alias.json")
             file.writeText(Gson().toJson(shipAlias))
         }
+        translateShipName(shipAlias)
     }
 
     private suspend fun checkAnnouncement(currentAnnouncementId: Int = 0) {
         val latestAnnouncement = CirnoApi.retrofitService.getAnnouncement()
+//        val shipUpgrade = CirnoApi.retrofitService.getUpgradePath(
+//            ShipUpgradePathPostBody(
+//                from_ship_id = 1,
+//                to_ship_id = 37,
+//                banned_list = listOf(),
+//                hangar_upgrade_list = listOf(),
+//                buyback_upgrade_list = listOf(),
+//                use_history_ccu = true,
+//                only_can_buy_ships = true,
+//                upgrade_multiplier = 1.2f
+//            )
+//        )
+//        Log.d("ShipUpgrade", shipUpgrade.toString())
         if(latestAnnouncement != null && latestAnnouncement.id > currentAnnouncementId) {
             this.runOnUiThread {
                 val builder = QMUIDialog.MessageDialogBuilder(this)

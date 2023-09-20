@@ -129,6 +129,18 @@
         <item name="colorSecondaryVariant">#6001579B</item>
         <item name="colorAccent">@color/light_blue_900</item>
         <item name="background">@color/black</item>"
+
+        <item name="qmui_skin_support_dialog_bg">@color/qmui_config_color_black</item>
+        <item name="qmui_skin_support_dialog_title_text_color">@color/qmui_config_color_white</item>
+        <item name="qmui_skin_support_dialog_message_text_color">@color/qmui_config_color_75_white</item>
+        <item name="qmui_skin_support_dialog_action_bg">@null</item>
+        <item name="qmui_skin_support_dialog_action_text_color">@color/qmui_config_color_white</item>
+        <item name="qmui_skin_support_dialog_positive_action_text_color">?attr/qmui_config_color_blue</item>
+        <item name="qmui_skin_support_dialog_negative_action_text_color">?attr/qmui_config_color_red</item>
+        <item name="qmui_skin_support_dialog_edit_text_color">@color/qmui_config_color_white</item>
+        <item name="qmui_skin_support_dialog_edit_text_hint_color">@color/qmui_config_color_75_white</item>
+        <item name="qmui_skin_support_dialog_menu_item_text_color">@color/qmui_config_color_white</item>
+
     </style>
 
 
