@@ -210,9 +210,10 @@ class MainActivity : RefugeBaseActivity() {
                 loadUserAvatar(userAvatar, it.profile_image)
                 loadUserAvatar(bottomMeIcon, it.profile_image)
                 if("default" !in it.profile_image) {
-                    drawerUserAvatar.loadImage(it.profile_image.replace("avatar", "heap_infobox"))
-                } else {
                     drawerUserAvatar.loadImage(it.profile_image)
+
+                } else {
+                    drawerUserAvatar.loadImage("https://cdn.robertsspaceindustries.com/static/images/account/avatar_default_big.jpg")
                 }
 
                 val userCredit = "${Parser.priceFormatter(it.store)} USD"
