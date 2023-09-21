@@ -106,7 +106,26 @@ class ShipUpgradeOptionsBottomSheet: RoundedCornerBottomSheet() {
                 return@setOnClickListener
             }
             val builder = QMUIBottomSheet.BottomListSheetBuilder(context, false)
-            for (upgrade in bannedCcuList) builder.addItem(upgrade.name)
+            for (upgrade in bannedCcuList) {
+                val itemName = when(upgrade.type) {
+                    UpgradeItemProperty.OriginType.NORMAL -> {
+                        upgrade.name
+                    }
+                    UpgradeItemProperty.OriginType.HANGAR -> {
+                        "[机库中] ${upgrade.name}"
+                    }
+                    UpgradeItemProperty.OriginType.HISTORY -> {
+                        "[历史升级] ${upgrade.name}"
+                    }
+                    UpgradeItemProperty.OriginType.BUYBACK -> {
+                        "[回购中] ${upgrade.name}"
+                    }
+                    UpgradeItemProperty.OriginType.NOT_AVAILABLE -> {
+                        TODO()
+                    }
+                }
+                builder.addItem(itemName)
+            }
             builder.setOnSheetItemClickListener { dialog, _, position, _ ->
                 removeBannedUpgrade(position)
                 Toast.makeText(context, "已将${bannedCcuList.get(position).name}移出CCU链黑名单哦~", Toast.LENGTH_SHORT).show()

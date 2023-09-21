@@ -218,7 +218,7 @@
                     <TextView android:layout_width="wrap_content"
                               android:layout_height="wrap_content"
                               android:text="@string/original_cost"
-                              android:textSize="25sp"
+                              android:textSize="20sp"
                               android:textStyle="bold"
                               android:layout_marginEnd="10dp"/>
                     <TextView android:layout_width="wrap_content"
@@ -226,7 +226,7 @@
                               android:id="@+id/textview_original_cost"
                               tools:text="$600"
                               android:textColor="#66BB6A"
-                              android:textSize="35sp"
+                              android:textSize="30sp"
                               android:textStyle="bold"
                               android:layout_marginEnd="10dp"/>
                     </LinearLayout>
@@ -238,7 +238,7 @@
                     <TextView android:layout_width="wrap_content"
                               android:layout_height="wrap_content"
                               android:text="@string/total_cost"
-                              android:textSize="25sp"
+                              android:textSize="20sp"
                               android:textStyle="bold"
                               android:layout_marginEnd="10dp"/>
                     <TextView android:layout_width="wrap_content"
@@ -246,7 +246,7 @@
                               tools:text="$300"
                               android:layout_marginEnd="5dp"
                               android:textColor="@color/hangar_log_giveaway_icon"
-                              android:textSize="35sp"
+                              android:textSize="30sp"
                               android:textStyle="bold"
                               android:id="@+id/total_cost"/>
                     </LinearLayout>

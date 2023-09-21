@@ -183,13 +183,13 @@ class  ShipUpgradeCart : Fragment() {
                     "${it.id}#1#${it.name}"
                 }
                 UpgradeItemProperty.OriginType.HANGAR -> {
-                    "${it.id}#3#[机库中] ${it.name}"
+                    "${it.id}#3#${it.name}"
                 }
                 UpgradeItemProperty.OriginType.HISTORY -> {
-                    "${it.id}#2#[历史升级] ${it.name}"
+                    "${it.id}#2#${it.name}"
                 }
                 UpgradeItemProperty.OriginType.BUYBACK -> {
-                    "${it.id}#4#[回购中]${it.name}"
+                    "${it.id}#4#${it.name}"
                 }
                 UpgradeItemProperty.OriginType.NOT_AVAILABLE -> {
                     TODO()
