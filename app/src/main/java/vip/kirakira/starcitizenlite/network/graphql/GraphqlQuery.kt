@@ -634,8 +634,19 @@ fragment TySkuFragment on TyCartLineItem {
     subtitle
     url
     type
+    frequency
     isWarbond
     isPackage
+    gameItems {
+      ... on ShipGameItem {
+        specs {
+          productionStatus
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
     stock {
       ...TyStockFragment
       __typename
@@ -694,6 +705,7 @@ fragment TyCartLineItemDiscountFragment on TyCartLineItemDiscount {
   }
   __typename
 }
+
 """
     data class Variables(
         val amount: Float,
@@ -850,7 +862,7 @@ fragment OrderSlugFragment on TyStore {
         val mark: String
     )
 
-    fun getRequestBody(storeFront: String="pledge", token: String, mark: String="mKGspgQ+jhzcWFWVLJiFfw"): BaseGraphQLBody {
+    fun getRequestBody(storeFront: String="pledge", token: String, mark: String="rLK3FmRE+uURZ4x40anLgg"): BaseGraphQLBody {
         return BaseGraphQLBody(query, Variables(storeFront = storeFront, token = token, mark = mark))
     }
 }
