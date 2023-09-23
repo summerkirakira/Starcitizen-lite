@@ -190,7 +190,7 @@ class MainActivity : RefugeBaseActivity() {
             if (it != null) {
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
-                        CirnoApi.getShipDetail("https://image.biaoju.site/starcitizen/ship_detail.0.1.json")
+//                        CirnoApi.getShipDetail("https://image.biaoju.site/starcitizen/ship_detail.0.1.json")
                         CirnoApi.retrofitService.updateClientInfo(
                             ClientInfo(
                                 primaryUser = it.handle
@@ -207,13 +207,14 @@ class MainActivity : RefugeBaseActivity() {
         currentUser.observe(this) {
             if (it != null) {
                 setRSICookie(it.rsi_token, it.rsi_device)
-                loadUserAvatar(userAvatar, it.profile_image)
-                loadUserAvatar(bottomMeIcon, it.profile_image)
                 if("default" !in it.profile_image) {
                     drawerUserAvatar.loadImage(it.profile_image)
-
+                    loadUserAvatar(userAvatar, it.profile_image)
+                    loadUserAvatar(bottomMeIcon, it.profile_image)
                 } else {
                     drawerUserAvatar.loadImage("https://cdn.robertsspaceindustries.com/static/images/account/avatar_default_big.jpg")
+                    loadUserAvatar(userAvatar, "https://cdn.robertsspaceindustries.com/static/images/account/avatar_default_big.jpg")
+                    loadUserAvatar(bottomMeIcon, "https://cdn.robertsspaceindustries.com/static/images/account/avatar_default_big.jpg")
                 }
 
                 val userCredit = "${Parser.priceFormatter(it.store)} USD"
@@ -544,6 +545,10 @@ class MainActivity : RefugeBaseActivity() {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     loadInitialData()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                try {
                     checkStartUp()
                     checkUpdate()
                     checkSubscription()
@@ -610,6 +615,13 @@ class MainActivity : RefugeBaseActivity() {
             }
             manager.download()
         }
+        try {
+            updateAlias(latestVersion.shipAliasUrl)
+            homeViewModel.refresh()
+            homeViewModel.refreshBuybackItems()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         val shipDetailVersion = sharedPreferences.getString(getString(R.string.SHIP_DETAIL_VERSION_KEY), "0.0.0")
         if(compareVersion(latestVersion.shipDetailVersion, shipDetailVersion!!)) {
             Log.d("ShipDetail", "Updating ship detail...")
@@ -633,13 +645,6 @@ class MainActivity : RefugeBaseActivity() {
             database.gameTranslationDao.insertAll(gameTranslations)
             sharedPreferences.edit().putBoolean(getString(R.string.GAME_TRANSLATION_KEY), true).apply()
             Toast.makeText(this, "游戏翻译数据已更新", Toast.LENGTH_SHORT).show()
-        }
-        try {
-            updateAlias(latestVersion.shipAliasUrl)
-            homeViewModel.refresh()
-            homeViewModel.refreshBuybackItems()
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
     }
 

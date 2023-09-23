@@ -263,6 +263,7 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
         ownedUpgradeList.clear()
         ownedHangarShip.clear()
         val hangarUpgradeNameList = mutableListOf<String>()
+        if (allHangarPackageWithItems.value == null) return
         for (hangerPackageWithItem in allHangarPackageWithItems.value!!) {
             if (hangarUpgradeNameList.contains(hangerPackageWithItem.hangerPackage.title)) continue
             hangarUpgradeNameList.add(hangerPackageWithItem.hangerPackage.title)
@@ -284,6 +285,7 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
     private fun updateOwnedBuybackUpgradeList() {
         ownedBuybackUpgradeList.clear()
         val buybackUpgradeNameList = mutableListOf<String>()
+        if (allBuyBacks.value == null) return
         for (buybackItem in allBuyBacks.value!!) {
             if (buybackUpgradeNameList.contains(buybackItem.title)) continue
             buybackUpgradeNameList.add(buybackItem.title)

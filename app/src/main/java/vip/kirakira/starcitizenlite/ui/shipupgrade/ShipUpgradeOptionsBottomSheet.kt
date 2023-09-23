@@ -156,6 +156,10 @@ class ShipUpgradeOptionsBottomSheet: RoundedCornerBottomSheet() {
         }
         fromShipAlias = getShipAliasById(fromShipId)
         toShipAlias = getShipAliasById(toShipId)
+        if (fromShipAlias == null || toShipAlias == null) {
+            createWarningAlerter(requireActivity(), "数据加载错误", "请回到主界面等待避难所加载数据哦~").show()
+            return
+        }
         binding.textviewFromShip.text = fromShipAlias!!.chineseName
         binding.textviewToShip.text = toShipAlias!!.chineseName
 
