@@ -40,6 +40,10 @@ import io.getstream.avatarview.coil.loadImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.Call
+import okhttp3.OkHttpClient
+import okhttp3.Response
 import vip.kirakira.starcitizenlite.activities.LoginActivity
 import vip.kirakira.starcitizenlite.activities.RefugeBaseActivity
 import vip.kirakira.starcitizenlite.activities.SettingsActivity
@@ -63,9 +67,12 @@ import vip.kirakira.starcitizenlite.ui.main.MainFragment
 import vip.kirakira.starcitizenlite.ui.me.MeFragment
 import vip.kirakira.starcitizenlite.ui.shopping.ShopItemFilter
 import vip.kirakira.starcitizenlite.ui.widgets.RefugeVip
+import vip.kirakira.viewpagertest.network.graphql.LoginBody
+import vip.kirakira.viewpagertest.network.graphql.RsiLauncherSignInBody
 import vip.kirakira.viewpagertest.ui.shopping.ShoppingFragment
 import vip.kirakira.viewpagertest.ui.shopping.ShoppingViewModel
 import java.io.File
+import java.io.IOException
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -207,6 +214,7 @@ class MainActivity : RefugeBaseActivity() {
         currentUser.observe(this) {
             if (it != null) {
                 setRSICookie(it.rsi_token, it.rsi_device)
+                sharedPreferences.edit().putString(getString(R.string.device_id_key), it.rsi_device).apply()
                 if("default" !in it.profile_image) {
                     drawerUserAvatar.loadImage(it.profile_image)
                     loadUserAvatar(userAvatar, it.profile_image)
@@ -228,40 +236,143 @@ class MainActivity : RefugeBaseActivity() {
                 drawerUserHangerValue.text = userHangerValue
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
-                        // Test here
-                        // RSIApi.getPledgeLog()
-
-                        saveUserData(20085, it.rsi_device, it.rsi_token, "", "")
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                    try {
-                        val loginTest = getCartSummary()
-                        if(loginTest.data.account.isAnonymous){
-                            sharedPreferences.edit().putInt(getString(R.string.primary_user_key), 0).apply()
-                            database.userDao.delete(primaryUserId)
-                            val alerter = createWarningAlerter(this@MainActivity, "警告", "RSI账号登录失效，点击此处重新登录")
-                            alerter
-                                .enableSwipeToDismiss()
-                                .setOnClickListener {
-                                    val intent = Intent(this@MainActivity, LoginActivity::class.java)
-                                    startActivity(intent)
-                                    finish()
-                                }
-                                .setOnHideListener {
-                                    val intent = Intent(this@MainActivity, MainActivity::class.java)
-                                    startActivity(intent)
-                                    finish()
-                                }
-                                .show()
+                        try {
+                            RSIApi.retrofitService.checkLauncherAccount()
+                            return@launch
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(this@MainActivity, "检测到IP变动，RSI账号登录失效，正在尝试重新登录...", Toast.LENGTH_LONG).show()
+                            }
                         }
+                        try {
+                            val reLogin = RSIApi.retrofitService.rsiLauncherSignIn(
+                                RsiLauncherSignInBody(
+                                    it.email,
+                                    it.password
+                                )
+                            )
+                            if (reLogin.data != null) {
+                                try{
+                                    val newUser = saveUserData(
+                                        uid = reLogin.data.account_id,
+                                        rsi_device = it.rsi_device,
+                                        rsi_token = reLogin.data.session_id,
+                                        email = it.email,
+                                        password = it.password)
+                                    setRSICookie(newUser.rsi_token, newUser.rsi_device)
+                                    database.userDao.insert(newUser)
+                                    sharedPreferences.edit().putInt(getString(R.string.primary_user_key), reLogin.data.account_id).apply()
+                                    primaryUserId = reLogin.data.account_id
+                                    val alerter = createSuccessAlerter(this@MainActivity, "重新登录成功", "检测到IP变动，自动登录成功")
+                                    alerter
+                                        .enableSwipeToDismiss()
+                                        .setOnClickListener {
+                                            val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                                            startActivity(intent)
+                                            finish()
+                                        }
+                                        .setOnHideListener {
+                                            val intent = Intent(this@MainActivity, MainActivity::class.java)
+                                            startActivity(intent)
+                                            finish()
+                                        }
+                                        .show()
+                                    return@launch
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
 
-
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                        try {
+                            getRSIToken()
+                            val token = CirnoApi.retrofitService.getReCaptchaV3(1)
+                            val response = RSIApi.retrofitService.login(
+                                LoginBody(
+                                    variables = LoginBody.Variables(
+                                        email = it.email,
+                                        password = it.password,
+                                        captcha = token.captcha_list[0].token
+                                    )
+                                )
+                            )
+                            val loginDetail = response.body()!!
+                            if (loginDetail.errors == null) {
+                                val headers = response.headers().toMultimap()["set-cookie"]!!
+                                for (header in headers) {
+                                    if (header.contains("Rsi-Token")) {
+                                        rsi_token = header.split(";")[0].split("=")[1]
+                                    }
+                                }
+                                val newUser = saveUserData(
+                                    loginDetail.data.account_signin!!.id,
+                                    rsi_device,
+                                    rsi_token,
+                                    it.email,
+                                    it.password
+                                )
+                                Thread {
+                                    val pref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+                                    with(pref.edit()) {
+                                        putInt(getString(R.string.primary_user_key), loginDetail.data.account_signin.id)
+                                        putBoolean(getString(R.string.is_log_in), true)
+                                        apply()
+                                    }
+                                    database.userDao.insert(newUser)
+                                    createSuccessAlerter(
+                                        this@MainActivity,
+                                        "检测到IP变动",
+                                        "自动登录成功"
+                                    )
+                                        .enableSwipeToDismiss()
+                                        .setOnClickListener {
+                                            val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                                            startActivity(intent)
+                                            finish()
+                                        }
+                                        .setOnHideListener {
+                                            val intent = Intent(this@MainActivity, MainActivity::class.java)
+                                            startActivity(intent)
+                                            finish()
+                                        }
+                                        .show()
+                                }.start()
+                                return@launch
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                        sharedPreferences.edit().putInt(getString(R.string.primary_user_key), 0).apply()
+                        database.userDao.delete(primaryUserId)
+                        val alerter = createWarningAlerter(this@MainActivity, "警告", "RSI账号登录失效，点击此处重新登录")
+                        alerter
+                            .enableSwipeToDismiss()
+                            .setOnClickListener {
+                                val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                                startActivity(intent)
+                                finish()
+                            }
+                            .setOnHideListener {
+                                val intent = Intent(this@MainActivity, MainActivity::class.java)
+                                startActivity(intent)
+                                finish()
+                            }
+                            .show()
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
                     }
                 }
+            else {
+                val rsiDevice = sharedPreferences.getString(getString(R.string.device_id_key), "")
+                Log.d("Cirno", "RSI Device: $rsiDevice")
+                if (rsiDevice != null) {
+                    setRSICookie("", rsiDevice)
+                }
+            }
             }
 
         userAvatar.setOnClickListener {
@@ -822,5 +933,24 @@ class MainActivity : RefugeBaseActivity() {
                 startActivity(intent)
             }
 
+    }
+
+    private fun getRSIToken() {
+        val url = "https://robertsspaceindustries.com/graphql"
+        val client = OkHttpClient()
+        val request = okhttp3.Request.Builder()
+            .url(url)
+            .build()
+        val response = client.newCall(request).execute()
+        rsi_token = response.header("Set-Cookie")?.split(";")?.get(0)?.split("=")?.get(1) ?: ""
+        setRSICookie(rsi_token, rsi_device)
+        val csrfClient = OkHttpClient()
+        val csrfRequest = okhttp3.Request.Builder()
+            .url("https://robertsspaceindustries.com")
+            .addHeader("Cookie", "CookieConsent=$RSI_COOKIE_CONSTENT; Rsi-Token=$rsi_token")
+            .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36")
+            .build()
+        val csrfResponse = csrfClient.newCall(csrfRequest).execute()
+        csrf_token = csrfResponse.body!!.string().split("csrf-token\" content=\"")?.get(1)?.split("\"")?.get(0) ?: ""
     }
 }

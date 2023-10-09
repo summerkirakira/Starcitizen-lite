@@ -215,4 +215,5 @@
     <string name="other_upgrade_cost">其他消耗: </string>
     <string name="please_select_removed_banned_ccu">请选择要移出黑名单的升级包</string>
     <string name="original_cost">原花费:</string>
+    <string name="device_id_key">DEVIC_ID_KEY</string>
 </resources>

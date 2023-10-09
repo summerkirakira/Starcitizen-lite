@@ -85,6 +85,19 @@ val client: OkHttpClient = OkHttpClient
                 .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
                 .build()
             return@addInterceptor chain.proceed(newRequest)
+        } else if (request.url.toString() == "https://robertsspaceindustries.com/api/launcher/v3/account/check") {
+            val newRequest = request.newBuilder()
+                .addHeader("x-rsi-token", rsi_token)
+                .addHeader("x-rsi-device", rsi_device)
+                .addHeader("user-agent", "RSI Launcher/1.6.8")
+                .build()
+            return@addInterceptor chain.proceed(newRequest)
+        } else if (request.url.toString() == "https://robertsspaceindustries.com/api/launcher/v3/signin") {
+            val newRequest = request.newBuilder()
+                .addHeader("x-rsi-device", rsi_device)
+                .addHeader("user-agent", "RSI Launcher/1.6.8")
+                .build()
+            return@addInterceptor chain.proceed(newRequest)
         }
         return@addInterceptor chain.proceed(request)
     }
@@ -182,7 +195,7 @@ interface RSIApiService {
     suspend fun buyBackPledge(@Body body: BuyBackPledgeBody): BuyBackPledgeProperty
 
     @POST("graphql")
-    suspend fun login(@Body body: LoginBody): LoginProperty
+    suspend fun login(@Body body: LoginBody): Response<LoginProperty>
 
     @POST("graphql")
     suspend fun loginAgain(@Body body: BaseGraphQLBody): LoginAgainProperty
@@ -198,6 +211,12 @@ interface RSIApiService {
 
     @POST("api/account/pledgeLog")
     suspend fun getPledgeLog(@Body body: GetPledgeBody): HangarLogProperty
+
+    @POST("api/launcher/v3/account/check")
+    suspend fun checkLauncherAccount(): RsiLauncherSignInCheckResponse
+
+    @POST("api/launcher/v3/signin")
+    suspend fun rsiLauncherSignIn(@Body body: RsiLauncherSignInBody): RsiLauncherSignInResponse
 
 }
 

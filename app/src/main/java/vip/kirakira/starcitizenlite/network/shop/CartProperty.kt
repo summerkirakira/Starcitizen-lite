@@ -247,3 +247,22 @@ data class HangarLogProperty(
 ) {
     data class Data(val page: Int, val pagecount: Int, val rendered: String)
 }
+
+data class RsiLauncherSignInCheckResponse(
+    val code: String,
+    val data: Data) {
+    data class Data(val auth: Boolean)
+}
+
+data class RsiLauncherSignInResponse(
+    val code: String,
+    val data: Data?
+) {
+    data class Data(
+        val account_id: Int,
+        val session_id: String,
+        val citizen_id: String,
+        val nickname: String,
+        val displayname: String,
+    )
+}

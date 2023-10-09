@@ -21,6 +21,7 @@ import kotlinx.coroutines.delay
 import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.Response
+import okhttp3.internal.toHeaderList
 import vip.kirakira.starcitizenlite.MainActivity
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.createSuccessAlerter
@@ -103,15 +104,9 @@ class LoginActivity : RefugeBaseActivity() {
                         return@launchWhenCreated
                     }
                     val loginDetail: LoginProperty
+                    val response: retrofit2.Response<LoginProperty>
                     try {
-//                        loginDetail = RSIApi.retrofitService.login(
-//                            LoginQuery().getRequestBody(
-//                                emailEditText.text.toString(),
-//                                passwordEditText.text.toString(),
-//                                token.captcha_list[0].token
-//                            )
-//                        )
-                        loginDetail = RSIApi.retrofitService.login(
+                        response = RSIApi.retrofitService.login(
                             LoginBody(
                                 variables = LoginBody.Variables(
                                     email = email,
@@ -120,6 +115,7 @@ class LoginActivity : RefugeBaseActivity() {
                                 )
                             )
                         )
+                        loginDetail = response.body()!!
                     } catch (e: Exception) {
                         stopLoading()
                         createWarningAlerter(
@@ -132,7 +128,39 @@ class LoginActivity : RefugeBaseActivity() {
                     }
 //                    Log.d("LoginActivity", loginDetail.toString())
                     if (loginDetail.errors == null) {
-                        TODO()
+                        Thread {
+//                            Log.d("LoginActivitySet", response.headers().toMultimap().toString())
+                            val headers = response.headers().toMultimap()["set-cookie"]!!
+                            for (header in headers) {
+                                if (header.contains("Rsi-Token")) {
+                                    rsi_token = header.split(";")[0].split("=")[1]
+                                }
+                            }
+                            val newUser = saveUserData(
+                                loginDetail.data.account_signin!!.id,
+                                rsi_device,
+                                rsi_token,
+                                email,
+                                password
+                            )
+                            lifecycleScope.launchWhenCreated {
+                                val pref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+                                with(pref.edit()) {
+                                    putInt(getString(R.string.primary_user_key), loginDetail.data.account_signin.id)
+                                    putBoolean(getString(R.string.is_log_in), true)
+                                    apply()
+                                }
+                                userRepository.insertUser(newUser)
+                                createSuccessAlerter(
+                                    this@LoginActivity,
+                                    getString(R.string.login_success),
+                                    getString(R.string.jump_to_main_page)
+                                ).show()
+                                val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                                startActivity(intent)
+                            }
+                        }.start()
+                        return@launchWhenCreated
                     }
                     if (loginDetail.errors[0].code == "AlreadyLoggedInException") {
                         stopLoading()
@@ -355,7 +383,7 @@ class LoginActivity : RefugeBaseActivity() {
             }
             override fun onResponse(call: Call, response: Response) {
                 rsi_token = response.header("Set-Cookie")?.split(";")?.get(0)?.split("=")?.get(1) ?: ""
-                setRSICookie(rsi_token, "")
+                setRSICookie(rsi_token, rsi_device)
                 val csrfClient = OkHttpClient()
                 val csrfRequest = okhttp3.Request.Builder()
                     .url("https://robertsspaceindustries.com")

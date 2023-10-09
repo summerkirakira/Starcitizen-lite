@@ -53,3 +53,9 @@ class ApplyPromoBody(
 
 @JsonClass(generateAdapter = true)
 class GetPledgeBody(private val page: Int)
+
+@JsonClass(generateAdapter = true)
+class RsiLauncherSignInBody(
+    private val username: String,
+    private val password: String
+)
