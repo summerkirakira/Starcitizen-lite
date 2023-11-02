@@ -201,7 +201,7 @@ data class LoginProperty(val errors: List<Error>?, val data: Data) {
 
     data class Error(val message: String, val extensions: Extensions, val code: String) {
         data class Extensions(val category: String, val details: Details) {
-            data class Details(val session_id: String, val device_id: String)
+            data class Details(val session_id: String?, val device_id: String?)
         }
     }
 }

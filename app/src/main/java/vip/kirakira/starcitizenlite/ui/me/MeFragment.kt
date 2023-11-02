@@ -87,7 +87,11 @@ class MeFragment : Fragment() {
 
             binding.errorBox.hide()
             binding.rootLayout.visibility = View.VISIBLE
-            binding.avatar.loadImage(it.profile_image)
+            if (it.profile_image.contains("default")) {
+                binding.avatar.loadImage("https://cdn.robertsspaceindustries.com/static/images/account/avatar_default_big.jpg")
+            } else {
+                binding.avatar.loadImage(it.profile_image)
+            }
             if(it.organization_image.isNotEmpty()){
                 binding.organizationImage.loadImage(it.organization_image)
             }

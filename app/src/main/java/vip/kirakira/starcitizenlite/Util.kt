@@ -131,24 +131,30 @@ fun getShipAliasById(id: Int): ShipAlias? {
     return null
 }
 
-fun getRSIToken() {
-    val url = "https://robertsspaceindustries.com/graphql"
-    val client = OkHttpClient()
-    val request = okhttp3.Request.Builder()
-        .url(url)
-        .build()
-    val response = client.newCall(request).execute()
-    rsi_token = response.header("Set-Cookie")?.split(";")?.get(0)?.split("=")?.get(1) ?: ""
-    setRSICookie(rsi_token, rsi_device)
+fun getRSIToken(my_rsi_token: String? = null, my_rsi_device: String? = null) {
+    if (my_rsi_token != null && my_rsi_device != null) {
+        setRSICookie(my_rsi_token, my_rsi_device)
+    } else {
+        val url = "https://robertsspaceindustries.com/pledge"
+        val client = OkHttpClient()
+        val request = okhttp3.Request.Builder()
+            .url(url)
+            .build()
+        val response = client.newCall(request).execute()
+        rsi_token = response.header("Set-Cookie")?.split(";")?.get(0)?.split("=")?.get(1) ?: ""
+        setRSICookie(rsi_token, rsi_device)
+    }
     val csrfClient = OkHttpClient()
     val csrfRequest = okhttp3.Request.Builder()
-        .url("https://robertsspaceindustries.com")
+        .url("https://robertsspaceindustries.com/pledge")
+        .addHeader("Cookie", "CookieConsent=$RSI_COOKIE_CONSTENT; Rsi-Token=$rsi_token; _rsi_device=$rsi_device")
         .addHeader(
             "User-Agent",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
         )
         .build()
     val csrfResponse = csrfClient.newCall(csrfRequest).execute()
-    csrf_token = csrfResponse.body!!.string().split("csrf-token\" content=\"")?.get(1)?.split("\"")?.get(0) ?: ""
+    val str_response = csrfResponse.body!!.string()
+    csrf_token = str_response.split("csrf-token\" content=\"")?.get(1)?.split("\"")?.get(0) ?: ""
     Log.d("Cirno", "CSRF Token: $csrf_token")
 }

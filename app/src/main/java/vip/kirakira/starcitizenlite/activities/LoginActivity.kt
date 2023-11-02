@@ -81,10 +81,10 @@ class LoginActivity : RefugeBaseActivity() {
                 passwordEditText.hint = getString(R.string.password)
                 return@setOnClickListener
             }
-            if (!isPrepared) {
-                createWarningAlerter(this, getString(R.string.error), getString(R.string.please_wait_init))
-                return@setOnClickListener
-            }
+//            if (!isPrepared) {
+//                createWarningAlerter(this, getString(R.string.error), getString(R.string.please_wait_init))
+//                return@setOnClickListener
+//            }
             if (emailEditText.text.toString().isNotEmpty() && passwordEditText.text.toString().isNotEmpty()) {
                 val email = emailEditText.text.toString()
                 val password = passwordEditText.text.toString()
@@ -121,7 +121,7 @@ class LoginActivity : RefugeBaseActivity() {
                         createWarningAlerter(
                             this@LoginActivity,
                             getString(R.string.error),
-                            getString(R.string.invalid_password)
+                            e.message ?: "未知错误"
                         ).show()
                         Log.d("LoginActivity", e.toString())
                         return@launchWhenCreated
@@ -179,7 +179,7 @@ class LoginActivity : RefugeBaseActivity() {
                     } else if (loginDetail.errors[0].code == "MultiStepRequiredException") {
                         val deviceId = loginDetail.errors[0].extensions.details.device_id
                         val rsiToken = loginDetail.errors[0].extensions.details.session_id
-                        setRSICookie(rsiToken, deviceId)
+                        setRSICookie(rsiToken!!, deviceId!!)
                         stopLoading()
                         val builder = QMUIDialog.EditTextDialogBuilder(this@LoginActivity)
                         builder.setTitle(getString(R.string.multi_step_required))
@@ -197,7 +197,7 @@ class LoginActivity : RefugeBaseActivity() {
                                             Thread {
                                                 val newUser = saveUserData(
                                                     multiStepInfo.data.account_multistep!!.id,
-                                                    deviceId,
+                                                    deviceId!!,
                                                     rsi_token,
                                                     email,
                                                     password
@@ -281,6 +281,12 @@ class LoginActivity : RefugeBaseActivity() {
                 createWarningAlerter(this, getString(R.string.error), getString(R.string.please_wait_init))
                 return@setOnClickListener
             }
+            if (rsi_token.isEmpty()) {
+                createWarningAlerter(this, getString(R.string.error), "初始化失败，官网可能在维护状态，请稍后再试")
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                return@setOnClickListener
+            }
             startLoading()
             var referralCode: String = referralCodeEditText.text.toString()
             if (referralCode.isEmpty())
@@ -289,7 +295,7 @@ class LoginActivity : RefugeBaseActivity() {
                 val returnCode = register(activity = this@LoginActivity, email = emailEditText.text.toString(), password = passwordEditText.text.toString(), referralCode = referralCode, handle = handleEditText.text.toString())
                 if (returnCode == 0) run {
                     startLoading()
-                    getRSIToken()
+//                    getRSIToken()
                     loginButton.performClick()
                     delay(6000)
                     loginButton.performClick()
@@ -372,10 +378,14 @@ class LoginActivity : RefugeBaseActivity() {
     }
 
     private fun getRSIToken() {
-        val url = "https://robertsspaceindustries.com/graphql"
+        val url = "https://robertsspaceindustries.com/pledge"
         val client = OkHttpClient()
         val request = okhttp3.Request.Builder()
             .url(url)
+            .addHeader("Host", "robertsspaceindustries.com")
+            .addHeader("Connection", "keep-alive")
+            .addHeader("Cache-Control", "max-age=0")
+            .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.37")
             .build()
         client.newCall(request).enqueue(object : okhttp3.Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -383,11 +393,12 @@ class LoginActivity : RefugeBaseActivity() {
             }
             override fun onResponse(call: Call, response: Response) {
                 rsi_token = response.header("Set-Cookie")?.split(";")?.get(0)?.split("=")?.get(1) ?: ""
+//                Log.d("rsi_token", rsi_token)
                 setRSICookie(rsi_token, rsi_device)
                 val csrfClient = OkHttpClient()
                 val csrfRequest = okhttp3.Request.Builder()
                     .url("https://robertsspaceindustries.com")
-                    .addHeader("Cookie", "CookieConsent=$RSI_COOKIE_CONSTENT; Rsi-Token=$rsi_token")
+                    .addHeader("Cookie", "CookieConsent=$RSI_COOKIE_CONSTENT; Rsi-Token=$rsi_token; _rsi_device=$rsi_device")
                     .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36")
                     .build()
                 csrfClient.newCall(csrfRequest).enqueue(object : okhttp3.Callback {

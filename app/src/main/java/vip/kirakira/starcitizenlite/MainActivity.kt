@@ -214,7 +214,7 @@ class MainActivity : RefugeBaseActivity() {
         currentUser.observe(this) {
             if (it != null) {
                 setRSICookie(it.rsi_token, it.rsi_device)
-                sharedPreferences.edit().putString(getString(R.string.device_id_key), it.rsi_device).apply()
+                sharedPreferences.edit().putString(getString(R.string.device_id_key), it.rsi_device).commit()
                 if("default" !in it.profile_image) {
                     drawerUserAvatar.loadImage(it.profile_image)
                     loadUserAvatar(userAvatar, it.profile_image)
@@ -237,7 +237,14 @@ class MainActivity : RefugeBaseActivity() {
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
                         try {
-                            RSIApi.retrofitService.checkLauncherAccount()
+                            getRSIToken(it.rsi_token, it.rsi_device)
+                            while (csrf_token.isEmpty()) {
+                                Thread.sleep(100)
+                            }
+                            val data = getCartSummary()
+                            if(data.data.account.isAnonymous) {
+                                throw Exception("Anonymous")
+                            }
                             return@launch
                         } catch (e: Exception) {
                             e.printStackTrace()
@@ -284,7 +291,7 @@ class MainActivity : RefugeBaseActivity() {
                                 }
 
                             }
-                            getRSIToken()
+//                            getRSIToken()
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
@@ -655,11 +662,11 @@ class MainActivity : RefugeBaseActivity() {
 
         if(sharedPreferences.getBoolean(getString(R.string.CHECK_UPDATE_KEY), true)) {
             CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    getRSIToken()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+//                try {
+//                    getRSIToken()
+//                } catch (e: Exception) {
+//                    e.printStackTrace()
+//                }
                 try {
                     loadInitialData()
                 } catch (e: Exception) {
