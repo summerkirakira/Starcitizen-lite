@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.WindowManager
 import androidx.core.content.ContextCompat.startActivity
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog
@@ -13,8 +14,8 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
 import vip.kirakira.starcitizenlite.database.User
+import vip.kirakira.starcitizenlite.network.*
 import vip.kirakira.starcitizenlite.network.CirnoProperty.ShipAlias
-import vip.kirakira.starcitizenlite.network.RSI_COOKIE_CONSTENT
 import vip.kirakira.starcitizenlite.network.search.getPlayerSearchResult
 import java.lang.reflect.Method
 
@@ -128,4 +129,26 @@ fun getShipAliasById(id: Int): ShipAlias? {
         }
     }
     return null
+}
+
+fun getRSIToken() {
+    val url = "https://robertsspaceindustries.com/graphql"
+    val client = OkHttpClient()
+    val request = okhttp3.Request.Builder()
+        .url(url)
+        .build()
+    val response = client.newCall(request).execute()
+    rsi_token = response.header("Set-Cookie")?.split(";")?.get(0)?.split("=")?.get(1) ?: ""
+    setRSICookie(rsi_token, rsi_device)
+    val csrfClient = OkHttpClient()
+    val csrfRequest = okhttp3.Request.Builder()
+        .url("https://robertsspaceindustries.com")
+        .addHeader(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+        )
+        .build()
+    val csrfResponse = csrfClient.newCall(csrfRequest).execute()
+    csrf_token = csrfResponse.body!!.string().split("csrf-token\" content=\"")?.get(1)?.split("\"")?.get(0) ?: ""
+    Log.d("Cirno", "CSRF Token: $csrf_token")
 }

@@ -206,9 +206,16 @@ class ShoppingFragment : Fragment() {
         binding.fab.setOnClickListener {
             val isAutoAddCredits = sharedPreferences.getBoolean("auto_add_credits", false)
             if(selectedItem != null) {
-                if (csrf_token == "") {
-                    createWarningAlerter(requireActivity(), "添加购物车失败", getString(R.string.network_error)).show()
-                    return@setOnClickListener
+                if (csrf_token.isEmpty()) {
+                    getRSIToken()
+                    if (csrf_token.isEmpty()) {
+                        createWarningAlerter(
+                            requireActivity(),
+                            "添加购物车失败",
+                            getString(R.string.network_error)
+                        ).show()
+                        return@setOnClickListener
+                    }
                 }
 
                 if (viewModel.currentUpgradeStage.value == ShoppingViewModel.UpgradeStage.CHOOSE_TO_SHIP) {

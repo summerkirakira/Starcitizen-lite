@@ -66,6 +66,8 @@ class Parser {
                 .replace("Mole Carbon Edition", "Mole")
                 .replace("Genesis Starliner", "Genesis")
                 .replace("Hercules Starship", "")
+                .replace("Warbond Subscribers Edition", "Warbond Edition")
+                .replace("Subscribers Edition", "Standard Edition")
                 .trim()
             return newShipName
         }

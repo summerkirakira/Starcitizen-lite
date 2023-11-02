@@ -284,6 +284,7 @@ class MainActivity : RefugeBaseActivity() {
                                 }
 
                             }
+                            getRSIToken()
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
@@ -655,6 +656,11 @@ class MainActivity : RefugeBaseActivity() {
         if(sharedPreferences.getBoolean(getString(R.string.CHECK_UPDATE_KEY), true)) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
+                    getRSIToken()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                try {
                     loadInitialData()
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -933,24 +939,5 @@ class MainActivity : RefugeBaseActivity() {
                 startActivity(intent)
             }
 
-    }
-
-    private fun getRSIToken() {
-        val url = "https://robertsspaceindustries.com/graphql"
-        val client = OkHttpClient()
-        val request = okhttp3.Request.Builder()
-            .url(url)
-            .build()
-        val response = client.newCall(request).execute()
-        rsi_token = response.header("Set-Cookie")?.split(";")?.get(0)?.split("=")?.get(1) ?: ""
-        setRSICookie(rsi_token, rsi_device)
-        val csrfClient = OkHttpClient()
-        val csrfRequest = okhttp3.Request.Builder()
-            .url("https://robertsspaceindustries.com")
-            .addHeader("Cookie", "CookieConsent=$RSI_COOKIE_CONSTENT; Rsi-Token=$rsi_token")
-            .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36")
-            .build()
-        val csrfResponse = csrfClient.newCall(csrfRequest).execute()
-        csrf_token = csrfResponse.body!!.string().split("csrf-token\" content=\"")?.get(1)?.split("\"")?.get(0) ?: ""
     }
 }
