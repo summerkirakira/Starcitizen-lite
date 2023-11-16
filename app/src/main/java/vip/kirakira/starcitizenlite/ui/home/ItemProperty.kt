@@ -8,6 +8,7 @@ import vip.kirakira.starcitizenlite.database.HangerItem
 import vip.kirakira.starcitizenlite.database.HangerPackageWithItems
 import vip.kirakira.starcitizenlite.network.convertLongToDate
 import vip.kirakira.starcitizenlite.network.hanger.HangerProcess
+import vip.kirakira.starcitizenlite.repositories.RepoUtil
 
 
 data class HangerItemProperty(
@@ -53,6 +54,26 @@ fun List<BuybackItem>.toItemProperty(): List<HangerItemProperty> {
     val map = mutableMapOf<String, HangerItemProperty>()
     for (item in this) {
         if(map[item.title] == null){
+
+            var currentPrice = -1
+
+            if(item.title.startsWith("Upgrade - ")) {
+                val shipUpgradeAliasList = Parser.getFullUpgradeName(item.title)
+                val upgradeFromShipAlias = RepoUtil.getShipAlias(shipUpgradeAliasList[0])
+                val upgradeToShipAlias = RepoUtil.getShipAlias(shipUpgradeAliasList[1])
+                if(upgradeFromShipAlias != null && upgradeToShipAlias != null) {
+                    currentPrice = RepoUtil.getHighestAliasPrice(upgradeToShipAlias) - RepoUtil.getHighestAliasPrice(upgradeFromShipAlias)
+                }
+            }
+
+            if(item.title.startsWith("Standalone Ship - ")) {
+                val shipName = item.title.replace("Standalone Ship - ", "")
+                val ship= RepoUtil.getShipAlias(shipName)
+                if(ship != null) {
+                    currentPrice = RepoUtil.getHighestAliasPrice(ship)
+                }
+            }
+
             map[item.title] = HangerItemProperty(
                 id = item.id,
                 name = item.chinesName?:item.title,
@@ -62,7 +83,7 @@ fun List<BuybackItem>.toItemProperty(): List<HangerItemProperty> {
                 tags = listOf(),
                 date = convertLongToDate(item.date),
                 contains = item.contains,
-                price = -1,
+                price = currentPrice,
                 insurance = "",
                 alsoContains = item.contains,
                 items = listOf(),
