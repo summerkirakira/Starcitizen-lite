@@ -81,10 +81,16 @@ class LoginActivity : RefugeBaseActivity() {
                 passwordEditText.hint = getString(R.string.password)
                 return@setOnClickListener
             }
-//            if (!isPrepared) {
-//                createWarningAlerter(this, getString(R.string.error), getString(R.string.please_wait_init))
-//                return@setOnClickListener
-//            }
+            if (!isPrepared) {
+                createWarningAlerter(this, getString(R.string.error), getString(R.string.please_wait_init))
+                return@setOnClickListener
+            }
+            if (rsi_token.isEmpty()) {
+                createWarningAlerter(this, getString(R.string.error), "初始化失败，官网可能在维护状态，请稍后再试")
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                return@setOnClickListener
+            }
             if (emailEditText.text.toString().isNotEmpty() && passwordEditText.text.toString().isNotEmpty()) {
                 val email = emailEditText.text.toString()
                 val password = passwordEditText.text.toString()
@@ -123,7 +129,7 @@ class LoginActivity : RefugeBaseActivity() {
                             getString(R.string.error),
                             e.message ?: "未知错误"
                         ).show()
-                        Log.d("LoginActivity", e.toString())
+//                        Log.d("LoginActivity", e.toString())
                         return@launchWhenCreated
                     }
 //                    Log.d("LoginActivity", loginDetail.toString())

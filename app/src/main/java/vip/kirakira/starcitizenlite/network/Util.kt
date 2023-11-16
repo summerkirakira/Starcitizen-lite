@@ -34,12 +34,16 @@ fun setRSIAccountAuth(token: String) {
     rsi_account_auth = token
 }
 
+fun getRSIAccountAuthCookie(): String {
+    return "Rsi-Account-Auth=$rsi_account_auth; $rsi_cookie"
+}
+
 fun setRSIShipUpgradesContext(context: String) {
     rsi_ship_upgrades_context = context
 }
 
 fun getShipUpgradesCookie(): String {
-    return "Rsi-Ship-Upgrades-Context=$rsi_ship_upgrades_context;Rsi-Account-Auth=$rsi_account_auth; rsi_cookie"
+    return "Rsi-ShipUpgrades-Context=$rsi_ship_upgrades_context;Rsi-Account-Auth=$rsi_account_auth;$rsi_cookie"
 }
 
 fun convertDateToLong(date: String): Long {

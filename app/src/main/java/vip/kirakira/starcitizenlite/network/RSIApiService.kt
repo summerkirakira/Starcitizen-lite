@@ -1,4 +1,5 @@
 package vip.kirakira.starcitizenlite.network
+import com.google.gson.Gson
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.*
@@ -58,7 +59,7 @@ val client: OkHttpClient = OkHttpClient
             return@addInterceptor chain.proceed(newRequest)
         } else if (request.url.toString().startsWith("https://robertsspaceindustries.com/api/ship-upgrades/setContextToken")) {
             val newRequest = request.newBuilder()
-                .addHeader("cookie", rsi_cookie)
+                .addHeader("cookie", getRSIAccountAuthCookie())
                 .addHeader("x-rsi-token", rsi_token)
                 .addHeader("referer", "https://robertsspaceindustries.com/account/pledges")
                 .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
@@ -279,8 +280,33 @@ object RSIApi {
         return authToken
     }
 
+    suspend fun setBuybackAuthToken(): String {
+        val response = retrofitService.setAuthToken(SetAuthTokenBody())
+        val setCookie = response.headers()["set-cookie"]!!
+        val authToken = setCookie.substringAfter("Rsi-Account-Auth=").substringBefore(";")
+        val buybackAuthTokenResponse = Gson().fromJson(response.body()!!.string(), BuybackAuthTokenResponse::class.java)
+        setRSIAccountAuth(authToken)
+        return buybackAuthTokenResponse.data
+    }
+
     suspend fun setUpgradeToken(): String {
         val response = retrofitService.setContextToken(SetContextTokenBody())
+        val setCookie = response.headers()["set-cookie"]!!
+        val authToken = setCookie.substringAfter("Rsi-ShipUpgrades-Context=").substringBefore(";")
+        setRSIShipUpgradesContext(authToken)
+        return authToken
+    }
+
+    suspend fun getBuybackContextToken(
+        fromShipId: Int? = null,
+        pledgeId: Int? = null,
+        toShipId: Int? = null,
+        toSkuId: Int? = null
+    ): String {
+        val setContextTokenBody = SetContextTokenBody(fromShipId, pledgeId, toShipId, toSkuId)
+        val response = retrofitService.setContextToken(
+            setContextTokenBody
+        )
         val setCookie = response.headers()["set-cookie"]!!
         val authToken = setCookie.substringAfter("Rsi-ShipUpgrades-Context=").substringBefore(";")
         setRSIShipUpgradesContext(authToken)
