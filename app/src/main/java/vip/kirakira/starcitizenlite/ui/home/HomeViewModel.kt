@@ -125,7 +125,11 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
             }
             else -> {
                 originHangerItems.map {
-                    it.filter { item -> item.hangerPackage.title.contains(filter, true) }
+                    it.filter {
+                        item -> item.hangerPackage.title.contains(filter, true) || (
+                            item.hangerPackage.chineseTitle != null &&
+                                    item.hangerPackage.chineseTitle!!.contains(filter, true))
+                    }
                 }
             }
         }
@@ -135,7 +139,9 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
     private fun filterBuybackByTitle(filter: String):  LiveData<List<BuybackItem>> {
         return originBuyBackItems.map {
             it.filter {
-                item -> item.title.contains(filter, true)
+                item -> item.title.contains(filter, true) || (
+                    item.chinesName != null &&
+                            item.chinesName!!.contains(filter, true))
             }
         }
     }
