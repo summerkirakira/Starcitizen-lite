@@ -358,7 +358,12 @@ class ShoppingFragment : Fragment() {
                                                 ).show()
                                                 return@launch
                                             }
-                                            val requiredTokenNumber: Int = number / maxCartNumber + 1
+                                            val requiredTokenNumber: Int = if (maxCartNumber < number) {
+                                                number / maxCartNumber + 1
+                                            } else {
+                                                1
+                                            }
+
                                             var totalItemNumber = number
 //                                        if (cartInfo.data.store.cart.totals.subTotal == 0) {
 //                                            createWarningAlerter(
@@ -395,6 +400,14 @@ class ShoppingFragment : Fragment() {
                                                         addToCart(selectedItem!!.id, totalItemNumber)
                                                     }
                                                     val cartInfo = getCartSummary()
+                                                    if (cartInfo.data.store.cart.totals.total == 0) {
+                                                        createWarningAlerter(
+                                                            requireActivity(),
+                                                            "添加购物车失败",
+                                                            "此商品未开放或已不再可用"
+                                                        ).show()
+                                                        return@launch
+                                                    }
                                                     if (builder.isChecked) {
                                                         val applicableCredit: Int =
                                                             cartInfo.data.store.cart.totals.credits.maxApplicable - cartInfo.data.store.cart.totals.credits.amount

@@ -41,6 +41,7 @@ import vip.kirakira.starcitizenlite.ui.loadImage
 import vip.kirakira.starcitizenlite.ui.widgets.RefugeVip
 import vip.kirakira.viewpagertest.network.graphql.ApplyTokenBody
 import vip.kirakira.viewpagertest.network.graphql.BuyBackPledgeBody
+import vip.kirakira.viewpagertest.network.graphql.SetContextTokenBody
 import vip.kirakira.viewpagertest.network.graphql.UpgradeAddToCartQuery
 
 
@@ -380,16 +381,33 @@ class HomeFragment : Fragment() {
                                                     createWarningAlerter(requireActivity(), getString(R.string.buy_back_failed), message.msg).show()
                                                 }
                                             } else {
-                                                RSIApi.setAuthToken()
-                                                RSIApi.setUpgradeToken()
-                                                val token = RSIApi.retrofitService.addUpgradeToCart(
-                                                    UpgradeAddToCartQuery().getRequestBody(
-                                                        item.formShipId,
-                                                        item.toSkuId
-                                                    )
+                                                val jwt = RSIApi.setBuybackAuthToken()
+                                                val contextToken = RSIApi.getBuybackContextToken(
+                                                    fromShipId = item.formShipId,
+                                                    pledgeId = item.id,
+                                                    toShipId = item.toShipId,
+                                                    toSkuId = item.toSkuId
                                                 )
+                                                val addToCartPostBody = UpgradeAddToCartQuery().getRequestBody(
+                                                    item.formShipId,
+                                                    item.toSkuId
+                                                )
+                                                val token = RSIApi.retrofitService.addUpgradeToCart(
+                                                    addToCartPostBody
+                                                )
+
                                                 RSIApi.retrofitService.applyToken(ApplyTokenBody(token.data.addToCart!!.jwt))
-                                                jumpToCartActivity(requireContext())
+                                                val bundle = Bundle()
+                                                bundle.putString(
+                                                    "url",
+                                                    "https://robertsspaceindustries.com/store/pledge/cart"
+                                                )
+                                                val intent = Intent(context, CartActivity::class.java)
+                                                intent.putExtras(bundle)
+                                                // wait activity result
+                                                // if result is ok, then do next step
+                                                // else do nothing
+                                                startActivity(intent)
                                             }
                                         } catch (e: Exception) {
                                             createWarningAlerter(activity!!, getString(R.string.buy_back_failed), getString(R.string.network_error)).show()

@@ -59,3 +59,10 @@ class RsiLauncherSignInBody(
     private val username: String,
     private val password: String
 )
+
+data class BuybackAuthTokenResponse(
+    val success: Int,
+    val code: String,
+    val msg: String,
+    val data: String
+)
