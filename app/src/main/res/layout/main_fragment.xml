@@ -17,7 +17,7 @@
             app:layout_constraintTop_toTopOf="parent"
              android:id="@+id/banner"
              android:layout_width="match_parent"
-            app:banner_loop_time="3000"
+            app:banner_loop_time="10000"
              android:layout_height="300dp" />
     <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
                                                        android:layout_height="match_parent"
