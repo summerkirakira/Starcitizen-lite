@@ -297,13 +297,13 @@ class MainActivity : RefugeBaseActivity() {
                         }
                         try {
                             getRSIToken()
-                            val token = CirnoApi.retrofitService.getReCaptchaV3(1)
+                            val token = CirnoApi.getReCaptchaV3(1)[0]
                             val response = RSIApi.retrofitService.login(
                                 LoginBody(
                                     variables = LoginBody.Variables(
                                         email = it.email,
                                         password = it.password,
-                                        captcha = token.captcha_list[0].token
+                                        captcha = token
                                     )
                                 )
                             )
