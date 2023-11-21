@@ -628,7 +628,7 @@ class ShoppingFragment : Fragment() {
             val builder = QMUIDialog.MessageDialogBuilder(requireContext())
             val dialog = builder
                 .setTitle("是否进入抢船模式？即将添加${selectedItem!!.name}")
-                .setMessage("当前此功能为测试版, 不保证能正常运作~点击确定后将会扣除100Token点数~")
+                .setMessage("当前此功能为测试版, 不保证能正常运作~")
                 .addAction("取消") { dialog, _ ->
                     dialog.dismiss()
                 }
