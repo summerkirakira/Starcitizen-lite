@@ -127,7 +127,7 @@ object CirnoApi {
         return BASE_URL + "subscribe"
     }
 
-    fun getReCaptchaV3(num: Int): ArrayList<String> {
+    suspend fun getReCaptchaV3(num: Int): ArrayList<String> {
         val reCaptchaList = ArrayList<String>()
         for (i in 0 until num) {
             reCaptchaList.add(RecaptchaV3.getRecaptchaToken())

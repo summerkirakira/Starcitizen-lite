@@ -38,6 +38,7 @@ import vip.kirakira.viewpagertest.network.graphql.FilterShipsQuery
 import vip.kirakira.viewpagertest.network.graphql.SearchFromShipQuery
 import vip.kirakira.viewpagertest.network.graphql.UpgradeAddToCartQuery
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.concurrent.schedule
 
 class ShoppingFragment : Fragment() {
@@ -374,16 +375,16 @@ class ShoppingFragment : Fragment() {
 //                                            canNextStep = false
 //                                        }
                                             if (canNextStep) {
-                                                var tokenList: MutableList<RecaptchaList.ReCaptcha> = mutableListOf()
+                                                var tokenList: MutableList<String> = mutableListOf()
                                                 try {
                                                     while (tokenList.size < requiredTokenNumber) {
                                                         val token =
-                                                            CirnoApi.retrofitService.getReCaptchaV3(requiredTokenNumber)
-                                                        if (token.captcha_list.isEmpty()) {
-                                                            RefugeVip.createWarningAlert(requireActivity(), "获取Token失败", token.message)
+                                                            CirnoApi.getReCaptchaV3(requiredTokenNumber)
+                                                        if (token.isEmpty()) {
+                                                            RefugeVip.createWarningAlert(requireActivity(), "获取Token失败", "未知错误")
                                                             return@launch
                                                         }
-                                                        tokenList.addAll(token.captcha_list)
+                                                        tokenList.addAll(token)
                                                     }
                                                 } catch (e: Exception) {
                                                     createWarningAlerter(
@@ -411,6 +412,15 @@ class ShoppingFragment : Fragment() {
                                                     if (builder.isChecked) {
                                                         val applicableCredit: Int =
                                                             cartInfo.data.store.cart.totals.credits.maxApplicable - cartInfo.data.store.cart.totals.credits.amount
+                                                        if (applicableCredit == 0) {
+                                                            Toast.makeText(
+                                                                context,
+                                                                "可添加信用点为零",
+                                                                Toast.LENGTH_LONG
+                                                            ).show()
+                                                            jumpToCartActivity(requireActivity())
+                                                            return@launch
+                                                        }
                                                         val addCredits = addCredit(applicableCredit / 100f)
                                                         if (addCredits.errors == null) {
                                                             Toast.makeText(
@@ -429,9 +439,9 @@ class ShoppingFragment : Fragment() {
                                                     nextStep()
                                                     val token = tokenList[0]
                                                     tokenList.removeAt(0)
-                                                    cartValidation(token.token)
+                                                    cartValidation(token)
                                                     val cartStatus = getCartSummary()
-                                                    if (cartStatus.data.store.cart.totals.total == 0) {
+                                                    if (cartStatus.data.store.cart.totals.total == 0 && cartStatus.data.store.cart.totals.subTotal == 0) {
                                                         createSuccessAlerter(
                                                             requireActivity(),
                                                             "购买成功",
@@ -540,21 +550,21 @@ class ShoppingFragment : Fragment() {
 //                                                    }
                                                 }
                                                 nextStep()
-                                                val tokenList: List<RecaptchaList.ReCaptcha>?
-                                                val recaptchaList: RecaptchaList
+                                                val tokenList: ArrayList<String>?
+                                                val recaptchaList: ArrayList<String>
                                                 try {
-                                                    recaptchaList = CirnoApi.retrofitService.getReCaptchaV3(1)
-                                                    tokenList = recaptchaList.captcha_list
+                                                    recaptchaList = CirnoApi.getReCaptchaV3(1)
+                                                    tokenList = recaptchaList
                                                 } catch (e: Exception) {
                                                     createWarningAlerter(requireActivity(), "获取Token失败", getString(R.string.cirno_token_error)).show()
                                                     return@launch
                                                 }
                                                 if (tokenList.isEmpty()) {
-                                                    RefugeVip.createWarningAlert(requireActivity(), "获取Token失败", recaptchaList.message)
+                                                    RefugeVip.createWarningAlert(requireActivity(), "获取Token失败", "未知错误")
                                                     return@launch
                                                 }
                                                 val token = tokenList[0]
-                                                Log.d("CartValidation", cartValidation(token.token).toString())
+                                                Log.d("CartValidation", cartValidation(token).toString())
                                                 val cartStatus = getCartSummary()
                                                 if (cartStatus.data.store.cart.totals.total == 0 && cartStatus.data.store.cart.totals.subTotal == 0) {
                                                     if (upgradeCount!! > 1) {
@@ -626,7 +636,7 @@ class ShoppingFragment : Fragment() {
                     dialog.dismiss()
                     scope.launch {
                         var canNextStep = false
-                        val token: RecaptchaList
+                        val token: ArrayList<String>
 
                         if (!RefugeVip.isVip()) {
                             RefugeVip.createWarningAlert(activity = requireActivity())
@@ -635,17 +645,17 @@ class ShoppingFragment : Fragment() {
 
                         try {
                             token =
-                                CirnoApi.retrofitService.getReCaptchaV3(100)
+                                CirnoApi.getReCaptchaV3(1)
                         } catch (e: Exception) {
                             createWarningAlerter(requireActivity(), "Token获取失败", getString(R.string.network_error)).show()
                             return@launch
                         }
 
-                        if (token.captcha_list.isEmpty()) {
-                            RefugeVip.createWarningAlert(title = "Token获取失败", detail = token.message, activity = requireActivity())
+                        if (token.isEmpty()) {
+                            RefugeVip.createWarningAlert(title = "Token获取失败", detail = "未知错误", activity = requireActivity())
                         }
 
-                        autoBuying = token.captcha_list.first().token
+                        autoBuying = token.first()
                         clearCart()
                         while (!canNextStep && isAdding) {
                             canNextStep = true

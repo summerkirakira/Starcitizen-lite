@@ -96,17 +96,18 @@ class LoginActivity : RefugeBaseActivity() {
                 val password = passwordEditText.text.toString()
                 startLoading()
                 lifecycleScope.launchWhenCreated {
-                    val token: RecaptchaList
+                    val token: ArrayList<String>
                     try {
-                        token = CirnoApi.retrofitService.getReCaptchaV3(1)
+                        token = CirnoApi.getReCaptchaV3(1)
                     } catch (e: Exception) {
                         stopLoading()
                         createWarningAlerter(this@LoginActivity, getString(R.string.network_error), getString(R.string.token_server_error)).show()
+                        e.printStackTrace()
                         return@launchWhenCreated
                     }
-                    if (token.captcha_list.isEmpty()) {
+                    if (token.isEmpty()) {
                         stopLoading()
-                        RefugeVip.createWarningAlert(this@LoginActivity, getString(R.string.no_cirno_token), token.message)
+                        RefugeVip.createWarningAlert(this@LoginActivity, getString(R.string.no_cirno_token), "请重试")
                         return@launchWhenCreated
                     }
                     val loginDetail: LoginProperty
@@ -117,7 +118,7 @@ class LoginActivity : RefugeBaseActivity() {
                                 variables = LoginBody.Variables(
                                     email = email,
                                     password = password,
-                                    captcha = token.captcha_list[0].token
+                                    captcha = token[0]
                                 )
                             )
                         )
@@ -312,18 +313,18 @@ class LoginActivity : RefugeBaseActivity() {
     }
 
     suspend fun register(activity: LoginActivity, email: String, password: String, handle: String, referralCode: String): Int {
-        val tokenList: RecaptchaList
+        val tokenList: ArrayList<String>
         try {
-            tokenList = CirnoApi.retrofitService.getReCaptchaV3(1)
+            tokenList = CirnoApi.getReCaptchaV3(1)
         } catch (e: Exception) {
             createWarningAlerter(activity, activity.getString(R.string.error), activity.getString(R.string.token_server_error)).show()
             return 1
         }
-        if (tokenList.captcha_list == null) {
+        if (tokenList.isEmpty()) {
             createWarningAlerter(activity, activity.getString(R.string.error), activity.getString(R.string.token_server_error)).show()
             return 1
         }
-        val token = tokenList.captcha_list[0].token
+        val token = tokenList[0]
         val registerDetail = RSIApi.retrofitService.signUp(RegisterBody(
             variables = RegisterBody.Variables(
                 handle = handle,
