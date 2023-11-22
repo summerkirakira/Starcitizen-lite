@@ -238,13 +238,12 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
                                     containsTranslation?.title ?: it
                                 }
                                 if (alsoContains.size > 0) {
+//                                    Log.d("HangerItemRepository", hangerPackage.chineseContains.toString())
                                     alsoContains.addAll(hangerPackage.chineseContains!!.split("#"))
-                                    for (item in alsoContains) {
-                                        if (item.contains("Upgrade")) {
-                                            alsoContains.remove(item)
-                                        }
-                                    }
-                                    hangerPackage.chineseContains = alsoContains.joinToString("#")
+//                                    Log.d("HangerItemRepository", alsoContains.toString())
+                                    hangerPackage.chineseContains = alsoContains.filter {
+                                        !it.contains("Upgrade")
+                                    }.joinToString("#")
                                 }
                             }
                         }
@@ -263,6 +262,7 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
                     }
                     database.hangerItemDao.deleteAllOldPackage(getTime)
                 } catch (e: Exception) {
+                    Log.d("HangerItemRepository", e.toString())
                     e.printStackTrace()
                 }
 
