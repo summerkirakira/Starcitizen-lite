@@ -638,10 +638,10 @@ class ShoppingFragment : Fragment() {
                         var canNextStep = false
                         val token: ArrayList<String>
 
-                        if (!RefugeVip.isVip()) {
-                            RefugeVip.createWarningAlert(activity = requireActivity())
-                            return@launch
-                        }
+//                        if (!RefugeVip.isVip()) {
+//                            RefugeVip.createWarningAlert(activity = requireActivity())
+//                            return@launch
+//                        }
 
                         try {
                             token =

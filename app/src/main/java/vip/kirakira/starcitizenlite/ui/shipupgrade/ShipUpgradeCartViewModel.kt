@@ -213,6 +213,9 @@ class ShipUpgradeCartViewModel(application: Application) : AndroidViewModel(appl
         if (shipNameList.isEmpty()) {
             return null
         }
+        if (shipNameList.size < 2) {
+            return null
+        }
         val fromShip = getShipAliasByName(shipNameList[0])
         val toShip = getShipAliasByName(shipNameList[1])
         if (fromShip == null || toShip == null) {

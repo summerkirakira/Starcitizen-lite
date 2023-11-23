@@ -579,11 +579,8 @@ class MainActivity : RefugeBaseActivity() {
                     }
                 }
                 FragmentType.HANGER.value -> {
-                    if(RefugeVip.isVip()){
-                        HangarLogBottomSheet.showDialog(supportFragmentManager)
-                    } else {
-                        RefugeVip.createWarningAlert(this)
-                    }
+//                    if(RefugeVip.isVip())
+                    HangarLogBottomSheet.showDialog(supportFragmentManager)
 
                 }
             }

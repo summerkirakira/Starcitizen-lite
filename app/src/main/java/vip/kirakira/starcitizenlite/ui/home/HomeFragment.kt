@@ -145,10 +145,10 @@ class HomeFragment : Fragment() {
                 val hangerItem = it
 
                 binding.contentDetail.setOnClickListener {
-                    if(!RefugeVip.isVip()) {
-                        RefugeVip.createWarningAlert(requireActivity())
-                        return@setOnClickListener
-                    }
+//                    if(!RefugeVip.isVip()) {
+//                        RefugeVip.createWarningAlert(requireActivity())
+//                        return@setOnClickListener
+//                    }
                     HangarItemDetailBottomSheet.showDialog(
                         requireActivity().supportFragmentManager,
                         hangerItem
@@ -211,10 +211,10 @@ class HomeFragment : Fragment() {
                         .setMessage("即将对${item.name}进行回收操作，结束后将会返还${item.price.toFloat() / 100f}信用点\n此操作不可逆！是否继续？")
                         .addAction("全部回收") { dialog, _ ->
                             dialog.dismiss()
-                            if (!RefugeVip.isVip()) {
-                                RefugeVip.createWarningAlert(requireActivity())
-                                return@addAction
-                            }
+//                            if (!RefugeVip.isVip()) {
+//                                RefugeVip.createWarningAlert(requireActivity())
+//                                return@addAction
+//                            }
                             QMUIDialog.MessageDialogBuilder(activity)
                                 .setTitle(getString(R.string.reclaim_warning))
                                 .setMessage("确定要对${item.name}进行全部回收吗？\n此操作不可逆！！！")
@@ -602,42 +602,42 @@ class HomeFragment : Fragment() {
     }
 
     private fun onUpgradeFabClick(homeViewModel: HomeViewModel) {
-        if(!RefugeVip.isVip()) {
-            RefugeVip.createWarningAlert(requireActivity())
-            return
-        }
+//        if(!RefugeVip.isVip()) {
+//            RefugeVip.createWarningAlert(requireActivity())
+//            return
+//        }
         homeViewModel.setFilter("Upgrade - ")
     }
 
     private fun onShipFabClick(homeViewModel: HomeViewModel) {
-        if(!RefugeVip.isVip()) {
-            RefugeVip.createWarningAlert(requireActivity())
-            return
-        }
+//        if(!RefugeVip.isVip()) {
+//            RefugeVip.createWarningAlert(requireActivity())
+//            return
+//        }
         homeViewModel.setFilter("Ship")
     }
 
     private fun onSubscribeFabClick(homeViewModel: HomeViewModel) {
-        if(!RefugeVip.isVip()) {
-            RefugeVip.createWarningAlert(requireActivity())
-            return
-        }
+//        if(!RefugeVip.isVip()) {
+//            RefugeVip.createWarningAlert(requireActivity())
+//            return
+//        }
         homeViewModel.setFilter("Subscribe")
     }
 
     private fun onPaintFabClick(homeViewModel: HomeViewModel) {
-        if(!RefugeVip.isVip()) {
-            RefugeVip.createWarningAlert(requireActivity())
-            return
-        }
+//        if(!RefugeVip.isVip()) {
+//            RefugeVip.createWarningAlert(requireActivity())
+//            return
+//        }
         homeViewModel.setFilter("paint")
     }
 
     private fun onTrashFabClick(homeViewModel: HomeViewModel) {
-        if(!RefugeVip.isVip()) {
-            RefugeVip.createWarningAlert(requireActivity())
-            return
-        }
+//        if(!RefugeVip.isVip()) {
+//            RefugeVip.createWarningAlert(requireActivity())
+//            return
+//        }
         homeViewModel.setFilter("Trash")
     }
 

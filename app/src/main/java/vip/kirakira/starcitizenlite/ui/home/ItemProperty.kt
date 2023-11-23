@@ -105,22 +105,36 @@ fun List<HangerPackageWithItems>.toItemPropertyList(): List<HangerItemProperty> 
     val map = mutableMapOf<String, HangerItemProperty>()
     for(packageWithItems in this) {
         val packageItemString = packageWithItems.hangerItems.map { it.title }.joinToString("#")
-        val saveKey = packageWithItems.hangerPackage.title + packageWithItems.hangerPackage.status + packageItemString + packageWithItems.hangerPackage.also_contains
+        val saveKey = packageWithItems.hangerPackage.title +
+                packageWithItems.hangerPackage.status +
+                packageItemString +
+                packageWithItems.hangerPackage.also_contains  +
+                packageWithItems.hangerPackage.image +
+                packageWithItems.hangerPackage.can_gift.toString()
         if(map[saveKey] == null){
             var insuranceTime = 0
             var insuranceString = ""
             packageWithItems.hangerPackage.also_contains.split("#").forEach {
                 var eachInsuranceTime = 0
-                if(it.contains("Insurance")){
-                    if(it.contains("Lifetime")){
-                        insuranceString = "LTI"
-                    } else {
-                        eachInsuranceTime = it.split(" ")[0].toInt()
+                try {
+                    if(it.contains("Insurance")){
+//                        Log.d("HangerItemProperty", it)
+                        val formattedInsurance = it.replace("-", " ")
+                        if(formattedInsurance.contains("Lifetime")){
+                            insuranceString = "LTI"
+                        } else {
+                            eachInsuranceTime = formattedInsurance.split(" ")[0].toInt()
+                        }
+                        if(formattedInsurance.split(" ")[1] == "Year"){
+                            eachInsuranceTime *= 10
+                        }
                     }
-                    if(it.split(" ")[1] == "Year"){
-                        eachInsuranceTime *= 10
-                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    eachInsuranceTime = 0
+//                    Log.d("HangerItemProperty", packageWithItems.hangerPackage.toString())
                 }
+
                 if(eachInsuranceTime > insuranceTime){
                     insuranceTime = eachInsuranceTime
                 }
