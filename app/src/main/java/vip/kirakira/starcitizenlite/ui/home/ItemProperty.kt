@@ -111,6 +111,9 @@ fun List<HangerPackageWithItems>.toItemPropertyList(): List<HangerItemProperty> 
                 packageWithItems.hangerPackage.also_contains  +
                 packageWithItems.hangerPackage.image +
                 packageWithItems.hangerPackage.can_gift.toString()
+        for (item in packageWithItems.hangerItems) {
+            saveKey + item.title
+        }
         if(map[saveKey] == null){
             var insuranceTime = 0
             var insuranceString = ""
