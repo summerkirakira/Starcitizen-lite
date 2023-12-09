@@ -128,6 +128,7 @@ class HomeFragment : Fragment() {
 
         val adapter = HangerViewAdapter(
             HangerViewAdapter.OnClickListener {
+//                vibrate()
                 if(binding.popupLayout.visibility == View.VISIBLE) {
                     binding.popupLayout.visibility = View.GONE
                     viewModel.isDetailShowing.value = false
@@ -639,6 +640,14 @@ class HomeFragment : Fragment() {
 //            return
 //        }
         homeViewModel.setFilter("Trash")
+    }
+
+    private fun vibrate() {
+        val vibrator = activity?.getSystemService(Context.VIBRATOR_SERVICE) as android.os.Vibrator
+        if (vibrator.hasVibrator()) {
+            val vibratorEffect = android.os.VibrationEffect.createOneShot(50, 70)
+            vibrator.vibrate(vibratorEffect)
+        }
     }
 
 }

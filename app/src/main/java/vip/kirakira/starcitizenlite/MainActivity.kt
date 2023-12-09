@@ -9,6 +9,7 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.os.Vibrator
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
@@ -943,5 +944,13 @@ class MainActivity : RefugeBaseActivity() {
                 startActivity(intent)
             }
 
+    }
+
+    private fun vibrate() {
+        val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        if (vibrator.hasVibrator()) {
+            val vibratorEffect = android.os.VibrationEffect.createOneShot(50, 70)
+            vibrator.vibrate(vibratorEffect)
+        }
     }
 }

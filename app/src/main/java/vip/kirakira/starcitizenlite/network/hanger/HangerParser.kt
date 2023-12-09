@@ -8,11 +8,19 @@ import vip.kirakira.starcitizenlite.database.HangerPackage
 import vip.kirakira.starcitizenlite.network.convertDateToLong
 import java.net.URL
 
-
+var hangarTimeId = 0
 
 class HangerProcess {
 
     data class PackageWithItem(val hangerPackages: List<HangerPackage>, val hangerItems: List<HangerItem>)
+
+    private fun getHangarTimeId(): Int {
+        if (hangarTimeId == 0) {
+            hangarTimeId = 1000000
+        }
+        hangarTimeId--
+        return hangarTimeId
+    }
 
     fun parsePage(page: String): PackageWithItem {
             val doc = Jsoup.parse(page)
@@ -40,7 +48,7 @@ class HangerProcess {
                 val canUpgrade = pledge.select(".shadow-button.js-apply-upgrade").isNotEmpty()
                 val upgradeInfo = pledge.select(".js-upgrade-data").attr("value")
                 val alsoContainsString = pledge.select(".title").joinToString("#") { it.text() }
-                val hangerPackage = HangerPackage(pledgeId, pledgeTitle, pledgeImage, pledgeValue, 0, pledgeStatus, canUpgrade, upgradeInfo, pledgeDate, pledgeContains, alsoContainsString, canGift, canExchange, System.currentTimeMillis())
+                val hangerPackage = HangerPackage(pledgeId, pledgeTitle, pledgeImage, pledgeValue, 0, pledgeStatus, canUpgrade, upgradeInfo, pledgeDate + getHangarTimeId(), pledgeContains, alsoContainsString, canGift, canExchange, System.currentTimeMillis())
                 val itemList = pledge.select(".with-images").select(".item").mapIndexed { position, item ->
                     val id = "$pledgeId#$position"
                     val title = item.select(".title").text()
@@ -62,7 +70,7 @@ class HangerProcess {
             val image = pledge.select("img").attr("src")
             val title = pledge.select(".information").select("h1").text()
             val timeString = pledge.select("dl").select("dd")[0].text()
-            val time = convertDateToLong(timeString)
+            val time = convertDateToLong(timeString) + getHangarTimeId()
             val contains = pledge.select("dl").select("dd")[2].text()
             var pledgeId = 0
             var isUpgrade = false

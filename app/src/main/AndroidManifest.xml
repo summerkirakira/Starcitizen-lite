@@ -3,6 +3,7 @@
     package="vip.kirakira.starcitizenlite" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:name=".RefugeApplication"
