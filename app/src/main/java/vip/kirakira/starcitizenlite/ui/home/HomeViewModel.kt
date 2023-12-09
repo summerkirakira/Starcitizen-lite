@@ -71,7 +71,6 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
 
     fun refresh() {
         viewModelScope.launch {
-            hangerItemFilter.value = ""
             try {
                 hangerItemRepository.refreshItems(getApplication())
             } catch (e: Exception) {
@@ -87,6 +86,7 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
                     userRepository.insertUser(newUser)
                 }
             }
+            hangerItemFilter.value = ""
         }
     }
 

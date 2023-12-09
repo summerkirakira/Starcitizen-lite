@@ -81,5 +81,22 @@ class RepoUtil {
             }
             return AddUpgradeRecord(upgradeInfoList)
         }
+
+        fun keepHangarPackagesInOrder(hangarPackages: List<HangerPackage>): List<HangerPackage> {
+            val result = mutableListOf<HangerPackage>()
+            var currentPackageTime = 0L
+            var currentOrder = 0
+            for (hangarPackage in hangarPackages.reversed()) {
+                if (hangarPackage.date > currentPackageTime) {
+                    currentPackageTime = hangarPackage.date
+                    currentOrder = 0
+                } else {
+                    currentOrder ++
+                    hangarPackage.date += currentOrder
+                }
+                result.add(hangarPackage)
+            }
+            return result
+        }
     }
 }

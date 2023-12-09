@@ -47,6 +47,8 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
                     translationRepository.refreshTranslation(application)
                     val unknownShipList: MutableList<String> = mutableListOf()
                     val upgradesList: MutableList<HangerPackage> = mutableListOf()
+                    val allHangarPackages = mutableListOf<HangerPackage>()
+                    val allHangarItems = mutableListOf<HangerItem>()
                     while (true) {
                         val data = HangerService().getHangerInfo(page)
                         if (data.hangerPackages.isEmpty()) {
@@ -247,10 +249,14 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
                                 }
                             }
                         }
-                        database.hangerItemDao.insertAllItems(data.hangerItems)
-                        database.hangerItemDao.insertAllPackages(data.hangerPackages)
+                        allHangarItems.addAll(data.hangerItems)
+                        allHangarPackages.addAll(data.hangerPackages)
+//                        database.hangerItemDao.insertAllItems(data.hangerItems)
+//                        database.hangerItemDao.insertAllPackages(data.hangerPackages)
                         page++
                     }
+                    database.hangerItemDao.insertAllItems(allHangarItems)
+                    database.hangerItemDao.insertAllPackages(RepoUtil.keepHangarPackagesInOrder(allHangarPackages))
                     if (notTranslatedItems.size > 0) {
                         CirnoApi.retrofitService.addNotTranslation(notTranslatedItems)
                     }

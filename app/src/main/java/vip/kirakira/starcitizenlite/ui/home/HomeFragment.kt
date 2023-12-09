@@ -22,10 +22,7 @@ import androidx.fragment.app.activityViewModels
 import com.nambimobile.widgets.efab.FabOption
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog
 import com.tapadoo.alerter.Alerter
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.RefugeApplication
 import vip.kirakira.starcitizenlite.activities.CartActivity
@@ -521,6 +518,8 @@ class HomeFragment : Fragment() {
             }
         )
 
+//        adapter.setHasStableIds(true)
+
         binding.hangerRecyclerView.adapter = adapter
         binding.hangerRecyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
         viewModel.hangerItems.observe(viewLifecycleOwner) {
@@ -528,7 +527,12 @@ class HomeFragment : Fragment() {
                 adapter.submitList(it.toItemPropertyList())
             } else if (viewModel.currentMode.value == HomeViewModel.Mode.BUYBACK) {
                 adapter.submitList(viewModel.buybackItems.value?.toItemProperty())
-
+            }
+            binding.hangerRecyclerView.post {
+                Log.d("scroll", "scroll to top")
+                // delay 100ms to scroll to top
+//                Thread.sleep(2000)
+                binding.hangerRecyclerView.scrollToPosition(0)
             }
         }
         viewModel.currentMode.observe(viewLifecycleOwner) {
@@ -545,6 +549,11 @@ class HomeFragment : Fragment() {
 
             } else if (viewModel.currentMode.value == HomeViewModel.Mode.HANGER) {
                 adapter.submitList(viewModel.hangerItems.value?.toItemPropertyList())
+            }
+            binding.hangerRecyclerView.post {
+                // delay 100ms to scroll to top
+//                Thread.sleep(2000)
+                binding.hangerRecyclerView.scrollToPosition(0)
             }
         }
 

@@ -116,7 +116,8 @@ class HangerViewAdapter(private val onClickListener: HangerViewAdapter.OnClickLi
     }
     companion object DiffCallback : DiffUtil.ItemCallback<HangerItemProperty>() {
         override fun areItemsTheSame(oldItem: HangerItemProperty, newItem: HangerItemProperty): Boolean {
-            return oldItem == newItem
+
+            return "${oldItem.id}#${oldItem.idList}#${oldItem.alsoContains}#${oldItem.status}#${oldItem.image}#${oldItem.price}" == "${newItem.id}#${newItem.idList}#${newItem.alsoContains}#${newItem.status}#${newItem.image}#${newItem.price}"
         }
 
         override fun areContentsTheSame(oldItem: HangerItemProperty, newItem: HangerItemProperty): Boolean {
