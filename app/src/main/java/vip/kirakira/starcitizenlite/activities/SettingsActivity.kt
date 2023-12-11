@@ -67,6 +67,18 @@ class SettingsActivity : RefugeBaseActivity() {
                 }
             }
             val localization: Preference? = findPreference("enable_localization")
+
+            val vibrate: Preference? = findPreference("enable_vibrate")
+
+            vibrate?.setOnPreferenceChangeListener { _, newValue ->
+                val enableVibrate = newValue as Boolean
+                pref.edit().apply {
+                    putBoolean(getString(R.string.VIBRATE_KEY), enableVibrate)
+                    apply()
+                }
+                true
+            }
+
             localization?.setOnPreferenceChangeListener { _, newValue ->
                 val enableLocalization = newValue as Boolean
                 if (enableLocalization) {

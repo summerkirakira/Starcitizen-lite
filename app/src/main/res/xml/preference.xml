@@ -24,6 +24,11 @@
                 android:title="@string/shop_chinese_localization"
                 android:defaultValue="true"
                 android:summary="@string/shop_localization_chinese_summary"/>
+        <SwitchPreferenceCompat
+                android:key="enable_vibrate"
+                android:title="启用震动反馈"
+                android:defaultValue="false"
+                android:summary="为避难所添加震动反馈（实验性）"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="避难所 Premium专属">
         <ListPreference

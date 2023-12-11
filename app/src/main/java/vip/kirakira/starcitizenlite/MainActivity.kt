@@ -951,6 +951,10 @@ class MainActivity : RefugeBaseActivity() {
     }
 
     private fun vibrate() {
+        val preferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        if(!preferences.getBoolean(getString(R.string.VIBRATE_KEY), false)) {
+            return
+        }
         val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         if (vibrator.hasVibrator()) {
             val vibratorEffect = android.os.VibrationEffect.createOneShot(50, 70)

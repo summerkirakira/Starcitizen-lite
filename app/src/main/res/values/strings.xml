@@ -216,4 +216,5 @@
     <string name="please_select_removed_banned_ccu">请选择要移出黑名单的升级包</string>
     <string name="original_cost">原花费:</string>
     <string name="device_id_key">DEVIC_ID_KEY</string>
+    <string name="VIBRATE_KEY">enable_viber</string>
 </resources>
