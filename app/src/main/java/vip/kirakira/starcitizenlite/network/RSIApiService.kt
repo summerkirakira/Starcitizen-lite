@@ -144,6 +144,9 @@ interface RSIApiService {
     @POST("graphql")
     suspend fun cartAddressQuery(@Body body: BaseGraphQLBody): CartAddressProperty
 
+    @POST("graphql")
+    suspend fun promotionCodeQuery(@Body body: BaseGraphQLBody): PromotionCodeQueryResponseProperty
+
     @POST("api/account/reclaimPledge")
     suspend fun reclaimPledge(@Body body: ReclaimRequestBody): BasicResponseBody
 
@@ -326,7 +329,11 @@ object RSIApi {
         return retrofitService.applyUpgrade(ApplyUpgradeBody(password, target_id, upgrade_id))
     }
 
-    suspend fun redeemPromoCode(promo: String, code: String, currency: String): ApplyPromoProperty {
+    suspend fun redeemPromoCode(promo: String, code: String, currency: String): PromotionCodeQueryResponseProperty {
+        return retrofitService.promotionCodeQuery(PromotionCodeQuery().getRequestBody(code = code, id = promo))
+    }
+
+    suspend fun redeemPromoCodeNew(promo: String, code: String, currency: String): ApplyPromoProperty {
         return retrofitService.redeemPromoCode(ApplyPromoBody(promo, currency, code))
     }
 

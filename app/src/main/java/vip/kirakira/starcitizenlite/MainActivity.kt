@@ -416,16 +416,20 @@ class MainActivity : RefugeBaseActivity() {
 
         bottomMainIcon.setOnClickListener {
             mPager.currentItem = FragmentType.MAIN.value
+            vibrate()
         }
         bottomHangerIcon.setOnClickListener {
             mPager.currentItem = FragmentType.HANGER.value
+            vibrate()
         }
 
         bottomShopIcon.setOnClickListener {
             mPager.currentItem = FragmentType.SHOPPING.value
+            vibrate()
         }
         bottomMeIcon.setOnClickListener {
             mPager.currentItem = FragmentType.ME.value
+            vibrate()
         }
 
         density = resources!!.displayMetrics.density

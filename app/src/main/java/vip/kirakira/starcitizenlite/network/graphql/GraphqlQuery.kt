@@ -1558,6 +1558,36 @@ class MultiStepLoginQuery {
     }
 }
 
+class PromotionCodeQuery {
+    val query = """query PromotionCodeQuery(${"$"}code: String!, ${"$"}id: ID!) {
+  promotionalCode {
+    validate(query: {code: ${"$"}code, id: ${"$"}id}) {
+      isValid
+      error
+      __typename
+    }
+    __typename
+  }
+  heap {
+    launcherDownloadLink: variables(key: "rsi.game.download_url") {
+      value
+      __typename
+    }
+    __typename
+  }
+}
+"""
+    class Variables(
+        val code: String,
+        val id: String
+    )
+
+    fun getRequestBody(code: String, id: String): BaseGraphQLBody {
+        return BaseGraphQLBody(query, Variables(code = code, id = id))
+    }
+}
+
+
 data class RegisterBody(
     @Json(name = "query")
     val query: String = """mutation signup(${"$"}handle: String!, ${"$"}email: String!, ${"$"}password: String!, ${"$"}dob: String!, ${"$"}agreementChecked: Boolean!, ${"$"}messageMe: Boolean, ${"$"}captcha: String!, ${"$"}referralCode: String, ${"$"}mark: String) {

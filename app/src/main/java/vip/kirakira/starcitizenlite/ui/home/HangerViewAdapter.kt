@@ -65,6 +65,9 @@ class HangerViewAdapter(private val onClickListener: HangerViewAdapter.OnClickLi
             if(item.status == "已礼物"){
                 binding.hangerItemStatus.setStrokeData(4, ColorStateList.valueOf(Color.parseColor("#F89BAC")))
                 binding.hangerItemStatus.setTextColor(Color.parseColor("#F89BAC"))
+            } else {
+                binding.hangerItemStatus.setStrokeData(4, ColorStateList.valueOf(Color.parseColor("#AED581")))
+                binding.hangerItemStatus.setTextColor(Color.parseColor("#AED581"))
             }
             if (item.insurance.isNotEmpty()){
                 binding.insuranceItemButton.visibility = View.VISIBLE
@@ -117,7 +120,7 @@ class HangerViewAdapter(private val onClickListener: HangerViewAdapter.OnClickLi
     companion object DiffCallback : DiffUtil.ItemCallback<HangerItemProperty>() {
         override fun areItemsTheSame(oldItem: HangerItemProperty, newItem: HangerItemProperty): Boolean {
 
-            return "${oldItem.id}#${oldItem.idList}#${oldItem.alsoContains}#${oldItem.status}#${oldItem.image}#${oldItem.price}" == "${newItem.id}#${newItem.idList}#${newItem.alsoContains}#${newItem.status}#${newItem.image}#${newItem.price}"
+            return "${oldItem.tags}#${oldItem.id}#${oldItem.idList}#${oldItem.alsoContains}#${oldItem.status}#${oldItem.image}#${oldItem.price}" == "${oldItem.tags}#${newItem.id}#${newItem.idList}#${newItem.alsoContains}#${newItem.status}#${newItem.image}#${newItem.price}"
         }
 
         override fun areContentsTheSame(oldItem: HangerItemProperty, newItem: HangerItemProperty): Boolean {

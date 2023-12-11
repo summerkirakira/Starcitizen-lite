@@ -87,14 +87,19 @@ class MainFragment : Fragment() {
                     .addAction("确认") { dialog, index ->
                         dialog.dismiss()
                         builder.checkedItemIndexes.forEach {
-                            scope.launch {
-                                val result = RSIApi.redeemPromoCode(promotionCode[it].promo, promotionCode[it].code, promotionCode[it].currency)
-                                if (result.success != 0) {
-                                    createSuccessAlerter(requireActivity(), "\"${promotionCode[it].chinese_title}\"兑换成功", result.msg).show()
-                                } else {
-                                    createWarningAlerter(requireActivity(), "\"${promotionCode[it].chinese_title}\"兑换失败", result.msg).show()
+                            try {
+                                scope.launch {
+                                    val result = RSIApi.redeemPromoCode(promotionCode[it].promo, promotionCode[it].code, promotionCode[it].currency)
+                                    if (result.data.promotionalCode.validate.isValid) {
+                                        createSuccessAlerter(requireActivity(), "\"${promotionCode[it].chinese_title}\"兑换成功", "请到机库查看惊喜礼物哦~").show()
+                                    } else {
+                                        createWarningAlerter(requireActivity(), "\"${promotionCode[it].chinese_title}\"兑换失败", "兑换礼物时发生错误: ${result.data.promotionalCode.validate.error}").show()
+                                    }
                                 }
+                            } catch (e: Exception) {
+                                createWarningAlerter(requireActivity(), "\"${promotionCode[it].chinese_title}\"兑换失败", "兑换礼物时发生错误: ${e.message}").show()
                             }
+
                         }
 
                     }

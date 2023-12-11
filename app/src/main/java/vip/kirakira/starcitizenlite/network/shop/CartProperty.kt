@@ -89,6 +89,15 @@ data class CartAddressProperty(val errors: List<Error>?, val data: Data) {
         }
 }
 
+
+data class PromotionCodeQueryResponseProperty(val errors: List<Error>?, val data: Data) {
+    data class Data(val promotionalCode: PromotionCode) {
+        data class PromotionCode(val validate: Validate) {
+            data class Validate(val isValid: Boolean, val error: String)
+        }
+    }
+}
+
 data class ChooseUpgradeTargetProperty(val code: String, val msg: String, val data: Data) {
     data class Data(val rendered: String?, val upgrade_id: String?)
 }

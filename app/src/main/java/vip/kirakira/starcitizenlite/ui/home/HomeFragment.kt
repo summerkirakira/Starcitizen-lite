@@ -528,12 +528,12 @@ class HomeFragment : Fragment() {
             } else if (viewModel.currentMode.value == HomeViewModel.Mode.BUYBACK) {
                 adapter.submitList(viewModel.buybackItems.value?.toItemProperty())
             }
-            binding.hangerRecyclerView.post {
-                Log.d("scroll", "scroll to top")
-                // delay 100ms to scroll to top
-//                Thread.sleep(2000)
-                binding.hangerRecyclerView.scrollToPosition(0)
-            }
+//            binding.hangerRecyclerView.post {
+//                Log.d("scroll", "scroll to top")
+//                // delay 100ms to scroll to top
+////                Thread.sleep(2000)
+//                binding.hangerRecyclerView.scrollToPosition(0)
+//            }
         }
         viewModel.currentMode.observe(viewLifecycleOwner) {
             if (it == HomeViewModel.Mode.HANGER) {
@@ -550,11 +550,11 @@ class HomeFragment : Fragment() {
             } else if (viewModel.currentMode.value == HomeViewModel.Mode.HANGER) {
                 adapter.submitList(viewModel.hangerItems.value?.toItemPropertyList())
             }
-            binding.hangerRecyclerView.post {
-                // delay 100ms to scroll to top
-//                Thread.sleep(2000)
-                binding.hangerRecyclerView.scrollToPosition(0)
-            }
+//            binding.hangerRecyclerView.post {
+//                // delay 100ms to scroll to top
+////                Thread.sleep(2000)
+//                binding.hangerRecyclerView.scrollToPosition(0)
+//            }
         }
 
         viewModel.isRefreshing.observe(viewLifecycleOwner) {
