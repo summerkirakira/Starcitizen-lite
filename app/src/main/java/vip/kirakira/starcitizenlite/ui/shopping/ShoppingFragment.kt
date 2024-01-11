@@ -534,7 +534,7 @@ class ShoppingFragment : Fragment() {
                                                     val applicableCredit: Int =
                                                         cartInfo.data.store.cart.totals.credits.maxApplicable - cartInfo.data.store.cart.totals.credits.amount
                                                     val addCredits = addCredit(applicableCredit / 100f)
-                                                    Log.d("AddCredits", addCredits.toString())
+//                                                    Log.d("AddCredits", addCredits.toString())
 //                                                    if (addCredits.errors == null) {
 //                                                        Toast.makeText(
 //                                                            context,
@@ -564,6 +564,16 @@ class ShoppingFragment : Fragment() {
                                                     return@launch
                                                 }
                                                 val token = tokenList[0]
+
+                                                val billingAddress = cartAddressQuery()
+
+                                                if (billingAddress.data.store.addressBook.isEmpty()) {
+                                                    createWarningAlerter(requireActivity(), "购物车添加失败", "请先在网页端添加至少一个账单地址").show()
+                                                    return@launch
+                                                }
+
+                                                cartAddressAssign(billingAddress.data.store.addressBook.first().id)
+
                                                 Log.d("CartValidation", cartValidation(token).toString())
                                                 val cartStatus = getCartSummary()
                                                 if (cartStatus.data.store.cart.totals.total == 0 && cartStatus.data.store.cart.totals.subTotal == 0) {

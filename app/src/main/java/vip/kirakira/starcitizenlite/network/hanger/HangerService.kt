@@ -19,7 +19,7 @@ class HangerService {
     }
 
     suspend fun giftPledge(itemId: String, password: String, receiver: String="Powered by Starcitizen lite", email: String): BasicResponseBody {
-        println(GiftPledgeRequestBody(itemId, password, email, receiver))
+//        println(GiftPledgeRequestBody(itemId, password, email, receiver))
         return RSIApi.retrofitService.giftPledge(GiftPledgeRequestBody(itemId, password, email, receiver))
     }
 

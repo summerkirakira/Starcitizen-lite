@@ -129,8 +129,31 @@ object CirnoApi {
 
     suspend fun getReCaptchaV3(num: Int): ArrayList<String> {
         val reCaptchaList = ArrayList<String>()
+        try {
+            val token = RecaptchaV3.getRecaptchaToken()
+            for (i in 0 until num) {
+                reCaptchaList.add(token)
+            }
+        } catch (e: Exception) {
+            val result = retrofitService.getReCaptchaV3(num)
+            if (result.error != null) {
+                return reCaptchaList
+            }
+            for (i in 0 until num) {
+                reCaptchaList.add(result.captcha_list[i].token)
+            }
+        }
+        return reCaptchaList
+    }
+
+    suspend fun getRecaptchaOldV3(num: Int): ArrayList<String> {
+        val reCaptchaList = ArrayList<String>()
+        val result = retrofitService.getReCaptchaV3(num)
+        if (result.error != null) {
+            Log.d("CirnoApi", "getRecaptchaOldV3: ${result.error}")
+        }
         for (i in 0 until num) {
-            reCaptchaList.add(RecaptchaV3.getRecaptchaToken())
+            reCaptchaList.add(result.captcha_list[i].token)
         }
         return reCaptchaList
     }
