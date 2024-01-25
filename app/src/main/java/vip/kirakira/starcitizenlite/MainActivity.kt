@@ -90,6 +90,7 @@ class MainActivity : RefugeBaseActivity() {
     private lateinit var bottomMainIcon: ImageView
     private lateinit var bottomMeIcon: ImageView
     private lateinit var userAvatar: ImageView
+    private lateinit var bottomShipInfoIcon: ImageView
     private lateinit var drawerUserAvatar: AvatarView
     private lateinit var drawerUserName: TextView
     private lateinit var drawerUserCredit: TextView
