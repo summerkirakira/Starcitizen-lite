@@ -66,6 +66,7 @@ import vip.kirakira.starcitizenlite.ui.home.Parser
 import vip.kirakira.starcitizenlite.ui.loadUserAvatar
 import vip.kirakira.starcitizenlite.ui.main.MainFragment
 import vip.kirakira.starcitizenlite.ui.me.MeFragment
+import vip.kirakira.starcitizenlite.ui.ship_info.ShipInfoFragment
 import vip.kirakira.starcitizenlite.ui.shopping.ShopItemFilter
 import vip.kirakira.starcitizenlite.ui.widgets.RefugeVip
 import vip.kirakira.viewpagertest.network.graphql.LoginBody
@@ -78,7 +79,7 @@ import java.util.*
 import kotlin.concurrent.thread
 
 
-var  PAGE_NUM = 4;
+var  PAGE_NUM = 5;
 
 lateinit var shipAlias: List<ShipAlias>
 
@@ -118,7 +119,8 @@ class MainActivity : RefugeBaseActivity() {
         SHOPPING(0),
         MAIN(2),
         HANGER(1),
-        ME(3)
+        ME(4),
+        SHIPINFO(3)
     }
 
 
@@ -166,6 +168,7 @@ class MainActivity : RefugeBaseActivity() {
         bottomHangerIcon = findViewById(R.id.bottom_hanger_icon) //底部挂件图标
         bottomMainIcon = findViewById(R.id.bottom_main_icon) //底部主页图标
         bottomMeIcon = findViewById(R.id.bottom_me_icon) //底部我的图标
+        bottomShipInfoIcon = findViewById(R.id.bottom_ship_info_icon) //底部我的图标
         searchButton = findViewById(R.id.search_icon) //搜索按钮
         userAvatar = findViewById(R.id.user_avatar) //用户头像
         drawerUserAvatar = findViewById(R.id.drawer_avatar_image) //用户头像
@@ -193,6 +196,7 @@ class MainActivity : RefugeBaseActivity() {
         bottomHangerIcon.setColorFilter(Color.GRAY)
         if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
         bottomMainIcon.setColorFilter(colorPrimary)
+        bottomShipInfoIcon.setColorFilter(Color.GRAY)
         mMovingBar.setBackgroundColor(colorPrimary)
 
         currentUser.observe(this) {
@@ -439,16 +443,17 @@ class MainActivity : RefugeBaseActivity() {
         val homeFragment = HomeFragment.newInstance()
         val meFragment = MeFragment.newInstance()
         val hangerFragment = MainFragment.newInstance()
+        val shipInfoFragment = ShipInfoFragment.newInstance()
 
         val pagerAdapter = ScreenSlidePagerAdapter(this)
-        val fragment_list: MutableList<Fragment> = mutableListOf(shopFragment, homeFragment, hangerFragment, meFragment)
+        val fragment_list: MutableList<Fragment> = mutableListOf(shopFragment, homeFragment, hangerFragment, shipInfoFragment, meFragment)
         pagerAdapter.setList(fragment_list)
         mPager.adapter = pagerAdapter
         mPager.setCurrentItem(2, false)
         mPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
 
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-                mMovingBar.x = (mPager.width * positionOffset + position * mPager.width) / 4 + mPager.width / 8 - 20 * density //设置滑动条的位置
+                mMovingBar.x = (mPager.width * positionOffset + position * mPager.width) / 5 + mPager.width / 10 - 20 * density //设置滑动条的位置
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels)
             }
 
@@ -458,6 +463,7 @@ class MainActivity : RefugeBaseActivity() {
                         bottomShopIcon.setColorFilter(colorPrimary)
                         bottomHangerIcon.setColorFilter(Color.GRAY)
                         bottomMainIcon.setColorFilter(Color.GRAY)
+                        bottomShipInfoIcon.setColorFilter(Color.GRAY)
                         if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
                         searchButton.setColorFilter(getColor(R.color.avatar_left_line))
                         filterButton.setImageDrawable(getDrawable(R.drawable.ic_filter))
@@ -478,6 +484,7 @@ class MainActivity : RefugeBaseActivity() {
                         bottomShopIcon.setColorFilter(Color.GRAY)
                         bottomHangerIcon.setColorFilter(colorPrimary)
                         bottomMainIcon.setColorFilter(Color.GRAY)
+                        bottomShipInfoIcon.setColorFilter(Color.GRAY)
                         if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
                         filterButton.setImageDrawable(getDrawable(R.drawable.ic_exchange))
                         searchButton.setColorFilter(getColor(R.color.avatar_left_line))
@@ -495,6 +502,7 @@ class MainActivity : RefugeBaseActivity() {
                         bottomShopIcon.setColorFilter(Color.GRAY)
                         bottomHangerIcon.setColorFilter(Color.GRAY)
                         bottomMainIcon.setColorFilter(colorPrimary)
+                        bottomShipInfoIcon.setColorFilter(Color.GRAY)
                         if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
                         searchButton.setColorFilter(Color.WHITE)
                         setAvatarLine(ColorStateList.valueOf(Color.WHITE))
@@ -508,6 +516,7 @@ class MainActivity : RefugeBaseActivity() {
                         bottomShopIcon.setColorFilter(Color.GRAY)
                         bottomHangerIcon.setColorFilter(Color.GRAY)
                         bottomMainIcon.setColorFilter(Color.GRAY)
+                        bottomShipInfoIcon.setColorFilter(Color.GRAY)
                         if(primaryUserId == 0) bottomMeIcon.setColorFilter(colorPrimary)
                         filterButton.visibility = View.GONE
 
@@ -516,10 +525,29 @@ class MainActivity : RefugeBaseActivity() {
                         setAvatarLine(ColorStateList.valueOf(Color.WHITE))
                         immersionBar.statusBarDarkFont(false).init()
                     }
+                    FragmentType.SHIPINFO.value -> {
+                        bottomShopIcon.setColorFilter(Color.GRAY)
+                        bottomHangerIcon.setColorFilter(Color.GRAY)
+                        bottomMainIcon.setColorFilter(Color.GRAY)
+                        bottomShipInfoIcon.setColorFilter(colorPrimary)
+                        searchButton.visibility = View.GONE
+                        if(primaryUserId == 0) bottomShipInfoIcon.setColorFilter(colorPrimary)
+                        filterButton.visibility = View.GONE
+
+                        shipUpgradeButton.visibility = View.GONE
+
+                        setAvatarLine(ColorStateList.valueOf(getColor(R.color.avatar_left_line)))
+                        immersionBar.statusBarDarkFont(false).init()
+                    }
                 }
                 super.onPageSelected(position)
             }
         })
+
+        bottomShipInfoIcon.setOnClickListener {
+            mPager.currentItem = FragmentType.SHIPINFO.value
+            vibrate()
+        }
 
 
 //        val intent = Intent(this, LoginActivity::class.java)
