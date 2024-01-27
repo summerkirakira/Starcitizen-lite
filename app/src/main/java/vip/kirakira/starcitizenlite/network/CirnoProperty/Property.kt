@@ -1,5 +1,6 @@
 package vip.kirakira.starcitizenlite.network.CirnoProperty
 
+//import com.cretin.www.cretinautoupdatelibrary.model.LibraryUpdateEntity
 import com.squareup.moshi.JsonClass
 import vip.kirakira.starcitizenlite.ui.shipupgrade.BannedUpgrade
 import java.util.Currency
@@ -174,3 +175,14 @@ data class ShipUpgradeResponse(
         )
     }
 }
+
+data class AppUpdateInfo(
+    val versionCode: Int = 100,
+    val versionName: String = "",
+    val isForceUpdate: Int = 0,
+    val preBaselineCode: Int = 0,
+    val downurl: String = "",
+    val updateLog: String = "",
+    val size: Int = 0,
+    val hasAffectCodes: String = ""
+)

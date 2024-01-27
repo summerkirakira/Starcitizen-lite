@@ -23,7 +23,7 @@ android {
         applicationId "vip.kirakira.starcitizenlite"
         minSdk 26
         targetSdk 33
-        versionCode 1
+        versionCode 2
         versionName "2.4.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -117,7 +117,7 @@ dependencies {
 
     implementation 'androidx.preference:preference-ktx:1.2.0'
 
-    implementation 'com.github.azhon:AppUpdate:4.0.0'
+//    implementation 'com.github.azhon:AppUpdate:4.0.0'
     implementation "androidx.core:core-ktx:+"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
@@ -136,6 +136,10 @@ dependencies {
     androidTestImplementation "androidx.room:room-testing:2.5.0"
 
     implementation "com.github.skydoves:powerspinner:1.2.7"
+
+//    implementation "me.reezy.cosmo:update:0.8.0"
+
+    implementation 'com.github.MZCretin:AutoUpdateProject:2.0.5'
 
 //    implementation 'com.github.Hitomis.transferee:Transferee:1.6.1'
 }

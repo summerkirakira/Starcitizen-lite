@@ -37,6 +37,8 @@ class ShipInfoFragment : Fragment() {
         webview = requireView().findViewById(R.id.ship_info_webview)
         webview.webViewClient = MyWebViewClient()
 
+        webview.overScrollMode = WebView.OVER_SCROLL_NEVER
+
         val webSettings: WebSettings = webview.settings
         webSettings.javaScriptEnabled = true
         webSettings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK

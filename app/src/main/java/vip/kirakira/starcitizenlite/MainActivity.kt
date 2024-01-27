@@ -16,25 +16,22 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
-import com.azhon.appupdate.manager.DownloadManager
-import com.azhon.appupdate.util.ApkUtil
-import com.github.vipulasri.timelineview.TimelineView
+import com.cretin.www.cretinautoupdatelibrary.model.DownloadInfo
+import com.cretin.www.cretinautoupdatelibrary.model.TypeConfig
+import com.cretin.www.cretinautoupdatelibrary.model.UpdateConfig
+import com.cretin.www.cretinautoupdatelibrary.utils.AppUpdateUtils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.gyf.immersionbar.ImmersionBar
-import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog
 import com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
-import com.tapadoo.alerter.Alerter
 import com.wyt.searchbox.SearchFragment
 import io.getstream.avatarview.AvatarView
 import io.getstream.avatarview.coil.loadImage
@@ -42,20 +39,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.Call
-import okhttp3.OkHttpClient
-import okhttp3.Response
+import normalizeDragSensitivity
+import reduceDragSensitivity
 import vip.kirakira.starcitizenlite.activities.LoginActivity
 import vip.kirakira.starcitizenlite.activities.RefugeBaseActivity
 import vip.kirakira.starcitizenlite.activities.SettingsActivity
-import vip.kirakira.starcitizenlite.database.HangarLog
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.network.*
 import vip.kirakira.starcitizenlite.network.CirnoProperty.ClientInfo
 import vip.kirakira.starcitizenlite.network.CirnoProperty.RefugeInfo
 import vip.kirakira.starcitizenlite.network.CirnoProperty.ShipAlias
-import vip.kirakira.starcitizenlite.network.CirnoProperty.ShipUpgradePathPostBody
 import vip.kirakira.starcitizenlite.network.shop.getCartSummary
 import vip.kirakira.starcitizenlite.ui.ScreenSlidePagerAdapter
 import vip.kirakira.starcitizenlite.ui.hangarlog.HangarLogBottomSheet
@@ -68,13 +62,11 @@ import vip.kirakira.starcitizenlite.ui.main.MainFragment
 import vip.kirakira.starcitizenlite.ui.me.MeFragment
 import vip.kirakira.starcitizenlite.ui.ship_info.ShipInfoFragment
 import vip.kirakira.starcitizenlite.ui.shopping.ShopItemFilter
-import vip.kirakira.starcitizenlite.ui.widgets.RefugeVip
 import vip.kirakira.viewpagertest.network.graphql.LoginBody
 import vip.kirakira.viewpagertest.network.graphql.RsiLauncherSignInBody
 import vip.kirakira.viewpagertest.ui.shopping.ShoppingFragment
 import vip.kirakira.viewpagertest.ui.shopping.ShoppingViewModel
 import java.io.File
-import java.io.IOException
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -479,6 +471,9 @@ class MainActivity : RefugeBaseActivity() {
                         shipUpgradeButton.setImageDrawable(getDrawable(R.drawable.ic_ship_upgrade))
                         setAvatarLine(ColorStateList.valueOf(getColor(R.color.avatar_left_line)))
                         immersionBar.statusBarDarkFont(true).init()
+
+                        mPager.normalizeDragSensitivity()
+
                     }
                     FragmentType.HANGER.value -> {
                         bottomShopIcon.setColorFilter(Color.GRAY)
@@ -497,6 +492,9 @@ class MainActivity : RefugeBaseActivity() {
 
                         setAvatarLine(ColorStateList.valueOf(getColor(R.color.avatar_left_line)))
                         immersionBar.statusBarDarkFont(true).init()
+
+                        mPager.normalizeDragSensitivity()
+
                     }
                     FragmentType.MAIN.value -> {
                         bottomShopIcon.setColorFilter(Color.GRAY)
@@ -511,6 +509,9 @@ class MainActivity : RefugeBaseActivity() {
                         shipUpgradeButton.visibility = View.GONE
 
                         immersionBar.statusBarDarkFont(false).init()
+
+                        mPager.normalizeDragSensitivity()
+
                     }
                     FragmentType.ME.value -> {
                         bottomShopIcon.setColorFilter(Color.GRAY)
@@ -524,6 +525,9 @@ class MainActivity : RefugeBaseActivity() {
 
                         setAvatarLine(ColorStateList.valueOf(Color.WHITE))
                         immersionBar.statusBarDarkFont(false).init()
+
+                        mPager.normalizeDragSensitivity()
+
                     }
                     FragmentType.SHIPINFO.value -> {
                         bottomShopIcon.setColorFilter(Color.GRAY)
@@ -536,8 +540,19 @@ class MainActivity : RefugeBaseActivity() {
 
                         shipUpgradeButton.visibility = View.GONE
 
-                        setAvatarLine(ColorStateList.valueOf(getColor(R.color.avatar_left_line)))
-                        immersionBar.statusBarDarkFont(false).init()
+                        if (sharedPreferences.getString(application.getString(R.string.theme_color_key), "DEEP_BLUE") == "BLACK") {
+                            setAvatarLine(ColorStateList.valueOf(Color.WHITE))
+                            immersionBar.statusBarDarkFont(false).init()
+                        } else {
+                            setAvatarLine(ColorStateList.valueOf(Color.BLACK))
+                            immersionBar.statusBarDarkFont(true).init()
+                        }
+
+//                        setAvatarLine(ColorStateList.valueOf(getColor(R.color.avatar_left_line)))
+//                        immersionBar.statusBarDarkFont(false).init()
+
+                        mPager.reduceDragSensitivity()
+
                     }
                 }
                 super.onPageSelected(position)
@@ -691,6 +706,8 @@ class MainActivity : RefugeBaseActivity() {
         }
 
 
+
+
         if(sharedPreferences.getBoolean(getString(R.string.CHECK_UPDATE_KEY), true)) {
             CoroutineScope(Dispatchers.IO).launch {
 //                try {
@@ -714,7 +731,7 @@ class MainActivity : RefugeBaseActivity() {
                 }
             }
         } else {
-            val result = ApkUtil.deleteOldApk(this, "${externalCacheDir?.path}/refuge_update.apk")
+
         }
     }
 
@@ -759,17 +776,17 @@ class MainActivity : RefugeBaseActivity() {
             )
         )
 
-        if(compareVersion(latestVersion.version, BuildConfig.VERSION_NAME)) {
-            val manager = DownloadManager.Builder(this).run {
-                apkUrl(latestVersion.url)
-                apkName("refuge_update.apk")
-                smallIcon(R.mipmap.ic_launcher)
-                apkDescription("更新星河避难所...")
-                //省略一些非必须参数...
-                build()
-            }
-            manager.download()
-        }
+//        if(compareVersion(latestVersion.version, BuildConfig.VERSION_NAME)) {
+//            val manager = DownloadManager.Builder(this).run {
+//                apkUrl(latestVersion.url)
+//                apkName("refuge_update.apk")
+//                smallIcon(R.mipmap.ic_launcher)
+//                apkDescription("更新星河避难所...")
+//                //省略一些非必须参数...
+//                build()
+//            }
+//            manager.download()
+//        }
         try {
             updateAlias(latestVersion.shipAliasUrl)
             homeViewModel.refresh()
@@ -801,6 +818,7 @@ class MainActivity : RefugeBaseActivity() {
             sharedPreferences.edit().putBoolean(getString(R.string.GAME_TRANSLATION_KEY), true).apply()
             Toast.makeText(this, "游戏翻译数据已更新", Toast.LENGTH_SHORT).show()
         }
+        checkAppUpdate()
     }
 
     private fun updateAlias(url: String) {
@@ -990,4 +1008,44 @@ class MainActivity : RefugeBaseActivity() {
             vibrator.vibrate(vibratorEffect)
         }
     }
+
+    private suspend fun checkAppUpdate() {
+        val info = CirnoApi.retrofitService.getAppUpdate()
+        Log.d("AppUpdate", info.toString())
+
+
+        if (info.versionCode <= BuildConfig.VERSION_CODE) {
+            return
+        }
+
+
+        val updateConfig = UpdateConfig()
+            .setDebug(true) //是否是Debug模式
+            .setDataSourceType(TypeConfig.DATA_SOURCE_TYPE_MODEL) //设置获取更新信息的方式
+            .setShowNotification(true) //配置更新的过程中是否在通知栏显示进度
+            .setUiThemeType(TypeConfig.UI_THEME_I) //配置UI的样式，一种有12种样式可供选择
+            .setAutoDownloadBackground(false) //是否需要后台静默下载，如果设置为true，则调用checkUpdate方法之后会直接下载安装，不会弹出更新页面。当你选择UI样式为TypeConfig.UI_THEME_CUSTOM，静默安装失效，您需要在自定义的Activity中自主实现静默下载，使用这种方式的时候建议setShowNotification(false)，这样基本上用户就会对下载无感知了
+//            .setCustomActivityClass(CustomActivity::class.java) //如果你选择的UI样式为TypeConfig.UI_THEME_CUSTOM，那么你需要自定义一个Activity继承自RootActivity，并参照demo实现功能，在此处填写自定义Activity的class
+            .setNeedFileMD5Check(false) //是否需要进行文件的MD5检验，如果开启需要提供文件本身正确的MD5校验码，DEMO中提供了获取文件MD5检验码的工具页面，也提供了加密工具类Md5Utils
+//            .setCustomDownloadConnectionCreator(Creator(builder)) //如果你想使用okhttp作为下载的载体，可以使用如下代码创建一个OkHttpClient，并使用demo中提供的OkHttp3Connection构建一个ConnectionCreator传入，在这里可以配置信任所有的证书，可解决根证书不被信任导致无法下载apk的问题
+
+        AppUpdateUtils.init(application, updateConfig)
+
+
+        val updateInfo = DownloadInfo().setApkUrl(info.downurl)
+            .setFileSize(info.size.toLong())
+            .setProdVersionCode(100)
+            .setProdVersionName(info.versionName)
+//            .setMd5Check("68919BF998C29DA3F5BD2C0346281AC0")
+            .setForceUpdateFlag(info.isForceUpdate)
+            .setUpdateLog(info.updateLog)
+
+        withContext(Dispatchers.Main) {
+            AppUpdateUtils.getInstance().checkUpdate(updateInfo)
+        }
+
+
+
+    }
+
 }
