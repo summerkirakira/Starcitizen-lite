@@ -18,7 +18,7 @@ class HangerService {
         return RSIApi.retrofitService.reclaimPledge(ReclaimRequestBody(itemId, password))
     }
 
-    suspend fun giftPledge(itemId: String, password: String, receiver: String="Powered by Starcitizen lite", email: String): BasicResponseBody {
+    suspend fun giftPledge(itemId: String, password: String, receiver: String="Powered by Refuge", email: String): BasicResponseBody {
 //        println(GiftPledgeRequestBody(itemId, password, email, receiver))
         return RSIApi.retrofitService.giftPledge(GiftPledgeRequestBody(itemId, password, email, receiver))
     }

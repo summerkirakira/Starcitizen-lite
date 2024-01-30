@@ -461,6 +461,7 @@ class MainActivity : RefugeBaseActivity() {
                         filterButton.setImageDrawable(getDrawable(R.drawable.ic_filter))
                         filterButton.setColorFilter(getColor(R.color.avatar_left_line))
                         filterButton.visibility = View.VISIBLE
+                        searchButton.visibility = View.VISIBLE
 
                         if(shoppingViewModel.currentUpgradeStage.value == ShoppingViewModel.UpgradeStage.UNDEFINED) {
                             shipUpgradeButton.setColorFilter(getColor(R.color.avatar_left_line))
@@ -489,6 +490,7 @@ class MainActivity : RefugeBaseActivity() {
                         shipUpgradeButton.setImageDrawable(getDrawable(R.drawable.baseline_history_24))
                         shipUpgradeButton.setColorFilter(getColor(R.color.avatar_left_line))
                         shipUpgradeButton.visibility = View.VISIBLE
+                        searchButton.visibility = View.VISIBLE
 
                         setAvatarLine(ColorStateList.valueOf(getColor(R.color.avatar_left_line)))
                         immersionBar.statusBarDarkFont(true).init()
@@ -507,6 +509,7 @@ class MainActivity : RefugeBaseActivity() {
                         filterButton.visibility = View.GONE
 
                         shipUpgradeButton.visibility = View.GONE
+                        searchButton.visibility = View.VISIBLE
 
                         immersionBar.statusBarDarkFont(false).init()
 
