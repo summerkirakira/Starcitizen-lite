@@ -1,6 +1,7 @@
 package vip.kirakira.viewpagertest.ui.shopping
 
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.database.ShopItem
 import vip.kirakira.starcitizenlite.databinding.ShoppingCatalogListItemBinding
+import vip.kirakira.viewpagertest.repositories.WARBOND_SHIP_IDS
 import kotlin.coroutines.coroutineContext
 
 class ShoppingAdapter(private val onClickListener: OnClickListener) : ListAdapter<ShopItem, ShoppingAdapter.ViewHolder>(DiffCallback) {
@@ -31,6 +33,11 @@ class ShoppingAdapter(private val onClickListener: OnClickListener) : ListAdapte
         fun bind(shopItem: ShopItem) {
             binding.property = shopItem
             binding.executePendingBindings()
+            if (shopItem.id - 100000 in WARBOND_SHIP_IDS) {
+                binding.isShopItemWarbond.visibility = android.view.View.VISIBLE
+            } else {
+                binding.isShopItemWarbond.visibility = android.view.View.GONE
+            }
             if (System.currentTimeMillis() - shopItem.insert_time > 60 * 60 * 1000 * 24) {
                 binding.canBuy.setImageDrawable(
                     ResourcesCompat.getDrawable(

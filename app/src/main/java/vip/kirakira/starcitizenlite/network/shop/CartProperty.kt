@@ -169,7 +169,7 @@ data class InitShipUpgradeProperty(val data: Data) {
                             slideShow = ship.medias.slideShow,
                             price = sku.price,
                             edition = sku.title,
-                            isAvailable = false
+                            isAvailable = sku.price == ship.skus.minByOrNull { it.price }!!.price && ship.skus!!.size > 1
                         )
                     }
                 }

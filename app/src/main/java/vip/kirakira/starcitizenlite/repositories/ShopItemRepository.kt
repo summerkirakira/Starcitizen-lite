@@ -19,6 +19,7 @@ import vip.kirakira.viewpagertest.network.graphql.FilterShipsQuery
 import vip.kirakira.viewpagertest.network.graphql.UpdateCatalogMutation
 import vip.kirakira.viewpagertest.network.graphql.initShipUpgradeQuery
 
+var WARBOND_SHIP_IDS: List<Int> = mutableListOf()
 
 class ShopItemRepository(private val database: ShopItemDatabase) {
 
@@ -129,6 +130,7 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
                 }
                 val canUpgrade = RSIApi.retrofitService.filterShips(FilterShipsQuery().getRequestBody())
                 val canUpgradeItemIds = canUpgrade.data.to.ships.map { it.id }
+                WARBOND_SHIP_IDS = canUpgrade.data.to.ships.filter {it.skus.size > 1}.map { it.id }
                 shopUpgradeItems.forEach {
                     if (canUpgradeItemIds.contains(it.id - 100000)) {
                         it.isUpgradeAvailable = true
@@ -158,6 +160,7 @@ class ShopItemRepository(private val database: ShopItemDatabase) {
                 shipUpgrades.addAll(InitShipUpgradeProperty.Data.Ship.toShipUpgradeRepoItems(ship))
             }
         }
+
         return shipUpgrades
     }
 

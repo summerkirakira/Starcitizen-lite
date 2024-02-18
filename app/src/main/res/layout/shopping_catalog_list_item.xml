@@ -5,6 +5,7 @@
     <data>
         <variable name="property" type="vip.kirakira.starcitizenlite.database.ShopItem"/>
     </data>
+
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:layout_marginStart="2dp"
@@ -29,6 +30,24 @@
                     android:elevation="20dp"
                     android:background="?attr/backgroundColor"
                     android:imageUrl="@{property.slideshow}" />
+            <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/is_shop_item_warbond"
+                    app:layout_constraintTop_toTopOf="@+id/ship_image"
+                    app:layout_constraintEnd_toEndOf="@+id/ship_image"
+                    app:qmui_backgroundColor="#FF9800"
+                    tools:text="WB"
+                    android:elevation="25dp"
+                    android:text="@string/warbond_short"
+                    android:padding="2dp"
+                    android:textColor="@color/white"
+                    app:qmui_borderColor="#FF8A65"
+                    app:qmui_radiusTopLeft="4dp"
+                    app:qmui_radiusTopRight="0dp"
+                    app:qmui_radiusBottomLeft="4dp"
+                    app:qmui_radiusBottomRight="4dp"
+            />
             <TextView android:layout_width="0dp"
                       app:layout_constraintHorizontal_weight="1"
                       app:layout_constraintEnd_toEndOf="parent"
