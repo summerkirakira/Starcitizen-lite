@@ -222,6 +222,7 @@
                             </androidx.constraintlayout.widget.ConstraintLayout>
                             <View style="@style/personal_info_divider"/>
                             <androidx.constraintlayout.widget.ConstraintLayout
+                                    android:id="@+id/referral_code_layout"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content">
                                 <TextView style="@style/personal_detail_info"

@@ -4,12 +4,16 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import com.google.gson.Gson
+import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
 import vip.kirakira.starcitizenlite.activities.CartActivity
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.network.search.getPlayerSearchResult
+import vip.kirakira.starcitizenlite.network.shop.GetStripePaymentMethodProperty
+import vip.kirakira.starcitizenlite.network.shop.StripDataProperty
 import vip.kirakira.starcitizenlite.repositories.UserRepository
 import java.text.SimpleDateFormat
 
@@ -201,4 +205,36 @@ fun saveUserData(uid: Int, rsi_device: String, rsi_token: String, email: String,
         userInfo.location ?: "",
         userInfo.fluency
     )
+}
+
+fun getAlipayUrl(data: GetStripePaymentMethodProperty): StripDataProperty {
+    val okHttpClient = OkHttpClient()
+
+    val formBody = FormBody.Builder()
+        .add("return_url", "https://robertsspaceindustries.com/store/pledge/cart/capture/${data.data.order.order.slug}/alipay")
+        .add("key", data.data.order.payment.apiKey.value)
+        .add("client_secret", data.data.order.order.paymentMethod.clientSecret)
+        .add("expected_payment_method_type", "alipay")
+        .build()
+    val piData = data.data.order.order.paymentMethod.clientSecret.split("_secret").first()
+    val newRequest = okhttp3.Request.Builder()
+        .url("https://api.stripe.com/v1/payment_intents/${piData}/confirm")
+        .post(formBody)
+        .build()
+    val response = okHttpClient.newCall(newRequest).execute()
+    val resData = Gson().fromJson(response.body?.string(), StripDataProperty::class.java)
+    return resData
+}
+
+fun getAliPayQrCodeUrl(url: String): String {
+    val okHttpClient = OkHttpClient()
+    val newRequest = okhttp3.Request.Builder()
+        .url(url)
+        .build()
+    val response = okHttpClient.newCall(newRequest).execute()
+    val body = response.body?.string()
+    val pattern = """value="(https://qr.alipay.com[^"]+)"""".toRegex()
+    val matchResult = pattern.find(body!!)
+    val result = matchResult?.groups?.get(1)!!.value
+    return result
 }

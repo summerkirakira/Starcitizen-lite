@@ -14,6 +14,7 @@ import android.view.WindowManager
 import android.webkit.*
 import androidx.appcompat.app.AppCompatActivity
 import com.gyf.immersionbar.ImmersionBar
+import okhttp3.OkHttpClient
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.createWarningAlerter
 import vip.kirakira.starcitizenlite.network.rsi_cookie
@@ -67,17 +68,10 @@ class CartActivity : RefugeBaseActivity() {
                         isWarned = true
                         createWarningAlerter(this@CartActivity,"暂不支持PayPal支付", "出于账户安全考量，请使用信用点或者信用卡支付哦").show()
                     }
-//                    val urlList = url.split("&")
-//                    var newUrlList = mutableListOf<String>()
-//                    urlList.forEach {
-//                        if (!it.contains("xcomponent") && !it.contains("version")){
-//                            newUrlList.add(it)
-//                        }
-//                    }
-//                    val intent = Intent()
-//                    intent.action = "android.intent.action.VIEW"
-//                    intent.data = Uri.parse(newUrlList.joinToString("&"))
-//                    startActivity(intent)
+
+
+
+
                     return WebResourceResponse("text/html", "utf-8", null)
                 }
                 if (url == "https://robertsspaceindustries.com/graphql") {
@@ -85,6 +79,23 @@ class CartActivity : RefugeBaseActivity() {
                     val payload = recorder.getPayload(request.method, "/graphql")
                     Log.d("payload", "$payload")
                 }
+
+
+                // Get AliPay URL
+                if (url.contains("/queryQRStatus.json")) {
+                    val okHttpClient = OkHttpClient()
+                    val newRequest = okhttp3.Request.Builder()
+                        .url(url)
+                        .build()
+                    val response = okHttpClient.newCall(newRequest).execute()
+                    val body = response.body?.string()
+                    Log.d("alipay body", body?: "")
+
+                    return WebResourceResponse("text/html", "utf-8", response.body?.byteStream())
+
+                }
+
+
                 return super.shouldInterceptRequest(view, request)
             }
 

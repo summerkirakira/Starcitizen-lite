@@ -46,7 +46,7 @@
     <string name="spectrum">光谱论坛</string>
     <string name="latest_update">最近更新</string>
     <string name="more">更多</string>
-    <string name="referral_code">邀请码</string>
+    <string name="referral_code">邀请码(点击复制)</string>
     <string name="total_spent">消费额</string>
     <string name="referral_num">邀请数量</string>
     <string name="register_date">注册时间</string>

@@ -147,6 +147,13 @@ interface RSIApiService {
     @POST("graphql")
     suspend fun promotionCodeQuery(@Body body: BaseGraphQLBody): PromotionCodeQueryResponseProperty
 
+
+    @POST("graphql")
+    suspend fun setPaymentMethod(@Body body: BaseGraphQLBody): SetPaymentMethodProperty
+
+    @POST("graphql")
+    suspend fun getStripePaymentMethod(@Body body: BaseGraphQLBody): GetStripePaymentMethodProperty
+
     @POST("api/account/reclaimPledge")
     suspend fun reclaimPledge(@Body body: ReclaimRequestBody): BasicResponseBody
 

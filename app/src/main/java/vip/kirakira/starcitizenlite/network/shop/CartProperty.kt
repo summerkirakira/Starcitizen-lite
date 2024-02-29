@@ -77,7 +77,15 @@ data class NextStepProperty(val errors: List<Error>?)
 
 data class ClearCartProperty(val errors: List<Error>?)
 
-data class CartValidationProperty(val errors: List<Error>?)
+data class CartValidationProperty(val errors: List<Error>?, val data: Data?) {
+    data class Data(val store: Store) {
+        data class Store(val cart: Cart) {
+            data class Cart(val mutations: Mutations) {
+                data class Mutations(val validate: String)
+            }
+        }
+    }
+}
 
 data class CartAddressAssignProperty(val errors: List<Error>?)
 
@@ -87,6 +95,39 @@ data class CartAddressProperty(val errors: List<Error>?, val data: Data) {
             data class AddressBook(val id: String)
             }
         }
+}
+
+data class SetPaymentMethodProperty(val errors: List<Error>?) {
+
+}
+
+data class GetStripePaymentMethodProperty(val errors: List<Error>?, val data: Data) {
+    data class Data(
+        val order: Order
+    ) {
+        data class Order(
+            val payment: Payment,
+            val order: Order2
+        ) {
+            data class Payment(
+                val apiKey: ApiKey
+            ) {
+                data class ApiKey(
+                    val value: String
+                )
+            }
+            data class Order2(
+                val id: String,
+                val recurring: Boolean,
+                val slug: String,
+                val paymentMethod: PaymentMethod
+            ) {
+                data class PaymentMethod(
+                    val clientSecret: String
+                )
+            }
+        }
+    }
 }
 
 
@@ -274,4 +315,17 @@ data class RsiLauncherSignInResponse(
         val nickname: String,
         val displayname: String,
     )
+}
+
+data class StripDataProperty(
+    val next_action: NextAction
+) {
+    data class NextAction(
+        val alipay_handle_redirect: AlipayHandleRedirect
+    ) {
+        data class AlipayHandleRedirect(
+            val url: String,
+            val return_url: String
+        )
+    }
 }

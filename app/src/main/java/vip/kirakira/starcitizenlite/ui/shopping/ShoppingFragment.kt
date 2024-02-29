@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.os.Handler
@@ -26,10 +27,8 @@ import vip.kirakira.starcitizenlite.activities.CartActivity
 import vip.kirakira.starcitizenlite.activities.WebLoginActivity
 import vip.kirakira.starcitizenlite.database.ShopItem
 import vip.kirakira.starcitizenlite.databinding.ShoppingFragmentBinding
-import vip.kirakira.starcitizenlite.network.CirnoApi
+import vip.kirakira.starcitizenlite.network.*
 import vip.kirakira.starcitizenlite.network.CirnoProperty.RecaptchaList
-import vip.kirakira.starcitizenlite.network.RSIApi
-import vip.kirakira.starcitizenlite.network.csrf_token
 import vip.kirakira.starcitizenlite.network.shop.*
 import vip.kirakira.starcitizenlite.ui.shopping.ShopItemFilter
 import vip.kirakira.starcitizenlite.ui.widgets.RefugeVip
@@ -439,7 +438,7 @@ class ShoppingFragment : Fragment() {
                                                     nextStep()
                                                     val token = tokenList[0]
                                                     tokenList.removeAt(0)
-                                                    cartValidation(token)
+                                                    val validateData = cartValidation(token)
                                                     val cartStatus = getCartSummary()
                                                     if (cartStatus.data.store.cart.totals.total == 0 && cartStatus.data.store.cart.totals.subTotal == 0) {
                                                         createSuccessAlerter(
@@ -574,7 +573,7 @@ class ShoppingFragment : Fragment() {
 
                                                 cartAddressAssign(billingAddress.data.store.addressBook.first().id)
 
-                                                Log.d("CartValidation", cartValidation(token).toString())
+                                                val cartValidateData = cartValidation(token)
                                                 val cartStatus = getCartSummary()
                                                 if (cartStatus.data.store.cart.totals.total == 0 && cartStatus.data.store.cart.totals.subTotal == 0) {
                                                     if (upgradeCount!! > 1) {
@@ -594,20 +593,66 @@ class ShoppingFragment : Fragment() {
                                                         return@launch
                                                     }
                                                 } else {
-                                                    //                            val address = cartAddressQuery()
-                                                    //                            val assignAddress = cartAddressAssign(address.data.store.addressBook.first().id)
-                                                    //                            println(cartValidation("03AGdBq27y9ldoo5gKZTkYZ2S_LEDgEI_iw1UUp9nMjsIW_Z0pywtluUGpXyisHFpdGB9sG84Zryqy3woCnhqGOR1mdIF6aGf1GGoGHe9C3QhpBk7S25IfLHbc2ticW4iw1fuUD6RLT-00vkTwZFwULI_p16BLRAHFLOwwFaJViXuXhlYpjc5Ot-CoQkbf2d-0MP9EpNiSWqF2gsZrje58g8AFF3rgRb19DSfDnVKQS0kE-Tl9zvrJwU-pLKIu_CaPiR2L5jVOItBMhCWe5iMInJN1rck-jUoLONhIc1MummaiyGrdVDHLYu2xb7_V2ipDSNqc_IZ30fJN_bT6RUUnFzFBJeea6hwR91VX34IrN1Tu3eok_7M6ZHRyk5IB_fGu2q5e4G0WfkR5QlEAOGwC6_5LCwlHyI5lRtMirIG2hsBjsbuoVzvYrPhalHHXr9zfxk6t-IDYAayQx3yApVLSBbbai0jGdjkqHeWUwJ3vI85MJhM5mYQRpH1bUCeJLY0snFpF5Lnli5GmeQwuxOiGOuw07JKwbXc1iyNWil9OXnBfGI9_1e4ijHJq0GIZQtg6N5cE1D1MMa37QYbUb8fy96NGurih1EezNDX-AmxWZzhsJ74O72CMIitn0BhpctSrcKHy-beFl6c1zz72vpMRVSgsH9Zg5Zb0QlN9zs6LA60ikLscWyyszeeup__oktpHGsjGE8D1N1zgOTjv2rBW8CsxQq7Q3FU2OJwBej5tZ8eW2udlGEWsHugamTGkdh1osrtgHvcwTsacvoxZXKeV_j2vzA2_iYsgAaNOQpzJzKMDApJd20lXMFyzT--CUZgYhfI0OpU5IUjOgUr0TmVGmouDwmlRUWFFu4Ui_9Cur65SgfE-saWHwyXIxHW72Uy6mQ97PslG69sydlIq-d-8v1350ZaZNJoA9kG_9bNJ7fhxGtjQWvraer8FphO5o8cGrA2ODjOesmYJP6VxeNe7TEhwMKwD3IwUdw1HxW6-2an1NYNMFRisX0Z2PyESqVn6hp1pqGufF6zIecYu0K9VR2MPbEJlktgKzT-pej95E857cimHU0OWgchmq5LYaKIkC95cPoZtIpg9llZ1o2lZ0wtZTFqWEzpJizZsX676cWEEvAaNMG-ksH18C1reNJcpq_QG4ICESXOBZHZbaBA252OnDA4p_Sfir-lYLIQOTYNyuw79Ml3hXnaDkvJHs3Tjv-bmHLoFTuZFaKKbfwG3ai9h_GRaKO6A4cTr0dO7osDDqMtmIXrcAWlgBtKwS8a8X-oOj1dYtwk-1JGFyYEqA5sidnLXLVFyvFJbdLfH88y1Ocy-yWoso5QfVimHQyYkQViNa0GitLcuWE3Q1u15nmnpsZ_mvV4-j-7GZPRFJoR-K5kGFHGmwciU-FrTxOWtTnxuBXqTKNLZPLPIV5IR5P8PIhV2Ur2RwWpaNFqGA9epnv-yJoQtfXewWFWrkH77Y29rUvqM1k04asj5xmyzSSbi43_hJnJVRV6Fo3dnzymgfgJ8tbbBSZ0EOdKTJL4KPeDs-_nZYycmnwwzsEWDqdfo9io7v4GgCrDbEY5GIIyb8Ixnc0KG6Gw"))
-                                                    val bundle = Bundle()
-                                                    bundle.putString(
-                                                        "url",
-                                                        "https://robertsspaceindustries.com/store/pledge/cart"
-                                                    )
-                                                    val intent = Intent(context, CartActivity::class.java)
-                                                    intent.putExtras(bundle)
-                                                    // wait activity result
-                                                    // if result is ok, then do next step
-                                                    // else do nothing
-                                                    startActivity(intent)
+
+                                                    if (cartValidateData.data != null) {
+                                                        setPaymentMethodMutation(cartValidateData.data.store.cart.mutations.validate)
+                                                        Toast.makeText(
+                                                            context,
+                                                            "无法使用信用点购买~转为现金购买",
+                                                            Toast.LENGTH_LONG
+                                                        ).show()
+                                                        try {
+                                                            val paymentData = getStripePaymentMethod(cartValidateData.data.store.cart.mutations.validate)
+                                                            Toast.makeText(
+                                                                context,
+                                                                "支付信息已确认，尝试拉起支付宝",
+                                                                Toast.LENGTH_LONG
+                                                            ).show()
+                                                            GlobalScope.launch(Dispatchers.IO) {
+                                                                try {
+                                                                    val urlData = getAlipayUrl(paymentData)
+                                                                    val qrcodeUrl = getAliPayQrCodeUrl(urlData.next_action.alipay_handle_redirect.url)
+
+
+                                                                    val topic = "alipays://platformapi/startapp?saId=10000007&qrcode="
+// 字符串拼接
+                                                                    val jumpUrl = topic + qrcodeUrl
+                                                                    val intent = Intent()
+                                                                    intent.action = "android.intent.action.VIEW"
+// jumpUrl 为先前示例拼接出来的 url
+                                                                    val contentUrl: Uri = Uri.parse(jumpUrl)
+                                                                    intent.data = contentUrl
+                                                                    startActivity(intent)
+                                                                } catch (e: Exception) {
+
+                                                                    withContext(Dispatchers.Main) {
+                                                                        Toast.makeText(
+                                                                            context,
+                                                                            "无法拉起支付宝, 请在浏览器窗口中继续",
+                                                                            Toast.LENGTH_LONG
+                                                                        ).show()
+                                                                    }
+
+                                                                    val bundle = Bundle()
+                                                                    bundle.putString(
+                                                                        "url",
+                                                                        "https://robertsspaceindustries.com/store/pledge/cart"
+                                                                    )
+                                                                    val intent = Intent(context, CartActivity::class.java)
+                                                                    intent.putExtras(bundle)
+
+                                                                    startActivity(intent)
+                                                                }
+
+
+                                                                Log.d("PaymentData", paymentData.toString())
+                                                            }
+                                                        } catch (e: Exception) {
+                                                            createWarningAlerter(requireActivity(), "获取支付信息失败", e.toString()).show()
+                                                            Log.d("PaymentData", e.toString())
+                                                        }
+
+                                                    }
                                                     return@launch
                                                 }
                                                 upgradeCount = upgradeCount!! - 1

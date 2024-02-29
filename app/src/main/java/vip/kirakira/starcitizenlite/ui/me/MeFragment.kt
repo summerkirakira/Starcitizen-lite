@@ -1,6 +1,9 @@
 package vip.kirakira.starcitizenlite.ui.me
 
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.graphics.Color
@@ -11,6 +14,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import io.getstream.avatarview.coil.loadImage
@@ -121,6 +125,14 @@ class MeFragment : Fragment() {
             binding.referralCodeValue.text = referralValue
             binding.referralCodeValueText.text = referralCode
             initRefugeVip(binding)
+
+            binding.referralCodeLayout.setOnClickListener {
+                // click to copy referral code
+                val clipboard = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText("Referral Code", referralCode)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(requireContext(), "邀请码已复制到剪切板~", Toast.LENGTH_SHORT).show()
+            }
         }
 
         return binding.root

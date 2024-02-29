@@ -39,3 +39,11 @@ suspend fun cartAddressAssign(billing: String): CartAddressAssignProperty {
 suspend fun cartAddressQuery(): CartAddressProperty {
     return RSIApi.retrofitService.cartAddressQuery(AddressBookQuery().getRequestBody())
 }
+
+suspend fun setPaymentMethodMutation(slug: String): SetPaymentMethodProperty {
+    return RSIApi.retrofitService.setPaymentMethod(SetPaymentMethodMutation().getRequestBody(slug))
+}
+
+suspend fun getStripePaymentMethod(slug: String): GetStripePaymentMethodProperty {
+    return RSIApi.retrofitService.getStripePaymentMethod(GetStripePaymentMethodQuery().getRequestBody(slug))
+}

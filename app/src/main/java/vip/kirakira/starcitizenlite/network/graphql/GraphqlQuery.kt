@@ -1458,6 +1458,113 @@ class FilterShipsQuery {
     }
 }
 
+
+class SetPaymentMethodMutation {
+    val query = """mutation SetPaymentMethodMutation(${"$"}orderSlug: String!, ${"$"}method: String!) {
+  tycoon_order_setPaymentMethod(orderSlug: ${"$"}orderSlug, method: ${"$"}method) {
+    order {
+      slug
+      __typename
+    }
+    __typename
+  }
+}
+
+    """.trimIndent()
+    class Variables(
+        val orderSlug: String,
+        val method: String = "alipay"
+    )
+
+    fun getRequestBody(orderSlug: String): BaseGraphQLBody {
+        return BaseGraphQLBody(query, Variables(orderSlug = orderSlug))
+    }
+}
+
+class GetStripePaymentMethodQuery {
+    val query="""query GetStripePaymentMethodQuery(${"$"}orderSlug: String!) {
+  order(slug: ${"$"}orderSlug) {
+    payment {
+      apiKey(name: "STRIPE") {
+        value
+        __typename
+      }
+      __typename
+    }
+    order {
+      id
+      recurring
+      slug
+      paymentMethod {
+        ... on StripeIntentMethod {
+          clientSecret
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    billingAddress {
+      ...PostalAddressFragment
+      __typename
+    }
+    shippingAddress {
+      ...PostalAddressFragment
+      __typename
+    }
+    context {
+      pricing {
+        currencyCode
+        __typename
+      }
+      __typename
+    }
+    totals {
+      total
+      __typename
+    }
+    savedCards {
+      id
+      brand
+      last4
+      expMonth
+      expYear
+      __typename
+    }
+    __typename
+  }
+  customer {
+    id
+    email
+    __typename
+  }
+}
+
+fragment PostalAddressFragment on PostalAddress {
+  id
+  firstname
+  lastname
+  addressLine
+  city
+  company
+  phone
+  postalCode
+  regionName
+  countryName
+  countryCode
+  __typename
+}
+""".trimIndent()
+    class Variables(
+        val orderSlug: String
+    )
+
+    fun getRequestBody(orderSlug: String): BaseGraphQLBody {
+        return BaseGraphQLBody(query, Variables(orderSlug = orderSlug))
+    }
+}
+
+
 class SearchFromShipQuery {
     val query = """query filterShips(${"$"}fromId: Int, ${"$"}toId: Int, ${"$"}fromFilters: [FilterConstraintValues], ${"$"}toFilters: [FilterConstraintValues]) {
   from(to: ${"$"}toId, filters: ${"$"}fromFilters) {
