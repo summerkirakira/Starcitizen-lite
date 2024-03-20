@@ -1,6 +1,7 @@
 package vip.kirakira.viewpagertest.network.graphql
 
 import android.telecom.Call.Details
+import com.google.gson.Gson
 import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
 
@@ -214,12 +215,12 @@ class SignInMutation {
     private val moshi: Moshi = Moshi.Builder().build()
 
 
-    data class SignInVariables(var operationName: String, var variables: Variables) {
+    data class SignInVariables(var variables: Variables) {
         data class Variables(
             var email: String,
             var password: String,
             val remember: Boolean,
-            val captcha: String
+            val captcha: String?
         )
     }
     data class NeedMultiStep(val errors: List<SignInError>) {
@@ -237,18 +238,15 @@ class SignInMutation {
     }
 
     fun parseRequest(json: String): SignInVariables {
-        val jsonAdapter = moshi.adapter(SignInVariables::class.java)
-        return jsonAdapter.fromJson(json)!!
+        return Gson().fromJson(json, SignInVariables::class.java)
     }
 
     fun parseFailure(json: String): NeedMultiStep {
-        val jsonAdapter = moshi.adapter(NeedMultiStep::class.java)
-        return jsonAdapter.fromJson(json)!!
+        return Gson().fromJson(json, NeedMultiStep::class.java)
     }
 
     fun parseLoginSuccess(json: String): LoginSuccess {
-        val jsonAdapter = moshi.adapter(LoginSuccess::class.java)
-        return jsonAdapter.fromJson(json)!!
+        return Gson().fromJson(json, LoginSuccess::class.java)
     }
 
 

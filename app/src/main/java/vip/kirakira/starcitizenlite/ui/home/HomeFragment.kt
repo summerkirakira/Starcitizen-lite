@@ -104,7 +104,7 @@ class HomeFragment : Fragment() {
                 binding.errorBox.setButton(
                     getString(R.string.click_to_login)
                 ) {
-                    val intent = Intent(context, LoginActivity::class.java)
+                    val intent = Intent(context, WebLoginActivity::class.java)
                     startActivity(intent)
                 }
                 binding.errorBox.show()

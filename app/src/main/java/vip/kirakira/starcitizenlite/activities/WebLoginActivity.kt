@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.webkit.*
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import com.tapadoo.alerter.Alerter
 import kotlinx.coroutines.CoroutineScope
@@ -72,11 +73,15 @@ class WebLoginActivity : RefugeBaseActivity() {
 
     lateinit var database: ShopItemDatabase
 
+    var isFirstReq: Boolean = true
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_web_login)
         supportActionBar?.hide()
+
+        isFirstReq = true
 
         val userRepository = UserRepository(getDatabase(application))
 
@@ -157,6 +162,10 @@ class WebLoginActivity : RefugeBaseActivity() {
 //                    Log.i("WebLoginActivity", "request: $request payload: $payload")
                     // handle the request with the given payload and return the response
                     if (payload?.contains("signin") == true) {
+                        if(isFirstReq){
+                            isFirstReq = false
+                            return super.shouldInterceptRequest(view, request)
+                        }
                         signInVariables = SignInMutation().parseRequest(payload)
                         email = signInVariables.variables.email
                         password = signInVariables.variables.password
@@ -173,12 +182,18 @@ class WebLoginActivity : RefugeBaseActivity() {
                             val contentType = response.header("content-type")
                             val responseBody = response.body?.string()
                             if ("errors" in responseBody!!) {
-                                val error = SignInMutation().parseFailure(responseBody).errors[0]
-                                if (error.message == "MultiStepRequired") {
+                                try {
+                                    val error = SignInMutation().parseFailure(responseBody).errors[0]
+                                    if (error.message == "MultiStepRequired") {
 //                                    Log.w("WebLoginActivity", "-----------MultiStepRequired-----------")
-                                    temp_device_id = error.extensions.details.device_id
-                                    temp_rsi_token = error.extensions.details.session_id
+                                        temp_device_id = error.extensions.details.device_id
+                                        temp_rsi_token = error.extensions.details.session_id
+                                    }
+                                } catch (e: Exception) {
+                                    Log.e("WebLoginActivity", "JSON parse error: ${e.message}")
+                                    return super.shouldInterceptRequest(view, request)
                                 }
+
                             }
                             return WebResourceResponse(contentType, "UTF-8", responseBody.byteInputStream())
                         }

@@ -20,6 +20,7 @@ import androidx.lifecycle.LiveData
 import io.getstream.avatarview.coil.loadImage
 import vip.kirakira.starcitizenlite.R
 import vip.kirakira.starcitizenlite.activities.LoginActivity
+import vip.kirakira.starcitizenlite.activities.WebLoginActivity
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.databinding.MeFragmentBinding
@@ -62,7 +63,7 @@ class MeFragment : Fragment() {
                 binding.errorBox.setButton(
                     getString(R.string.click_to_login)
                 ) {
-                    val intent = Intent(context, LoginActivity::class.java)
+                    val intent = Intent(context, WebLoginActivity::class.java)
                     startActivity(intent)
                 }
                 binding.errorBox.show()

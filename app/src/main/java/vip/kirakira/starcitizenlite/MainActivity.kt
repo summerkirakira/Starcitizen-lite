@@ -44,6 +44,7 @@ import reduceDragSensitivity
 import vip.kirakira.starcitizenlite.activities.LoginActivity
 import vip.kirakira.starcitizenlite.activities.RefugeBaseActivity
 import vip.kirakira.starcitizenlite.activities.SettingsActivity
+import vip.kirakira.starcitizenlite.activities.WebLoginActivity
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.network.*
@@ -269,20 +270,24 @@ class MainActivity : RefugeBaseActivity() {
                                     database.userDao.insert(newUser)
                                     sharedPreferences.edit().putInt(getString(R.string.primary_user_key), reLogin.data.account_id).apply()
                                     primaryUserId = reLogin.data.account_id
-                                    val alerter = createSuccessAlerter(this@MainActivity, "重新登录成功", "检测到IP变动，自动登录成功")
-                                    alerter
-                                        .enableSwipeToDismiss()
-                                        .setOnClickListener {
-                                            val intent = Intent(this@MainActivity, LoginActivity::class.java)
-                                            startActivity(intent)
-                                            finish()
-                                        }
-                                        .setOnHideListener {
-                                            val intent = Intent(this@MainActivity, MainActivity::class.java)
-                                            startActivity(intent)
-                                            finish()
-                                        }
-                                        .show()
+                                    Toast.makeText(this@MainActivity, "检测到IP变动, 自动登录成功", Toast.LENGTH_SHORT).show()
+//                                    val alerter = createSuccessAlerter(this@MainActivity, "重新登录成功", "检测到IP变动，自动登录成功")
+//                                    alerter
+//                                        .enableSwipeToDismiss()
+//                                        .setOnClickListener {
+//                                            val intent = Intent(this@MainActivity, LoginActivity::class.java)
+//                                            startActivity(intent)
+//                                            finish()
+//                                        }
+//                                        .setOnHideListener {
+//                                            val intent = Intent(this@MainActivity, MainActivity::class.java)
+//                                            startActivity(intent)
+//                                            finish()
+//                                        }
+//                                        .show()
+                                    val intent = Intent(this@MainActivity, MainActivity::class.java)
+                                    startActivity(intent)
+                                    finish()
                                     return@launch
                                 } catch (e: Exception) {
                                     e.printStackTrace()
@@ -328,23 +333,27 @@ class MainActivity : RefugeBaseActivity() {
                                         apply()
                                     }
                                     database.userDao.insert(newUser)
-                                    createSuccessAlerter(
-                                        this@MainActivity,
-                                        "检测到IP变动",
-                                        "自动登录成功"
-                                    )
-                                        .enableSwipeToDismiss()
-                                        .setOnClickListener {
-                                            val intent = Intent(this@MainActivity, LoginActivity::class.java)
-                                            startActivity(intent)
-                                            finish()
-                                        }
-                                        .setOnHideListener {
-                                            val intent = Intent(this@MainActivity, MainActivity::class.java)
-                                            startActivity(intent)
-                                            finish()
-                                        }
-                                        .show()
+                                    Toast.makeText(this@MainActivity, "检测到IP变动, 自动登录成功", Toast.LENGTH_SHORT).show()
+//                                    createSuccessAlerter(
+//                                        this@MainActivity,
+//                                        "检测到IP变动",
+//                                        "自动登录成功"
+//                                    )
+//                                        .enableSwipeToDismiss()
+//                                        .setOnClickListener {
+//                                            val intent = Intent(this@MainActivity, LoginActivity::class.java)
+//                                            startActivity(intent)
+//                                            finish()
+//                                        }
+//                                        .setOnHideListener {
+//                                            val intent = Intent(this@MainActivity, MainActivity::class.java)
+//                                            startActivity(intent)
+//                                            finish()
+//                                        }
+//                                        .show()
+                                    val intent = Intent(this@MainActivity, MainActivity::class.java)
+                                    startActivity(intent)
+                                    finish()
                                 }.start()
                                 return@launch
                             }
@@ -357,7 +366,7 @@ class MainActivity : RefugeBaseActivity() {
                         alerter
                             .enableSwipeToDismiss()
                             .setOnClickListener {
-                                val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                                val intent = Intent(this@MainActivity, WebLoginActivity::class.java)
                                 startActivity(intent)
                                 finish()
                             }
@@ -656,7 +665,7 @@ class MainActivity : RefugeBaseActivity() {
                             sharedPreferences.edit().putInt(getString(R.string.current_hanger_value_key), 0).apply()
                         }
                         if(builder.checkedIndex == items.size - 1){
-                            val intent = Intent(this, LoginActivity::class.java)
+                            val intent = Intent(this, WebLoginActivity::class.java)
                             startActivity(intent)
                         } else {
                             dialog.dismiss()

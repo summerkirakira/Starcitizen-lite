@@ -10,5 +10,14 @@
              android:layout_height="match_parent"
              android:id="@+id/login_webview"
     />
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              app:layout_constraintTop_toTopOf="parent"
+              app:layout_constraintStart_toStartOf="parent"
+              app:layout_constraintEnd_toEndOf="parent"
+              android:layout_marginTop="60dp"
+              android:textColor="@color/white"
+              android:textSize="20dp"
+              android:text="点击登录后若出现Capcha错误\n请尝试再次点击登录按钮\n请将设备信任时间设为一年" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

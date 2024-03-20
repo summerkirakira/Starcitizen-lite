@@ -19,7 +19,7 @@ import vip.kirakira.starcitizenlite.uuid
 import java.util.Locale
 
 private const val BASE_URL = "https://biaoju.site:6188/"
-//private const val BASE_URL = "http://192.168.173.154:6088/"
+//private const val BASE_URL = "http://192.168.144.154:6088/"
 
 private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())

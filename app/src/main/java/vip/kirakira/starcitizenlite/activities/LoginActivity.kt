@@ -107,7 +107,7 @@ class LoginActivity : RefugeBaseActivity() {
                     }
                     if (token.isEmpty()) {
                         stopLoading()
-                        RefugeVip.createWarningAlert(this@LoginActivity, getString(R.string.no_cirno_token), "请重试")
+                        RefugeVip.createTokenNotSufficientWarningAlert(this@LoginActivity)
                         return@launchWhenCreated
                     }
                     val loginDetail: LoginProperty
@@ -122,7 +122,21 @@ class LoginActivity : RefugeBaseActivity() {
                                 )
                             )
                         )
-                        loginDetail = response.body()!!
+                        val firstLoginDetail = response.body()!!
+                        if (firstLoginDetail.errors != null) {
+                            val secResponse = RSIApi.retrofitService.login(
+                                LoginBody(
+                                    variables = LoginBody.Variables(
+                                        email = email,
+                                        password = password,
+                                        captcha = CirnoApi.getReCaptchaV3(1)[0]
+                                    )
+                                )
+                            )
+                            loginDetail = secResponse.body()!!
+                        } else {
+                            loginDetail = firstLoginDetail
+                        }
                     } catch (e: Exception) {
                         stopLoading()
                         createWarningAlerter(
@@ -184,8 +198,17 @@ class LoginActivity : RefugeBaseActivity() {
                             getString(R.string.invalid_password)
                         ).show()
                     } else if (loginDetail.errors[0].code == "MultiStepRequiredException") {
-                        val deviceId = loginDetail.errors[0].extensions.details.device_id
-                        val rsiToken = loginDetail.errors[0].extensions.details.session_id
+                        if (loginDetail.errors[0].extensions.details == null) {
+                            stopLoading()
+                            createWarningAlerter(
+                                this@LoginActivity,
+                                getString(R.string.error),
+                                "未知错误"
+                            ).show()
+                            return@launchWhenCreated
+                        }
+                        val deviceId = loginDetail.errors[0].extensions.details!!.device_id
+                        val rsiToken = loginDetail.errors[0].extensions.details!!.session_id
                         setRSICookie(rsiToken!!, deviceId!!)
                         stopLoading()
                         val builder = QMUIDialog.EditTextDialogBuilder(this@LoginActivity)
@@ -247,6 +270,14 @@ class LoginActivity : RefugeBaseActivity() {
                                 }
                             }
                             .show()
+                    } else {
+                        stopLoading()
+                        createWarningAlerter(
+                            this@LoginActivity,
+                            getString(R.string.error),
+                            loginDetail.errors[0].message
+                        ).show()
+
                     }
                 }
             } else {
@@ -321,7 +352,7 @@ class LoginActivity : RefugeBaseActivity() {
             return 1
         }
         if (tokenList.isEmpty()) {
-            createWarningAlerter(activity, activity.getString(R.string.error), activity.getString(R.string.token_server_error)).show()
+            RefugeVip.createTokenNotSufficientWarningAlert(activity)
             return 1
         }
         val token = tokenList[0]
