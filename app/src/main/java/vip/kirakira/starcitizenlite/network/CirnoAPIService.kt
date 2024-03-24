@@ -87,6 +87,9 @@ interface CirnoApiService {
 
     @GET("app/update")
     suspend fun getAppUpdate(): AppUpdateInfo
+
+    @GET("qq_group")
+    suspend fun getQQGroup(): QQGroup
 }
 
 

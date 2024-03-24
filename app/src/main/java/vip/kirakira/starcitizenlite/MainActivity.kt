@@ -589,7 +589,14 @@ class MainActivity : RefugeBaseActivity() {
         }
 
         feedbackButton.setOnClickListener {
-            joinQQGroup()
+            CoroutineScope(Dispatchers.IO).launch {
+                val result = joinQQGroup()
+                if (!result) {
+                    withContext(Dispatchers.Main) {
+                        createWarningAlerter(activity = this@MainActivity, title = "加入QQ群失败", message = "请检查是否安装手机QQ").show()
+                    }
+                }
+            }
         }
 
         settingsButton.setOnClickListener {
@@ -709,8 +716,8 @@ class MainActivity : RefugeBaseActivity() {
 //        }
         try {
             updateAlias(latestVersion.shipAliasUrl)
-            homeViewModel.refresh()
-            homeViewModel.refreshBuybackItems()
+//            homeViewModel.refresh()
+//            homeViewModel.refreshBuybackItems()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -869,9 +876,9 @@ class MainActivity : RefugeBaseActivity() {
      * @param key 由官网生成的key
      * @return 返回true表示呼起手Q成功，返回false表示呼起失败
      */
-    fun joinQQGroup(): Boolean {
+    suspend fun joinQQGroup(): Boolean {
         val intent = Intent()
-        val key = "LzRUVOyetWjRlVyNh24tN2gU8KZZvDcB"
+        val key = CirnoApi.retrofitService.getQQGroup().qq_group
         intent.data =
             Uri.parse("mqqopensdkapi://bizAgent/qm/qr?url=http%3A%2F%2Fqm.qq.com%2Fcgi-bin%2Fqm%2Fqr%3Ffrom%3Dapp%26p%3Dandroid%26jump_from%3Dwebapi%26k%3D$key")
         // 此Flag可根据具体产品需要自定义，如设置，则在加群界面按返回，返回手Q主界面，不设置，按返回会返回到呼起产品界面    //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -1094,7 +1101,6 @@ class MainActivity : RefugeBaseActivity() {
     }
 
     suspend fun tryRelogin(checkLoginStatus: Boolean = true) {
-        reloginFailureCount++
         if (reloginFailureCount > 5) {
             withContext(Dispatchers.Main) {
                 createWarningAlerter(
@@ -1153,6 +1159,10 @@ class MainActivity : RefugeBaseActivity() {
                         captcha = captcha
                     )
                 )
+                runOnUiThread {
+                    Toast.makeText(this@MainActivity, "登录成功", Toast.LENGTH_SHORT).show()
+                }
+                reloginFailureCount++
 
                 if (reLogin.success == 1) {
                     try {

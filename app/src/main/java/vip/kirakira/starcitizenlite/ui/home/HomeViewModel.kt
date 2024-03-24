@@ -57,7 +57,7 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
 
     init {
 //        refreshBuybackItems()
-        refresh()
+//        refresh()
 
         hangerItems = hangerItemFilter.switchMap {
             filterHangerByTitle(it)

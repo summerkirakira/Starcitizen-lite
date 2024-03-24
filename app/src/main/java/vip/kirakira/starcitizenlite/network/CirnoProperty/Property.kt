@@ -186,3 +186,7 @@ data class AppUpdateInfo(
     val size: Int = 0,
     val hasAffectCodes: String = ""
 )
+
+data class QQGroup(
+    val qq_group: String
+)

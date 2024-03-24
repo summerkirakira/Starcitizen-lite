@@ -21,7 +21,7 @@ class HangerProcess {
         return hangarTime
     }
 
-    fun parsePage(page: String): PackageWithItem {
+    fun parsePage(page: String, index: Int): PackageWithItem {
             val doc = Jsoup.parse(page)
             val hangerPackages: MutableList<HangerPackage> = mutableListOf()
             val hangerItems: MutableList<HangerItem> = mutableListOf()
@@ -40,7 +40,7 @@ class HangerProcess {
                     pledgeTitle = pledgeTitle.split(" Contains ")[0]
                 }
                 val pledgeStatus = pledge.select(".availability").text()
-                val pledgeDate = convertDateToLong( pledge.select(".date-col").text().replace("Created: ", ""))
+                val pledgeDate = convertDateToLong( pledge.select(".date-col").text().replace("Created: ", "")) - index
                 val pledgeContains = pledge.select(".items-col").text().replace("Contains:", "")
                 val canGift = pledge.select(".shadow-button.js-gift").isNotEmpty()
                 val canExchange = pledge.select(".shadow-button.js-reclaim").isNotEmpty()
@@ -84,7 +84,7 @@ class HangerProcess {
                 isUpgrade = true
                 fromShipId = pledge.select(".holosmallbtn").attr("data-fromshipid").toInt()
                 toShipId = pledge.select(".holosmallbtn").attr("data-toshipid").toInt()
-                toSkuId = pledge.select(".holosmallbtn").attr("data-toskuid").toInt()
+//                toSkuId = pledge.select(".holosmallbtn").attr("data-toskuid").toInt()
             }
             buybackItems.add(BuybackItem(
                 pledgeId,

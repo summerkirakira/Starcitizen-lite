@@ -6,7 +6,7 @@ import vip.kirakira.starcitizenlite.network.RSIApi
 class HangerService {
     suspend fun getHangerInfo(page: Int): HangerProcess.PackageWithItem {
         val hangerInfo = RSIApi.getHangerPage(page=page)
-        return HangerProcess().parsePage(hangerInfo)
+        return HangerProcess().parsePage(hangerInfo, index=page)
     }
 
     suspend fun getBuybackInfo(page: Int): List<BuybackItem> {

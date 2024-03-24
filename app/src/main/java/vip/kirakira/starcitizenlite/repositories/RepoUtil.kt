@@ -11,7 +11,7 @@ import vip.kirakira.starcitizenlite.ui.home.UpgradeInfo
 class RepoUtil {
     companion object {
         fun getShipAlias(name: String): ShipAlias? {
-            Log.d("RepoUtil", "getShipAlias: $name")
+//            Log.d("RepoUtil", "getShipAlias: $name")
             for(ship in shipAlias) {
                 if(compareShipName(ship.name, name)) {
                     return ship
