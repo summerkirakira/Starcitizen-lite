@@ -57,7 +57,9 @@ class GetPledgeBody(private val page: Int)
 @JsonClass(generateAdapter = true)
 class RsiLauncherSignInBody(
     private val username: String,
-    private val password: String
+    private val password: String,
+    private val remember: Boolean = true,
+    private val captcha: String? = null
 )
 
 data class BuybackAuthTokenResponse(
@@ -65,4 +67,16 @@ data class BuybackAuthTokenResponse(
     val code: String,
     val msg: String,
     val data: String
+)
+
+data class RsiLauncherSignInMultiStepBody(
+    private val code: String,
+    private val device_name: String = "StarRefuge",
+    private val device_type: String = "computer",
+    private val duration: String = "year"
+)
+
+
+data class RsiLauncherRecaptchaPostbody(
+    val k: String? = null,
 )

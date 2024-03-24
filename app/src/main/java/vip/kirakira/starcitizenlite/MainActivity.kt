@@ -3,6 +3,7 @@ package vip.kirakira.starcitizenlite
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.content.res.Resources
@@ -10,19 +11,25 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Vibrator
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Base64
 import android.util.Log
 import android.util.TypedValue
+import android.view.Gravity
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.view.ViewGroup
+import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.GravityCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
+import com.bumptech.glide.Glide
 import com.cretin.www.cretinautoupdatelibrary.model.DownloadInfo
 import com.cretin.www.cretinautoupdatelibrary.model.TypeConfig
 import com.cretin.www.cretinautoupdatelibrary.model.UpdateConfig
@@ -30,7 +37,17 @@ import com.cretin.www.cretinautoupdatelibrary.utils.AppUpdateUtils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.gyf.immersionbar.ImmersionBar
+import com.qmuiteam.qmui.layout.QMUIFrameLayout
+import com.qmuiteam.qmui.skin.QMUISkinHelper
+import com.qmuiteam.qmui.skin.QMUISkinManager
+import com.qmuiteam.qmui.skin.QMUISkinValueBuilder
+import com.qmuiteam.qmui.util.QMUIDisplayHelper
+import com.qmuiteam.qmui.util.QMUIKeyboardHelper
+import com.qmuiteam.qmui.util.QMUIResHelper
+import com.qmuiteam.qmui.util.QMUIWindowInsetHelper
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog
+import com.qmuiteam.qmui.widget.popup.QMUIFullScreenPopup
+import com.qmuiteam.qmui.widget.popup.QMUIPopups
 import com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
 import com.wyt.searchbox.SearchFragment
 import io.getstream.avatarview.AvatarView
@@ -44,7 +61,7 @@ import reduceDragSensitivity
 import vip.kirakira.starcitizenlite.activities.LoginActivity
 import vip.kirakira.starcitizenlite.activities.RefugeBaseActivity
 import vip.kirakira.starcitizenlite.activities.SettingsActivity
-import vip.kirakira.starcitizenlite.activities.WebLoginActivity
+import vip.kirakira.starcitizenlite.database.ShopItemDatabase
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.network.*
@@ -64,15 +81,18 @@ import vip.kirakira.starcitizenlite.ui.me.MeFragment
 import vip.kirakira.starcitizenlite.ui.ship_info.ShipInfoFragment
 import vip.kirakira.starcitizenlite.ui.shopping.ShopItemFilter
 import vip.kirakira.viewpagertest.network.graphql.LoginBody
+import vip.kirakira.viewpagertest.network.graphql.RsiLauncherRecaptchaPostbody
 import vip.kirakira.viewpagertest.network.graphql.RsiLauncherSignInBody
 import vip.kirakira.viewpagertest.ui.shopping.ShoppingFragment
 import vip.kirakira.viewpagertest.ui.shopping.ShoppingViewModel
 import java.io.File
+import java.security.AccessController.getContext
 import java.util.*
 import kotlin.concurrent.thread
+import kotlin.properties.Delegates
 
 
-var  PAGE_NUM = 5;
+var PAGE_NUM = 5;
 
 lateinit var shipAlias: List<ShipAlias>
 
@@ -101,12 +121,20 @@ class MainActivity : RefugeBaseActivity() {
     private lateinit var feedbackButton: ConstraintLayout
     private lateinit var settingsButton: ConstraintLayout
     private lateinit var logoutButton: ConstraintLayout
-    lateinit var  shipUpgradeButton: ImageView
+    lateinit var shipUpgradeButton: ImageView
+    var reloginFailureCount = 0
+
+    var user: User? = null
 
 
-    private var  density: Float = 0f
+    private var density: Float = 0f
+
+    private var captcha: String? = null
 
     lateinit var searchButton: ImageView
+
+    var primaryUserId = 0
+
 
     enum class FragmentType(val value: Int) {
         SHOPPING(0),
@@ -131,9 +159,11 @@ class MainActivity : RefugeBaseActivity() {
 
         val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
 
-        var primaryUserId = sharedPreferences.getInt(getString(R.string.primary_user_key), 0)
+        primaryUserId = sharedPreferences.getInt(getString(R.string.primary_user_key), 0)
 
         val database = getDatabase(application)
+
+
 
         val currentUser: LiveData<User> = database.userDao.getById(primaryUserId)
 
@@ -153,7 +183,7 @@ class MainActivity : RefugeBaseActivity() {
 //        QMUIStatusBarHelper.translucent(this)
 //        QMUIStatusBarHelper.setStatusBarLightMode(this)
 //        QMUIStatusBarHelper.getStatusbarHeight(this)
-         //设置状态栏透明
+        //设置状态栏透明
 
         mMovingBar = findViewById(R.id.bottom_moving_bar) //底部滑动条
         mPager = findViewById(R.id.pager) //ViewPager
@@ -187,12 +217,13 @@ class MainActivity : RefugeBaseActivity() {
 
         bottomShopIcon.setColorFilter(Color.GRAY)
         bottomHangerIcon.setColorFilter(Color.GRAY)
-        if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
+        if (primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
         bottomMainIcon.setColorFilter(colorPrimary)
         bottomShipInfoIcon.setColorFilter(Color.GRAY)
         mMovingBar.setBackgroundColor(colorPrimary)
 
         currentUser.observe(this) {
+            user = it
             if (it != null) {
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
@@ -214,14 +245,20 @@ class MainActivity : RefugeBaseActivity() {
             if (it != null) {
                 setRSICookie(it.rsi_token, it.rsi_device)
                 sharedPreferences.edit().putString(getString(R.string.device_id_key), it.rsi_device).commit()
-                if("default" !in it.profile_image) {
+                if ("default" !in it.profile_image) {
                     drawerUserAvatar.loadImage(it.profile_image)
                     loadUserAvatar(userAvatar, it.profile_image)
                     loadUserAvatar(bottomMeIcon, it.profile_image)
                 } else {
                     drawerUserAvatar.loadImage("https://cdn.robertsspaceindustries.com/static/images/account/avatar_default_big.jpg")
-                    loadUserAvatar(userAvatar, "https://cdn.robertsspaceindustries.com/static/images/account/avatar_default_big.jpg")
-                    loadUserAvatar(bottomMeIcon, "https://cdn.robertsspaceindustries.com/static/images/account/avatar_default_big.jpg")
+                    loadUserAvatar(
+                        userAvatar,
+                        "https://cdn.robertsspaceindustries.com/static/images/account/avatar_default_big.jpg"
+                    )
+                    loadUserAvatar(
+                        bottomMeIcon,
+                        "https://cdn.robertsspaceindustries.com/static/images/account/avatar_default_big.jpg"
+                    )
                 }
 
                 val userCredit = "${Parser.priceFormatter(it.store)} USD"
@@ -233,162 +270,22 @@ class MainActivity : RefugeBaseActivity() {
                 drawerUserUEC.text = userUEC
                 drawerUserREC.text = userREC
                 drawerUserHangerValue.text = userHangerValue
-                CoroutineScope(Dispatchers.IO).launch {
-                    try {
-                        try {
-                            getRSIToken(it.rsi_token, it.rsi_device)
-                            while (csrf_token.isEmpty()) {
-                                Thread.sleep(100)
-                            }
-                            val data = getCartSummary()
-                            if(data.data.account.isAnonymous) {
-                                throw Exception("Anonymous")
-                            }
-                            return@launch
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(this@MainActivity, "检测到IP变动，RSI账号登录失效，正在尝试重新登录...", Toast.LENGTH_LONG).show()
-                            }
-                        }
-                        try {
-                            val reLogin = RSIApi.retrofitService.rsiLauncherSignIn(
-                                RsiLauncherSignInBody(
-                                    it.email,
-                                    it.password
-                                )
-                            )
-                            if (reLogin.data != null) {
-                                try{
-                                    val newUser = saveUserData(
-                                        uid = reLogin.data.account_id,
-                                        rsi_device = it.rsi_device,
-                                        rsi_token = reLogin.data.session_id,
-                                        email = it.email,
-                                        password = it.password)
-                                    setRSICookie(newUser.rsi_token, newUser.rsi_device)
-                                    database.userDao.insert(newUser)
-                                    sharedPreferences.edit().putInt(getString(R.string.primary_user_key), reLogin.data.account_id).apply()
-                                    primaryUserId = reLogin.data.account_id
-                                    Toast.makeText(this@MainActivity, "检测到IP变动, 自动登录成功", Toast.LENGTH_SHORT).show()
-//                                    val alerter = createSuccessAlerter(this@MainActivity, "重新登录成功", "检测到IP变动，自动登录成功")
-//                                    alerter
-//                                        .enableSwipeToDismiss()
-//                                        .setOnClickListener {
-//                                            val intent = Intent(this@MainActivity, LoginActivity::class.java)
-//                                            startActivity(intent)
-//                                            finish()
-//                                        }
-//                                        .setOnHideListener {
-//                                            val intent = Intent(this@MainActivity, MainActivity::class.java)
-//                                            startActivity(intent)
-//                                            finish()
-//                                        }
-//                                        .show()
-                                    val intent = Intent(this@MainActivity, MainActivity::class.java)
-                                    startActivity(intent)
-                                    finish()
-                                    return@launch
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                }
 
-                            }
-//                            getRSIToken()
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                        try {
-                            getRSIToken()
-                            val token = CirnoApi.getReCaptchaV3(1)[0]
-                            val response = RSIApi.retrofitService.login(
-                                LoginBody(
-                                    variables = LoginBody.Variables(
-                                        email = it.email,
-                                        password = it.password,
-                                        captcha = token
-                                    )
-                                )
-                            )
-                            val loginDetail = response.body()!!
-                            if (loginDetail.errors == null) {
-                                val headers = response.headers().toMultimap()["set-cookie"]!!
-                                for (header in headers) {
-                                    if (header.contains("Rsi-Token")) {
-                                        rsi_token = header.split(";")[0].split("=")[1]
-                                    }
-                                }
-                                val newUser = saveUserData(
-                                    loginDetail.data.account_signin!!.id,
-                                    rsi_device,
-                                    rsi_token,
-                                    it.email,
-                                    it.password
-                                )
-                                Thread {
-                                    val pref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-                                    with(pref.edit()) {
-                                        putInt(getString(R.string.primary_user_key), loginDetail.data.account_signin.id)
-                                        putBoolean(getString(R.string.is_log_in), true)
-                                        apply()
-                                    }
-                                    database.userDao.insert(newUser)
-                                    Toast.makeText(this@MainActivity, "检测到IP变动, 自动登录成功", Toast.LENGTH_SHORT).show()
-//                                    createSuccessAlerter(
-//                                        this@MainActivity,
-//                                        "检测到IP变动",
-//                                        "自动登录成功"
-//                                    )
-//                                        .enableSwipeToDismiss()
-//                                        .setOnClickListener {
-//                                            val intent = Intent(this@MainActivity, LoginActivity::class.java)
-//                                            startActivity(intent)
-//                                            finish()
-//                                        }
-//                                        .setOnHideListener {
-//                                            val intent = Intent(this@MainActivity, MainActivity::class.java)
-//                                            startActivity(intent)
-//                                            finish()
-//                                        }
-//                                        .show()
-                                    val intent = Intent(this@MainActivity, MainActivity::class.java)
-                                    startActivity(intent)
-                                    finish()
-                                }.start()
-                                return@launch
-                            }
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                        sharedPreferences.edit().putInt(getString(R.string.primary_user_key), 0).apply()
-                        database.userDao.delete(primaryUserId)
-                        val alerter = createWarningAlerter(this@MainActivity, "警告", "RSI账号登录失效，点击此处重新登录")
-                        alerter
-                            .enableSwipeToDismiss()
-                            .setOnClickListener {
-                                val intent = Intent(this@MainActivity, WebLoginActivity::class.java)
-                                startActivity(intent)
-                                finish()
-                            }
-                            .setOnHideListener {
-                                val intent = Intent(this@MainActivity, MainActivity::class.java)
-                                startActivity(intent)
-                                finish()
-                            }
-                            .show()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                    }
+
+
+
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    tryRelogin()
                 }
-            else {
+            } else {
                 val rsiDevice = sharedPreferences.getString(getString(R.string.device_id_key), "")
                 Log.d("Cirno", "RSI Device: $rsiDevice")
                 if (rsiDevice != null) {
                     setRSICookie("", rsiDevice)
                 }
             }
-            }
+        }
 
         userAvatar.setOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
@@ -400,18 +297,18 @@ class MainActivity : RefugeBaseActivity() {
         searchButton.setOnClickListener(View.OnClickListener {
             val searchFragment = SearchFragment.newInstance()
             searchFragment.show(supportFragmentManager, "search")
-            searchFragment.setOnSearchClickListener {
-                keyword -> when(mPager.currentItem){
+            searchFragment.setOnSearchClickListener { keyword ->
+                when (mPager.currentItem) {
                     FragmentType.SHOPPING.value -> {
                         shoppingViewModel.setFilter(ShopItemFilter(keyword, listOf("")))
                     }
+
                     FragmentType.HANGER.value -> {
                         homeViewModel.setFilter(keyword)
                     }
                 }
             }
         })
-
 
 
         val searchFragment: SearchFragment = SearchFragment.newInstance()
@@ -447,32 +344,34 @@ class MainActivity : RefugeBaseActivity() {
         val shipInfoFragment = ShipInfoFragment.newInstance()
 
         val pagerAdapter = ScreenSlidePagerAdapter(this)
-        val fragment_list: MutableList<Fragment> = mutableListOf(shopFragment, homeFragment, hangerFragment, shipInfoFragment, meFragment)
+        val fragment_list: MutableList<Fragment> =
+            mutableListOf(shopFragment, homeFragment, hangerFragment, shipInfoFragment, meFragment)
         pagerAdapter.setList(fragment_list)
         mPager.adapter = pagerAdapter
         mPager.setCurrentItem(2, false)
         mPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
 
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-                mMovingBar.x = (mPager.width * positionOffset + position * mPager.width) / 5 + mPager.width / 10 - 20 * density //设置滑动条的位置
+                mMovingBar.x =
+                    (mPager.width * positionOffset + position * mPager.width) / 5 + mPager.width / 10 - 20 * density //设置滑动条的位置
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels)
             }
 
             override fun onPageSelected(position: Int) {
-                when(position) {
+                when (position) {
                     FragmentType.SHOPPING.value -> {
                         bottomShopIcon.setColorFilter(colorPrimary)
                         bottomHangerIcon.setColorFilter(Color.GRAY)
                         bottomMainIcon.setColorFilter(Color.GRAY)
                         bottomShipInfoIcon.setColorFilter(Color.GRAY)
-                        if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
+                        if (primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
                         searchButton.setColorFilter(getColor(R.color.avatar_left_line))
                         filterButton.setImageDrawable(getDrawable(R.drawable.ic_filter))
                         filterButton.setColorFilter(getColor(R.color.avatar_left_line))
                         filterButton.visibility = View.VISIBLE
                         searchButton.visibility = View.VISIBLE
 
-                        if(shoppingViewModel.currentUpgradeStage.value == ShoppingViewModel.UpgradeStage.UNDEFINED) {
+                        if (shoppingViewModel.currentUpgradeStage.value == ShoppingViewModel.UpgradeStage.UNDEFINED) {
                             shipUpgradeButton.setColorFilter(getColor(R.color.avatar_left_line))
                         } else {
                             shipUpgradeButton.setColorFilter(getColor(R.color.upgrade_is_selected))
@@ -485,12 +384,13 @@ class MainActivity : RefugeBaseActivity() {
                         mPager.normalizeDragSensitivity()
 
                     }
+
                     FragmentType.HANGER.value -> {
                         bottomShopIcon.setColorFilter(Color.GRAY)
                         bottomHangerIcon.setColorFilter(colorPrimary)
                         bottomMainIcon.setColorFilter(Color.GRAY)
                         bottomShipInfoIcon.setColorFilter(Color.GRAY)
-                        if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
+                        if (primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
                         filterButton.setImageDrawable(getDrawable(R.drawable.ic_exchange))
                         searchButton.setColorFilter(getColor(R.color.avatar_left_line))
                         filterButton.setColorFilter(getColor(R.color.avatar_left_line))
@@ -507,12 +407,13 @@ class MainActivity : RefugeBaseActivity() {
                         mPager.normalizeDragSensitivity()
 
                     }
+
                     FragmentType.MAIN.value -> {
                         bottomShopIcon.setColorFilter(Color.GRAY)
                         bottomHangerIcon.setColorFilter(Color.GRAY)
                         bottomMainIcon.setColorFilter(colorPrimary)
                         bottomShipInfoIcon.setColorFilter(Color.GRAY)
-                        if(primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
+                        if (primaryUserId == 0) bottomMeIcon.setColorFilter(Color.GRAY)
                         searchButton.setColorFilter(Color.WHITE)
                         setAvatarLine(ColorStateList.valueOf(Color.WHITE))
                         filterButton.visibility = View.GONE
@@ -525,12 +426,13 @@ class MainActivity : RefugeBaseActivity() {
                         mPager.normalizeDragSensitivity()
 
                     }
+
                     FragmentType.ME.value -> {
                         bottomShopIcon.setColorFilter(Color.GRAY)
                         bottomHangerIcon.setColorFilter(Color.GRAY)
                         bottomMainIcon.setColorFilter(Color.GRAY)
                         bottomShipInfoIcon.setColorFilter(Color.GRAY)
-                        if(primaryUserId == 0) bottomMeIcon.setColorFilter(colorPrimary)
+                        if (primaryUserId == 0) bottomMeIcon.setColorFilter(colorPrimary)
                         filterButton.visibility = View.GONE
 
                         shipUpgradeButton.visibility = View.GONE
@@ -541,18 +443,23 @@ class MainActivity : RefugeBaseActivity() {
                         mPager.normalizeDragSensitivity()
 
                     }
+
                     FragmentType.SHIPINFO.value -> {
                         bottomShopIcon.setColorFilter(Color.GRAY)
                         bottomHangerIcon.setColorFilter(Color.GRAY)
                         bottomMainIcon.setColorFilter(Color.GRAY)
                         bottomShipInfoIcon.setColorFilter(colorPrimary)
                         searchButton.visibility = View.GONE
-                        if(primaryUserId == 0) bottomShipInfoIcon.setColorFilter(colorPrimary)
+                        if (primaryUserId == 0) bottomShipInfoIcon.setColorFilter(colorPrimary)
                         filterButton.visibility = View.GONE
 
                         shipUpgradeButton.visibility = View.GONE
 
-                        if (sharedPreferences.getString(application.getString(R.string.theme_color_key), "DEEP_BLUE") == "BLACK") {
+                        if (sharedPreferences.getString(
+                                application.getString(R.string.theme_color_key),
+                                "DEEP_BLUE"
+                            ) == "BLACK"
+                        ) {
                             setAvatarLine(ColorStateList.valueOf(Color.WHITE))
                             immersionBar.statusBarDarkFont(false).init()
                         } else {
@@ -581,10 +488,8 @@ class MainActivity : RefugeBaseActivity() {
 //        startActivity(intent)
 
 
-
-
         filterButton.setOnClickListener {
-            when(mPager.currentItem) {
+            when (mPager.currentItem) {
                 FragmentType.SHOPPING.value -> {
                     val itemTypes = listOf("单船", "涂装", "装备", "附加包", "UEC", "礼品卡", "资格包", "组合包")
                     val builder = QMUIDialog.MultiCheckableDialogBuilder(this)
@@ -595,7 +500,7 @@ class MainActivity : RefugeBaseActivity() {
                         .addAction("确认") { dialog, index ->
                             val filterList = mutableListOf<String>()
                             builder.checkedItemIndexes.forEach {
-                                when(it) {
+                                when (it) {
                                     0 -> filterList.add(ShopItemType.SHIP.itemName)
                                     1 -> filterList.add(ShopItemType.PAINT.itemName)
                                     2 -> filterList.add(ShopItemType.GEAR.itemName)
@@ -613,8 +518,9 @@ class MainActivity : RefugeBaseActivity() {
                         }
                         .show()
                 }
+
                 FragmentType.HANGER.value -> {
-                    if(homeViewModel.currentMode.value == HomeViewModel.Mode.HANGER) {
+                    if (homeViewModel.currentMode.value == HomeViewModel.Mode.HANGER) {
                         homeViewModel.currentMode.value = HomeViewModel.Mode.BUYBACK
                         homeViewModel.refreshBuybackItems()
                     } else {
@@ -626,7 +532,7 @@ class MainActivity : RefugeBaseActivity() {
         }
 
         shipUpgradeButton.setOnClickListener {
-            when(mPager.currentItem) {
+            when (mPager.currentItem) {
                 FragmentType.SHOPPING.value -> {
                     shoppingViewModel.isDetailShowing.value = false
                     if (shoppingViewModel.currentUpgradeStage.value == ShoppingViewModel.UpgradeStage.UNDEFINED) {
@@ -639,6 +545,7 @@ class MainActivity : RefugeBaseActivity() {
                         shipUpgradeButton.setColorFilter(getColor(R.color.avatar_left_line))
                     }
                 }
+
                 FragmentType.HANGER.value -> {
 //                    if(RefugeVip.isVip())
                     HangarLogBottomSheet.showDialog(supportFragmentManager)
@@ -664,8 +571,9 @@ class MainActivity : RefugeBaseActivity() {
                             sharedPreferences.edit().putInt(getString(R.string.crawled_page_key), 0).apply()
                             sharedPreferences.edit().putInt(getString(R.string.current_hanger_value_key), 0).apply()
                         }
-                        if(builder.checkedIndex == items.size - 1){
-                            val intent = Intent(this, WebLoginActivity::class.java)
+                        if (builder.checkedIndex == items.size - 1) {
+                            dialog.dismiss()
+                            val intent = Intent(this, LoginActivity::class.java)
                             startActivity(intent)
                         } else {
                             dialog.dismiss()
@@ -720,7 +628,7 @@ class MainActivity : RefugeBaseActivity() {
 
 
 
-        if(sharedPreferences.getBoolean(getString(R.string.CHECK_UPDATE_KEY), true)) {
+        if (sharedPreferences.getBoolean(getString(R.string.CHECK_UPDATE_KEY), true)) {
             CoroutineScope(Dispatchers.IO).launch {
 //                try {
 //                    getRSIToken()
@@ -754,7 +662,7 @@ class MainActivity : RefugeBaseActivity() {
 
     private fun loadAliasFromStorage(): List<ShipAlias> {
         val file = File("${filesDir?.path}/ship_alias.json")
-        if(file.exists()) {
+        if (file.exists()) {
             val json = file.readText()
             val type = object : TypeToken<List<ShipAlias>>() {}.type
             return Gson().fromJson(json, type)
@@ -807,14 +715,16 @@ class MainActivity : RefugeBaseActivity() {
             e.printStackTrace()
         }
         val shipDetailVersion = sharedPreferences.getString(getString(R.string.SHIP_DETAIL_VERSION_KEY), "0.0.0")
-        if(compareVersion(latestVersion.shipDetailVersion, shipDetailVersion!!)) {
+        if (compareVersion(latestVersion.shipDetailVersion, shipDetailVersion!!)) {
             Log.d("ShipDetail", "Updating ship detail...")
             val shipDetails = CirnoApi.getShipDetail(latestVersion.shipDetailUrl)
-            val gameTranslations = CirnoApi.getGameTranslation("https://image.biaoju.site/starcitizen/localization.${latestVersion.shipDetailVersion}.json")
-            if(shipDetails.isNotEmpty()) {
+            val gameTranslations =
+                CirnoApi.getGameTranslation("https://image.biaoju.site/starcitizen/localization.${latestVersion.shipDetailVersion}.json")
+            if (shipDetails.isNotEmpty()) {
                 val database = getDatabase(application)
                 database.shipDetailDao.insertAll(shipDetails)
-                sharedPreferences.edit().putString(getString(R.string.SHIP_DETAIL_VERSION_KEY), latestVersion.shipDetailVersion).apply()
+                sharedPreferences.edit()
+                    .putString(getString(R.string.SHIP_DETAIL_VERSION_KEY), latestVersion.shipDetailVersion).apply()
             }
             if (gameTranslations.isNotEmpty()) {
                 val database = getDatabase(application)
@@ -823,9 +733,10 @@ class MainActivity : RefugeBaseActivity() {
                 Toast.makeText(this, "游戏翻译数据已更新", Toast.LENGTH_SHORT).show()
             }
         }
-        if(!sharedPreferences.getBoolean(getString(R.string.GAME_TRANSLATION_KEY), false)) {
+        if (!sharedPreferences.getBoolean(getString(R.string.GAME_TRANSLATION_KEY), false)) {
             val database = getDatabase(application)
-            val gameTranslations = CirnoApi.getGameTranslation("https://image.biaoju.site/starcitizen/localization.${latestVersion.shipDetailVersion}.json")
+            val gameTranslations =
+                CirnoApi.getGameTranslation("https://image.biaoju.site/starcitizen/localization.${latestVersion.shipDetailVersion}.json")
             database.gameTranslationDao.insertAll(gameTranslations)
             sharedPreferences.edit().putBoolean(getString(R.string.GAME_TRANSLATION_KEY), true).apply()
             Toast.makeText(this, "游戏翻译数据已更新", Toast.LENGTH_SHORT).show()
@@ -857,15 +768,17 @@ class MainActivity : RefugeBaseActivity() {
 //            )
 //        )
 //        Log.d("ShipUpgrade", shipUpgrade.toString())
-        if(latestAnnouncement != null && latestAnnouncement.id > currentAnnouncementId) {
+        if (latestAnnouncement != null && latestAnnouncement.id > currentAnnouncementId) {
             this.runOnUiThread {
                 val builder = QMUIDialog.MessageDialogBuilder(this)
                 builder.setTitle(latestAnnouncement.title)
                     .setMessage(latestAnnouncement.content)
                     .addAction("确定") { dialog, index ->
                         dialog.dismiss()
-                        getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE).edit().putInt(getString(R.string.CURRENT_ANNOUNCEMENT_ID), latestAnnouncement.id).apply()
+                        getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE).edit()
+                            .putInt(getString(R.string.CURRENT_ANNOUNCEMENT_ID), latestAnnouncement.id).apply()
                     }
+
                     .show()
             }
         }
@@ -880,7 +793,7 @@ class MainActivity : RefugeBaseActivity() {
         } else {
             uuid = preference.getString(getString(R.string.UUID), "DEFAULT")!!
         }
-        if(preference.getBoolean(getString(R.string.FIRST_START_KEY), true)) {
+        if (preference.getBoolean(getString(R.string.FIRST_START_KEY), true)) {
             val startUpMessage = CirnoApi.retrofitService.getStartup()
             val uniqueID = UUID.randomUUID().toString()
             preference.edit().apply {
@@ -905,7 +818,7 @@ class MainActivity : RefugeBaseActivity() {
                     .show()
             }
         } else {
-            uuid = preference.getString(getString(R.string.UUID), "DEFAULT")?: "DEFAULT"
+            uuid = preference.getString(getString(R.string.UUID), "DEFAULT") ?: "DEFAULT"
         }
     }
 
@@ -920,15 +833,16 @@ class MainActivity : RefugeBaseActivity() {
     }
 
     override fun onBackPressed() {
-        when(mPager.currentItem) {
+        when (mPager.currentItem) {
             FragmentType.HANGER.value -> {
-                if (homeViewModel.isDetailShowing.value == true){
+                if (homeViewModel.isDetailShowing.value == true) {
                     homeViewModel.isDetailShowing.value = false
                     return
                 }
             }
+
             FragmentType.SHOPPING.value -> {
-                if (shoppingViewModel.isDetailShowing.value == true){
+                if (shoppingViewModel.isDetailShowing.value == true) {
                     shoppingViewModel.isDetailShowing.value = false
                     return
                 }
@@ -971,24 +885,24 @@ class MainActivity : RefugeBaseActivity() {
     }
 
     private suspend fun checkSubscription() {
-            val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
-            val latestVersion = CirnoApi.retrofitService.getVersion(
-                RefugeInfo(
-                    version = BuildConfig.VERSION_NAME,
-                    androidVersion = android.os.Build.VERSION.RELEASE,
-                    systemModel = android.os.Build.MODEL
-                )
+        val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
+        val latestVersion = CirnoApi.retrofitService.getVersion(
+            RefugeInfo(
+                version = BuildConfig.VERSION_NAME,
+                androidVersion = android.os.Build.VERSION.RELEASE,
+                systemModel = android.os.Build.MODEL
             )
-            val isVip = sharedPreferences.getBoolean(getString(R.string.IS_VIP), false)
+        )
+        val isVip = sharedPreferences.getBoolean(getString(R.string.IS_VIP), false)
 
-            sharedPreferences.edit().apply {
-                putBoolean(getString(R.string.IS_VIP), latestVersion.isVip)
-                putInt(getString(R.string.VIP_EXPIRE), latestVersion.vipExpire)
-                putInt(getString(R.string.TOTAL_VIP_TIME), latestVersion.totalVipTime)
-                putInt(getString(R.string.REFUGE_CREDIT), latestVersion.credit)
-                apply()
-            }
-            if (isVip != latestVersion.isVip) {
+        sharedPreferences.edit().apply {
+            putBoolean(getString(R.string.IS_VIP), latestVersion.isVip)
+            putInt(getString(R.string.VIP_EXPIRE), latestVersion.vipExpire)
+            putInt(getString(R.string.TOTAL_VIP_TIME), latestVersion.totalVipTime)
+            putInt(getString(R.string.REFUGE_CREDIT), latestVersion.credit)
+            apply()
+        }
+        if (isVip != latestVersion.isVip) {
 //            if (latestVersion.isVip) {
 //                Alerter.create(this)
 //                    .setTitle("星河避难所 Premium已激活")
@@ -1002,16 +916,16 @@ class MainActivity : RefugeBaseActivity() {
 //                    .setBackgroundColorRes(R.color.alert_dialog_background_failure)
 //                    .show()
 //            }
-                //更新主界面
-                val intent = Intent(this@MainActivity, MainActivity::class.java)
-                startActivity(intent)
-            }
+            //更新主界面
+            val intent = Intent(this@MainActivity, MainActivity::class.java)
+            startActivity(intent)
+        }
 
     }
 
     private fun vibrate() {
         val preferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        if(!preferences.getBoolean(getString(R.string.VIBRATE_KEY), false)) {
+        if (!preferences.getBoolean(getString(R.string.VIBRATE_KEY), false)) {
             return
         }
         val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -1057,7 +971,344 @@ class MainActivity : RefugeBaseActivity() {
         }
 
 
-
     }
 
+    suspend fun getCaptchaView(): ImageView {
+        val newImageView = ImageView(this)
+        val layoutParams =
+            ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        layoutParams.width = 900
+        layoutParams.height = 300
+        newImageView.layoutParams = layoutParams
+        newImageView.scaleType = ImageView.ScaleType.FIT_XY
+        val captchaResponse = RSIApi.retrofitService.rsiLauncherSignInCaptcha(
+            RsiLauncherRecaptchaPostbody()
+        )
+        val captchaBase64 = Base64.encodeToString(captchaResponse.bytes(), Base64.DEFAULT)
+        val captchaUrl = "data:image/png;base64,$captchaBase64"
+        withContext(Dispatchers.Main) {
+            Glide.with(this@MainActivity)
+                .load(captchaUrl)
+                .fitCenter()
+                .into(newImageView)
+        }
+        return newImageView
+    }
+
+     suspend fun getCaptchaPopupBuilder(): QMUIFullScreenPopup {
+            val builder: QMUISkinValueBuilder = QMUISkinValueBuilder.acquire()
+            val frameLayout = QMUIFrameLayout(this)
+            frameLayout.setBackground(
+                QMUIResHelper.getAttrDrawable(this, R.attr.qmui_skin_support_popup_bg)
+            )
+            builder.background(R.attr.qmui_skin_support_popup_bg)
+            QMUISkinHelper.setSkinValue(frameLayout, builder)
+            frameLayout.setRadius(QMUIDisplayHelper.dp2px(this, 12))
+            val padding: Int = QMUIDisplayHelper.dp2px(this, 10)
+            frameLayout.setPadding(padding, padding, padding, padding)
+            QMUIKeyboardHelper.listenKeyBoardWithOffsetSelfHalf(frameLayout, true)
+            val captchaImageView = getCaptchaView()
+//            val textView = TextView(this)
+//            textView.setLineSpacing(QMUIDisplayHelper.dp2px(this, 4).toFloat(), 1.0f)
+//            textView.setPadding(padding, padding, padding, padding)
+//            textView.setText("这是自定义显示的内容")
+            builder.clear()
+//            QMUISkinHelper.setSkinValue(textView, builder)
+//            textView.setGravity(Gravity.CENTER)
+            val size: Int = QMUIDisplayHelper.dp2px(this, 200)
+            val lp: FrameLayout.LayoutParams = FrameLayout.LayoutParams(size, size)
+            frameLayout.addView(captchaImageView)
+            val editFitSystemWindowWrapped = FrameLayout(this)
+            editFitSystemWindowWrapped.setFitsSystemWindows(true)
+            QMUIWindowInsetHelper.handleWindowInsets(
+                editFitSystemWindowWrapped,
+                WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout(), true
+            )
+            QMUIKeyboardHelper.listenKeyBoardWithOffsetSelf(editFitSystemWindowWrapped, true)
+            val minHeight: Int = QMUIDisplayHelper.dp2px(this, 48)
+            val editParent = QMUIFrameLayout(this)
+            editParent.setMinimumHeight(minHeight)
+            editParent.setRadius(minHeight / 2)
+            editParent.setBackground(
+                QMUIResHelper.getAttrDrawable(this, R.attr.qmui_skin_support_popup_bg)
+            )
+            builder.clear()
+            builder.background(R.attr.qmui_skin_support_popup_bg)
+            QMUISkinHelper.setSkinValue(editParent, builder)
+            val editText = EditText(this)
+            editText.setHint("请输入图形验证码...")
+            editText.setBackground(null)
+
+            builder.clear()
+            QMUISkinHelper.setSkinValue(editText, builder)
+            val paddingHor: Int = QMUIDisplayHelper.dp2px(this, 20)
+            val paddingVer: Int = QMUIDisplayHelper.dp2px(this, 10)
+            editText.setPadding(paddingHor, paddingVer, paddingHor, paddingVer)
+            editText.setMaxHeight(QMUIDisplayHelper.dp2px(this, 100))
+            val editLp: FrameLayout.LayoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            editLp.gravity = Gravity.CENTER_HORIZONTAL
+            editParent.addView(editText, editLp)
+            editFitSystemWindowWrapped.addView(
+                editParent, FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            )
+            val eLp: ConstraintLayout.LayoutParams = ConstraintLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT)
+            val mar: Int = QMUIDisplayHelper.dp2px(this, 20)
+            eLp.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID
+            eLp.rightToRight = ConstraintLayout.LayoutParams.PARENT_ID
+            eLp.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+            eLp.leftMargin = mar
+            eLp.rightMargin = mar
+            eLp.bottomMargin = mar
+            val popupBuilder = QMUIPopups.fullScreenPopup(this)
+                .addView(frameLayout)
+                .addView(editFitSystemWindowWrapped, eLp)
+                .skinManager(QMUISkinManager.defaultInstance(this))
+                .onBlankClick {  }
+                .onDismiss { }
+
+         editText.addTextChangedListener(object : TextWatcher {
+             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+             }
+
+             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                 if (p0.toString().endsWith("\n")) {
+                     captcha = p0.toString().substring(0, p0.toString().length - 1)
+                     popupBuilder.dismiss()
+                     CoroutineScope(Dispatchers.IO).launch {
+                         tryRelogin(checkLoginStatus = false)
+                     }
+                 }
+             }
+
+             override fun afterTextChanged(p0: Editable?) {
+
+             }
+         })
+
+         return popupBuilder
+    }
+
+    suspend fun tryRelogin(checkLoginStatus: Boolean = true) {
+        reloginFailureCount++
+        if (reloginFailureCount > 5) {
+            withContext(Dispatchers.Main) {
+                createWarningAlerter(
+                    this@MainActivity,
+                    "警告",
+                    "RSI账号登录失败次数过多，请手动登录"
+                )
+                    .enableSwipeToDismiss()
+                    .setOnClickListener {
+                        val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }
+                    .setOnHideListener {
+                        val intent = Intent(this@MainActivity, MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }
+                    .show()
+            }
+            return
+        }
+        val it = user!!
+        val database = getDatabase(application)
+        val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
+
+        try {
+            if (checkLoginStatus) {
+                try {
+                    getRSIToken(it.rsi_token, it.rsi_device)
+                    while (csrf_token.isEmpty()) {
+                        Thread.sleep(100)
+                    }
+                    val data = getCartSummary()
+                    if (data.data.account.isAnonymous) {
+                        throw Exception("Anonymous")
+                    }
+                    return
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "检测到IP变动，RSI账号登录失效，正在尝试重新登录...",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
+
+            try {
+                val reLogin = RSIApi.retrofitService.rsiLauncherSignIn(
+                    RsiLauncherSignInBody(
+                        it.email,
+                        it.password,
+                        captcha = captcha
+                    )
+                )
+
+                if (reLogin.success == 1) {
+                    try {
+                        val newUser = saveUserData(
+                            uid = it.id,
+                            rsi_device = it.rsi_device,
+                            rsi_token = reLogin.data!!.session_id,
+                            email = it.email,
+                            password = it.password
+                        )
+                        setRSICookie(newUser.rsi_token, newUser.rsi_device)
+                        database.userDao.insert(newUser)
+                        sharedPreferences.edit().putInt(getString(R.string.primary_user_key), it.id).apply()
+                        primaryUserId = it.id
+                        createSuccessAlerter(
+                            this@MainActivity,
+                            "检测到IP变动",
+                            "自动登录成功"
+                        )
+                            .enableSwipeToDismiss()
+                            .setOnClickListener {
+                                val intent = Intent(this@MainActivity, MainActivity::class.java)
+                                startActivity(intent)
+                                finish()
+                            }
+                            .setOnHideListener {
+                                val intent = Intent(this@MainActivity, MainActivity::class.java)
+                                startActivity(intent)
+                                finish()
+                            }
+                            .show()
+                        return
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+
+                } else if (reLogin.code == "ErrCaptchaRequiredLauncher") {
+                    try {
+                        val builder = getCaptchaPopupBuilder()
+
+                        runOnUiThread {
+                            builder.show(mPager)
+                        }
+                        return
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+
+                } else {
+                    createWarningAlerter(
+                        this@MainActivity,
+                        "警告",
+                        "RSI账号登录失效，点击此处重新登录"
+                    )
+                        .enableSwipeToDismiss()
+                        .setOnClickListener {
+                            val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        }
+                        .setOnHideListener {
+                            val intent = Intent(this@MainActivity, MainActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        }
+                        .show()
+                }
+//                            getRSIToken()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            try {
+                getRSIToken()
+                val token = CirnoApi.getReCaptchaV3(1)[0]
+                val response = RSIApi.retrofitService.login(
+                    LoginBody(
+                        variables = LoginBody.Variables(
+                            email = it.email,
+                            password = it.password,
+                            captcha = token
+                        )
+                    )
+                )
+                val loginDetail = response.body()!!
+                if (loginDetail.errors == null) {
+                    val headers = response.headers().toMultimap()["set-cookie"]!!
+                    for (header in headers) {
+                        if (header.contains("Rsi-Token")) {
+                            rsi_token = header.split(";")[0].split("=")[1]
+                        }
+                    }
+                    val newUser = saveUserData(
+                        loginDetail.data.account_signin!!.id,
+                        rsi_device,
+                        rsi_token,
+                        it.email,
+                        it.password
+                    )
+                    Thread {
+                        val pref = getSharedPreferences(
+                            getString(R.string.preference_file_key),
+                            Context.MODE_PRIVATE
+                        )
+                        with(pref.edit()) {
+                            putInt(getString(R.string.primary_user_key), loginDetail.data.account_signin.id)
+                            putBoolean(getString(R.string.is_log_in), true)
+                            apply()
+                        }
+                        database.userDao.insert(newUser)
+                        Toast.makeText(this@MainActivity, "检测到IP变动, 自动登录成功", Toast.LENGTH_SHORT)
+                            .show()
+//                                    createSuccessAlerter(
+//                                        this@MainActivity,
+//                                        "检测到IP变动",
+//                                        "自动登录成功"
+//                                    )
+//                                        .enableSwipeToDismiss()
+//                                        .setOnClickListener {
+//                                            val intent = Intent(this@MainActivity, LoginActivity::class.java)
+//                                            startActivity(intent)
+//                                            finish()
+//                                        }
+//                                        .setOnHideListener {
+//                                            val intent = Intent(this@MainActivity, MainActivity::class.java)
+//                                            startActivity(intent)
+//                                            finish()
+//                                        }
+//                                        .show()
+                        val intent = Intent(this@MainActivity, MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }.start()
+                    return
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            sharedPreferences.edit().putInt(getString(R.string.primary_user_key), 0).apply()
+            database.userDao.delete(primaryUserId)
+            val alerter =
+                createWarningAlerter(this@MainActivity, "警告", "RSI账号登录失效，点击此处重新登录")
+            alerter
+                .enableSwipeToDismiss()
+                .setOnClickListener {
+                    val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+                .setOnHideListener {
+                    val intent = Intent(this@MainActivity, MainActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+                .show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }

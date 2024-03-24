@@ -60,11 +60,28 @@
                   android:hint="@string/referral_code"
                   android:autofillHints=""
                   android:inputType="textNoSuggestions"/>
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:visibility="gone"
+                      tools:visibility="visible"
+                      android:id="@+id/captcha_layout"
+                      android:orientation="vertical">
+            <ImageView android:layout_width="match_parent"
+                       android:layout_height="wrap_content"
+                       android:id="@+id/captcha_image_view"
+            />
+            <EditText android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:id="@+id/captcha_edit_text"
+                      android:hint="@string/type_captcha"
+            />
+        </LinearLayout>
         <TextView android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:gravity="center"
-                  android:textColor="?attr/backgroundColor"
                   android:text="@string/login_by_web"
+                  android:textColor="@color/qmui_config_color_blue"
+                  android:tint="?attr/textFillColor"
                   android:id="@+id/login_by_web" />
         <LinearLayout android:layout_width="match_parent"
                       android:layout_height="wrap_content">
@@ -88,8 +105,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/progress_layout"
-            android:visibility="invisible"
             android:background="@color/progress_background"
+            android:visibility="invisible"
     >
         <com.github.ybq.android.spinkit.SpinKitView
                 android:id="@+id/loading_view"

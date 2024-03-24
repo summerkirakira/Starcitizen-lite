@@ -5,15 +5,18 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.InputType
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.github.ybq.android.spinkit.SpinKitView
 import com.gyf.immersionbar.ImmersionBar
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog
@@ -32,11 +35,9 @@ import vip.kirakira.starcitizenlite.network.CirnoProperty.RecaptchaList
 import vip.kirakira.starcitizenlite.network.shop.LoginProperty
 import vip.kirakira.starcitizenlite.repositories.UserRepository
 import vip.kirakira.starcitizenlite.ui.widgets.RefugeVip
-import vip.kirakira.viewpagertest.network.graphql.LoginBody
-import vip.kirakira.viewpagertest.network.graphql.LoginQuery
-import vip.kirakira.viewpagertest.network.graphql.MultiStepLoginQuery
-import vip.kirakira.viewpagertest.network.graphql.RegisterBody
+import vip.kirakira.viewpagertest.network.graphql.*
 import java.io.IOException
+import java.util.Random
 
 class LoginActivity : RefugeBaseActivity() {
 
@@ -50,6 +51,9 @@ class LoginActivity : RefugeBaseActivity() {
     private lateinit var handleEditText: EditText
     private lateinit var loadingLayout: ConstraintLayout
     private lateinit var loadingView: SpinKitView
+    private lateinit var captchaLayout: LinearLayout
+    private lateinit var captchaEditText: EditText
+    private lateinit var captchaImageView: ImageView
     var isPrepared = false
 
 
@@ -67,6 +71,9 @@ class LoginActivity : RefugeBaseActivity() {
         handleEditText = findViewById(R.id.handle_edit_text)
         loadingLayout = findViewById(R.id.progress_layout)
         loadingView = findViewById(R.id.loading_view)
+        captchaLayout = findViewById(R.id.captcha_layout)
+        captchaEditText = findViewById(R.id.captcha_edit_text)
+        captchaImageView = findViewById(R.id.captcha_image_view)
 
         val userRepository = UserRepository(getDatabase(application))
         getRSIToken()
@@ -96,82 +103,52 @@ class LoginActivity : RefugeBaseActivity() {
                 val password = passwordEditText.text.toString()
                 startLoading()
                 lifecycleScope.launchWhenCreated {
-                    val token: ArrayList<String>
-                    try {
-                        token = CirnoApi.getReCaptchaV3(1)
-                    } catch (e: Exception) {
-                        stopLoading()
-                        createWarningAlerter(this@LoginActivity, getString(R.string.network_error), getString(R.string.token_server_error)).show()
-                        e.printStackTrace()
-                        return@launchWhenCreated
-                    }
-                    if (token.isEmpty()) {
-                        stopLoading()
-                        RefugeVip.createTokenNotSufficientWarningAlert(this@LoginActivity)
-                        return@launchWhenCreated
-                    }
-                    val loginDetail: LoginProperty
-                    val response: retrofit2.Response<LoginProperty>
-                    try {
-                        response = RSIApi.retrofitService.login(
-                            LoginBody(
-                                variables = LoginBody.Variables(
-                                    email = email,
-                                    password = password,
-                                    captcha = token[0]
-                                )
-                            )
+//                    val token: ArrayList<String>
+//                    try {
+//                        token = CirnoApi.getReCaptchaV3(1)
+//                    } catch (e: Exception) {
+//                        stopLoading()
+//                        createWarningAlerter(this@LoginActivity, getString(R.string.network_error), getString(R.string.token_server_error)).show()
+//                        e.printStackTrace()
+//                        return@launchWhenCreated
+//                    }
+//                    if (token.isEmpty()) {
+//                        stopLoading()
+//                        RefugeVip.createTokenNotSufficientWarningAlert(this@LoginActivity)
+//                        return@launchWhenCreated
+//                    }
+//                    val loginDetail: LoginProperty
+//                    val response: retrofit2.Response<LoginProperty>
+                    val captcha = if (captchaEditText.text.isNotEmpty()) captchaEditText.text.toString() else null
+                    val firstLoginAttempt = RSIApi.retrofitService.rsiLauncherSignIn(
+                        RsiLauncherSignInBody(
+                            username = email,
+                            password = password,
+                            remember = true,
+                            captcha = captcha
                         )
-                        val firstLoginDetail = response.body()!!
-                        if (firstLoginDetail.errors != null) {
-                            val secResponse = RSIApi.retrofitService.login(
-                                LoginBody(
-                                    variables = LoginBody.Variables(
-                                        email = email,
-                                        password = password,
-                                        captcha = CirnoApi.getReCaptchaV3(1)[0]
-                                    )
-                                )
-                            )
-                            loginDetail = secResponse.body()!!
-                        } else {
-                            loginDetail = firstLoginDetail
-                        }
-                    } catch (e: Exception) {
-                        stopLoading()
-                        createWarningAlerter(
-                            this@LoginActivity,
-                            getString(R.string.error),
-                            e.message ?: "未知错误"
-                        ).show()
-//                        Log.d("LoginActivity", e.toString())
-                        return@launchWhenCreated
-                    }
-//                    Log.d("LoginActivity", loginDetail.toString())
-                    if (loginDetail.errors == null) {
+                    )
+                    Log.d("LoginActivity", firstLoginAttempt.toString())
+                    if (firstLoginAttempt.success == 1) {
+                        setRSICookie(firstLoginAttempt.data!!.session_id, rsi_device)
                         Thread {
-//                            Log.d("LoginActivitySet", response.headers().toMultimap().toString())
-                            val headers = response.headers().toMultimap()["set-cookie"]!!
-                            for (header in headers) {
-                                if (header.contains("Rsi-Token")) {
-                                    rsi_token = header.split(";")[0].split("=")[1]
-                                }
-                            }
+                            val uid = Random().nextInt(1000000)
                             val newUser = saveUserData(
-                                loginDetail.data.account_signin!!.id,
+                                uid,
                                 rsi_device,
                                 rsi_token,
                                 email,
                                 password
                             )
+    //                                            Log.d("LoginActivity", newUser.toString())
                             lifecycleScope.launchWhenCreated {
                                 val pref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
                                 with(pref.edit()) {
-                                    putInt(getString(R.string.primary_user_key), loginDetail.data.account_signin.id)
+                                    putInt(getString(R.string.primary_user_key), uid)
                                     putBoolean(getString(R.string.is_log_in), true)
                                     apply()
                                 }
-                                userRepository.insertUser(newUser)
+                                userRepository.insertUser(newUser).isSuccess.toString()
                                 createSuccessAlerter(
                                     this@LoginActivity,
                                     getString(R.string.login_success),
@@ -181,105 +158,94 @@ class LoginActivity : RefugeBaseActivity() {
                                 startActivity(intent)
                             }
                         }.start()
-                        return@launchWhenCreated
-                    }
-                    if (loginDetail.errors[0].code == "AlreadyLoggedInException") {
-                        stopLoading()
-                        createWarningAlerter(
-                            this@LoginActivity,
-                            getString(R.string.error),
-                            getString(R.string.already_logged_in)
-                        ).show()
-                    } else if (loginDetail.errors[0].code == "InvalidPasswordException") {
-                        stopLoading()
-                        createWarningAlerter(
-                            this@LoginActivity,
-                            getString(R.string.error),
-                            getString(R.string.invalid_password)
-                        ).show()
-                    } else if (loginDetail.errors[0].code == "MultiStepRequiredException") {
-                        if (loginDetail.errors[0].extensions.details == null) {
+                    } else {
+                        if (firstLoginAttempt.code == "ErrCaptchaRequiredLauncher") {
+                            rsi_token = firstLoginAttempt.data!!.session_id
+                            val captchaResponse = RSIApi.retrofitService.rsiLauncherSignInCaptcha(
+                                RsiLauncherRecaptchaPostbody()
+                            )
+                            val captchaBase64 = Base64.encodeToString(captchaResponse.bytes(), Base64.DEFAULT)
+                            val captchaUrl = "data:image/png;base64,$captchaBase64"
+                            captchaLayout.visibility = View.VISIBLE
+                            Glide.with(this@LoginActivity).load(captchaUrl).into(captchaImageView)
                             stopLoading()
-                            createWarningAlerter(
-                                this@LoginActivity,
-                                getString(R.string.error),
-                                "未知错误"
-                            ).show()
                             return@launchWhenCreated
-                        }
-                        val deviceId = loginDetail.errors[0].extensions.details!!.device_id
-                        val rsiToken = loginDetail.errors[0].extensions.details!!.session_id
-                        setRSICookie(rsiToken!!, deviceId!!)
-                        stopLoading()
-                        val builder = QMUIDialog.EditTextDialogBuilder(this@LoginActivity)
-                        builder.setTitle(getString(R.string.multi_step_required))
-                            .setPlaceholder(getString(R.string.please_input_validation_code))
-                            .addAction(getString(R.string.cancel)) { dialog, _ ->
-                                dialog.dismiss()
-                            }
-                            .addAction(getString(R.string.accept)) { dialog, _ ->
-                                dialog.dismiss()
-                                lifecycleScope.launchWhenCreated {
-                                    try {
-                                        startLoading()
-                                        val multiStepInfo = RSIApi.retrofitService.multiStepLogin(MultiStepLoginQuery().getRequestBody(builder.editText.text.toString()))
-                                        if (multiStepInfo.errors == null) {
-                                            Thread {
-                                                val newUser = saveUserData(
-                                                    multiStepInfo.data.account_multistep!!.id,
-                                                    deviceId!!,
-                                                    rsi_token,
-                                                    email,
-                                                    password
-                                                )
-//                                            Log.d("LoginActivity", newUser.toString())
-                                                lifecycleScope.launchWhenCreated {
-                                                    val pref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-                                                    with(pref.edit()) {
-                                                        putInt(getString(R.string.primary_user_key), multiStepInfo.data.account_multistep.id)
-                                                        putBoolean(getString(R.string.is_log_in), true)
-                                                        apply()
+                        } else if (firstLoginAttempt.code == "ErrMultiStepRequired") {
+                            stopLoading()
+                            setRSICookie(firstLoginAttempt.data!!.session_id, rsi_device)
+                            val builder = QMUIDialog.EditTextDialogBuilder(this@LoginActivity)
+                            builder.setTitle(getString(R.string.multi_step_required))
+                                .setPlaceholder(getString(R.string.please_input_validation_code))
+                                .addAction(getString(R.string.cancel)) { dialog, _ ->
+                                    dialog.dismiss()
+                                }
+                                .addAction(getString(R.string.accept)) { dialog, _ ->
+                                    dialog.dismiss()
+                                    lifecycleScope.launchWhenCreated {
+                                        try {
+                                            startLoading()
+                                            val multiStepInfo = RSIApi.retrofitService.rsiLauncherSignInMultiStep(RsiLauncherSignInMultiStepBody(
+                                                code = builder.editText.text.toString()
+                                            ))
+                                            if (multiStepInfo.success == 1) {
+                                                setRSICookie(multiStepInfo.data!!.session_id, rsi_device)
+                                                val uid = Random().nextInt(1000000)
+                                                Thread {
+                                                    val newUser = saveUserData(
+                                                        uid,
+                                                        rsi_device,
+                                                        rsi_token,
+                                                        email,
+                                                        password
+                                                    )
+    //                                            Log.d("LoginActivity", newUser.toString())
+                                                    lifecycleScope.launchWhenCreated {
+                                                        val pref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+                                                        with(pref.edit()) {
+                                                            putInt(getString(R.string.primary_user_key), uid)
+                                                            putBoolean(getString(R.string.is_log_in), true)
+                                                            apply()
+                                                        }
+                                                        userRepository.insertUser(newUser).isSuccess.toString()
+                                                        createSuccessAlerter(
+                                                            this@LoginActivity,
+                                                            getString(R.string.login_success),
+                                                            getString(R.string.jump_to_main_page)
+                                                        ).show()
+                                                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                                                        startActivity(intent)
                                                     }
-                                                    userRepository.insertUser(newUser).isSuccess.toString()
-                                                    createSuccessAlerter(
-                                                        this@LoginActivity,
-                                                        getString(R.string.login_success),
-                                                        getString(R.string.jump_to_main_page)
-                                                    ).show()
-                                                    val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                                                    startActivity(intent)
-                                                }
-                                            }.start()
-                                        } else {
-                                            stopLoading()
-                                            createWarningAlerter(
-                                                this@LoginActivity,
-                                                getString(R.string.error),
-                                                getString(R.string.invalid_validation_code)
-                                            ).show()
-                                        }
+                                                }.start()
+                                            } else {
+                                                stopLoading()
+                                                createWarningAlerter(
+                                                    this@LoginActivity,
+                                                    getString(R.string.error),
+                                                    getString(R.string.invalid_validation_code)
+                                                ).show()
+                                            }
 
-                                    } catch (e: Exception) {
-                                        stopLoading()
-                                        createWarningAlerter(this@LoginActivity,
-                                            getString(R.string.error),
-                                            getString(R.string.network_error)
-                                        ).show()
-                                        Log.d("LoginActivity", e.toString())
+                                        } catch (e: Exception) {
+                                            stopLoading()
+                                            createWarningAlerter(this@LoginActivity,
+                                                getString(R.string.error),
+                                                getString(R.string.network_error)
+                                            ).show()
+                                            Log.d("LoginActivity", e.toString())
+                                        }
                                     }
                                 }
+                                .show()
+                            } else if (firstLoginAttempt.code == "ErrWrongPassword_email") {
+                                stopLoading()
+                                createWarningAlerter(this@LoginActivity, "登录失败", "请确认邮箱和密码是否正确哦").show()
+                            } else {
+                                stopLoading()
+                                createWarningAlerter(this@LoginActivity, "登录失败", firstLoginAttempt.code).show()
                             }
-                            .show()
-                    } else {
-                        stopLoading()
-                        createWarningAlerter(
-                            this@LoginActivity,
-                            getString(R.string.error),
-                            loginDetail.errors[0].message
-                        ).show()
-
+                        }
                     }
-                }
+//
             } else {
                 Toast.makeText(this, getString(R.string.please_enter_email_and_password), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener

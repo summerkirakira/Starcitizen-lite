@@ -84,11 +84,16 @@ interface UserDao {
     @Query("Delete FROM user where id = :id")
     fun delete(id: Int)
 
+    @Query("Delete FROM user where handle = :handle")
+    fun deleteByHandle(handle: String)
+
     @Query("SELECT * FROM user where id = :id")
     fun getById(id: Int): LiveData<User>
 
     @Query("SELECT * FROM user where handle = :handle")
     fun getByHandle(handle: String): LiveData<User>
+
+
 }
 
 @Dao

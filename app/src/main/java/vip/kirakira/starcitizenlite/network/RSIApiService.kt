@@ -86,15 +86,9 @@ val client: OkHttpClient = OkHttpClient
                 .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
                 .build()
             return@addInterceptor chain.proceed(newRequest)
-        } else if (request.url.toString() == "https://robertsspaceindustries.com/api/launcher/v3/account/check") {
+        } else if (request.url.toString().startsWith("https://robertsspaceindustries.com/api/launcher/v3")) {
             val newRequest = request.newBuilder()
                 .addHeader("x-rsi-token", rsi_token)
-                .addHeader("x-rsi-device", rsi_device)
-                .addHeader("user-agent", "RSI Launcher/1.6.8")
-                .build()
-            return@addInterceptor chain.proceed(newRequest)
-        } else if (request.url.toString() == "https://robertsspaceindustries.com/api/launcher/v3/signin") {
-            val newRequest = request.newBuilder()
                 .addHeader("x-rsi-device", rsi_device)
                 .addHeader("user-agent", "RSI Launcher/1.6.8")
                 .build()
@@ -228,6 +222,12 @@ interface RSIApiService {
 
     @POST("api/launcher/v3/signin")
     suspend fun rsiLauncherSignIn(@Body body: RsiLauncherSignInBody): RsiLauncherSignInResponse
+
+    @POST("api/launcher/v3/signin/multiStep")
+    suspend fun rsiLauncherSignInMultiStep(@Body body: RsiLauncherSignInMultiStepBody): RsiLauncherSignInResponse
+
+    @POST("api/launcher/v3/signin/captcha")
+    suspend fun rsiLauncherSignInCaptcha(@Body body: RsiLauncherRecaptchaPostbody): ResponseBody
 
 }
 

@@ -306,14 +306,12 @@ data class RsiLauncherSignInCheckResponse(
 
 data class RsiLauncherSignInResponse(
     val code: String,
+    val success: Int,
     val data: Data?
 ) {
     data class Data(
-        val account_id: Int,
         val session_id: String,
-        val citizen_id: String,
-        val nickname: String,
-        val displayname: String,
+        val device_id: String?,
     )
 }
 

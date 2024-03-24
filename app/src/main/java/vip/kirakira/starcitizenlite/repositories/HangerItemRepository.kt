@@ -22,6 +22,7 @@ import vip.kirakira.starcitizenlite.network.rsi_cookie
 import vip.kirakira.starcitizenlite.ui.home.Parser
 import vip.kirakira.starcitizenlite.ui.home.UpgradeInfo
 import vip.kirakira.starcitizenlite.util.Translation
+import java.util.concurrent.Executors
 
 class HangerItemRepository(private val database: ShopItemDatabase) {
 //    val allItems: LiveData<List<HangerItem>> = database.hangerItemDao.getAllItems()
@@ -34,6 +35,7 @@ class HangerItemRepository(private val database: ShopItemDatabase) {
 
     suspend fun refreshItems(application: Application) {
         withContext(Dispatchers.IO) {
+            val executor = Executors.newFixedThreadPool(5)
             var page = 1
             isRefreshing.postValue(true)
             val notTranslatedItems: MutableList<AddNotTranslationBody> = mutableListOf()

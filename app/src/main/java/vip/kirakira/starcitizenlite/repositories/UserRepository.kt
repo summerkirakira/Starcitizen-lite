@@ -14,6 +14,7 @@ class UserRepository(private val database: ShopItemDatabase) {
 
     suspend fun insertUser(user: User): Result<Int> {
         return withContext(Dispatchers.IO) {
+            database.userDao.deleteByHandle(user.handle)
             val id = database.userDao.insert(user)
             Result.success(user.id)
         }
