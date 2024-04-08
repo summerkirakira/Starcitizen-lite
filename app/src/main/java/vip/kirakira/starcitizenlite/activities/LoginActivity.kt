@@ -159,8 +159,11 @@ class LoginActivity : RefugeBaseActivity() {
                             }
                         }.start()
                     } else {
+                        rsi_token = firstLoginAttempt.data!!.session_id
+                        if (firstLoginAttempt.data.device_id != null) {
+                            rsi_device = firstLoginAttempt.data.device_id
+                        }
                         if (firstLoginAttempt.code == "ErrCaptchaRequiredLauncher") {
-                            rsi_token = firstLoginAttempt.data!!.session_id
                             val captchaResponse = RSIApi.retrofitService.rsiLauncherSignInCaptcha(
                                 RsiLauncherRecaptchaPostbody()
                             )
@@ -221,7 +224,7 @@ class LoginActivity : RefugeBaseActivity() {
                                                 createWarningAlerter(
                                                     this@LoginActivity,
                                                     getString(R.string.error),
-                                                    getString(R.string.invalid_validation_code)
+                                                    multiStepInfo.msg
                                                 ).show()
                                             }
 

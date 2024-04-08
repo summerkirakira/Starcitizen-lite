@@ -71,7 +71,7 @@ data class BuybackAuthTokenResponse(
 
 data class RsiLauncherSignInMultiStepBody(
     private val code: String,
-    private val device_name: String = "StarRefuge",
+    private val device_name: String = "My Device",
     private val device_type: String = "computer",
     private val duration: String = "year"
 )

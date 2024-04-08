@@ -307,6 +307,7 @@ data class RsiLauncherSignInCheckResponse(
 data class RsiLauncherSignInResponse(
     val code: String,
     val success: Int,
+    val msg: String,
     val data: Data?
 ) {
     data class Data(
