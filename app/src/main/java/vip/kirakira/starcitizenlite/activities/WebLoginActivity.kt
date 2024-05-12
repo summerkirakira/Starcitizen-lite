@@ -3,6 +3,7 @@ package vip.kirakira.starcitizenlite.activities
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -36,22 +37,45 @@ import vip.kirakira.viewpagertest.network.graphql.SignInMutation
 import java.io.ByteArrayInputStream
 
 val INTERCEPT_JS = """
-    var csrf = "";
-    window.onload = function() {
-        csrf = document.querySelector('meta[name="csrf-token"]').content;
+    function getCookie(name) {
+    let cookieArray = document.cookie.split(';'); // 将 cookie 字符串分割为数组
+    for(let cookie of cookieArray) {
+        let [cookieName, cookieValue] = cookie.trim().split('='); // 分割每个 cookie 的名称和值
+        if(cookieName === name) {
+            return cookieValue; // 找到匹配的 cookie 名称，返回对应的值
+        }
     }
-    XMLHttpRequest.prototype.origOpen = XMLHttpRequest.prototype.open;
-XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
-    // these will be the key to retrieve the payload
-    this.recordedMethod = method;
-    this.recordedUrl = url;
-    this.origOpen(method, url, async, user, password);
-};
-XMLHttpRequest.prototype.origSend = XMLHttpRequest.prototype.send;
-XMLHttpRequest.prototype.send = function(body) {
-    // interceptor is a Kotlin interface added in WebView
-    if(body) recorder.recordPayload(this.recordedMethod, this.recordedUrl, body, csrf);
-    this.origSend(body);
+    return ""; // 如果没有找到匹配的 cookie 名称，返回空字符串
+}
+const { fetch: originalFetch } = window;
+
+window.fetch = async (...args) => {
+    let [resource, config ] = args; console.log(args);
+    if(resource === "/graphql") {
+        data = JSON.parse(config.body);
+        if (config.headers["x-csrf-token"] != undefined) {
+            console.log("csdsddsdsa");
+            window.recorder.saveCsrfToken(config.headers["x-csrf-token"]);
+        }
+        console.log(data);
+        if (data.variables.email != undefined && data.variables.password != undefined) {
+            window.recorder.saveEmailPassword(data.variables.email, data.variables.password);
+        }
+        rsi_token = getCookie("Rsi-Token");
+        if (rsi_token != "") {
+            window.recorder.saveRsiToken(rsi_token);
+        }
+        _rsi_device = getCookie("_rsi_device");
+        if (_rsi_device != "") {
+            window.recorder.saveDeviceId(_rsi_device);
+        }
+        if ("RsiAuthenticatedAccount" in config.body) {
+            window.recorder.saveIsSuccess(true);
+        }
+    };
+    const response = await originalFetch(resource, config);
+    // response interceptor here
+    return response;
 };"""
 
 class WebLoginActivity : RefugeBaseActivity() {
@@ -82,6 +106,8 @@ class WebLoginActivity : RefugeBaseActivity() {
         supportActionBar?.hide()
 
         isFirstReq = true
+
+        WebView.setWebContentsDebuggingEnabled(true)
 
         val userRepository = UserRepository(getDatabase(application))
 
@@ -155,122 +181,7 @@ class WebLoginActivity : RefugeBaseActivity() {
             override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest): WebResourceResponse? {
                 val url = request.url.toString()
                 if (url.equals("https://robertsspaceindustries.com/graphql")) {
-                    val payload = recorder.getPayload(request.method, "/graphql")
-                    csrf_token = recorder.getCsrfToken()!!
-                    val webviewCookie = CookieManager.getInstance().getCookie(url)
 
-//                    Log.i("WebLoginActivity", "request: $request payload: $payload")
-                    // handle the request with the given payload and return the response
-                    if (payload?.contains("signin") == true) {
-                        if(isFirstReq){
-                            isFirstReq = false
-                            return super.shouldInterceptRequest(view, request)
-                        }
-                        signInVariables = SignInMutation().parseRequest(payload)
-                        email = signInVariables.variables.email
-                        password = signInVariables.variables.password
-                        if (signInVariables.variables.captcha != null) {
-                            val builder = Request.Builder()
-                            val req = builder.url("https://robertsspaceindustries.com/graphql")
-                                .addHeader("user-agent", DEFAULT_USER_AGENT)
-                                .addHeader("cookie", webviewCookie)
-                                .addHeader("x-csrf-token", recorder.getCsrfToken()!!)
-                                .addHeader("content-type", "application/json")
-                                .post(RequestBody.create("application/json".toMediaTypeOrNull(), payload))
-                                .build();
-                            val response = OkHttpClient().newCall(req).execute()
-                            val contentType = response.header("content-type")
-                            val responseBody = response.body?.string()
-                            if ("errors" in responseBody!!) {
-                                try {
-                                    val error = SignInMutation().parseFailure(responseBody).errors[0]
-                                    if (error.message == "MultiStepRequired") {
-//                                    Log.w("WebLoginActivity", "-----------MultiStepRequired-----------")
-                                        temp_device_id = error.extensions.details.device_id
-                                        temp_rsi_token = error.extensions.details.session_id
-                                    }
-                                } catch (e: Exception) {
-                                    Log.e("WebLoginActivity", "JSON parse error: ${e.message}")
-                                    return super.shouldInterceptRequest(view, request)
-                                }
-
-                            }
-                            return WebResourceResponse(contentType, "UTF-8", responseBody.byteInputStream())
-                        }
-                    } else if (payload?.contains("multistep") == true) {
-                        val builder = Request.Builder()
-                        val req = builder.url("https://robertsspaceindustries.com/graphql")
-                            .addHeader("user-agent", DEFAULT_USER_AGENT)
-                            .addHeader("content-type", "application/json")
-                            .addHeader("x-csrf-token", recorder.getCsrfToken()!!)
-                            .addHeader(
-                                "cookie",
-                                "CookieConsent=$RSI_COOKIE_CONSTENT;Rsi-Token=$temp_rsi_token; _rsi_device=$temp_device_id"
-                            )
-                            .post(RequestBody.create("application/json".toMediaTypeOrNull(), payload))
-                            .build();
-                        val response = OkHttpClient().newCall(req).execute()
-                        val responseBody = response.body?.string()
-                        if ("RsiAuthenticatedAccount" in responseBody!!) {
-                            val successLoginInfo = SignInMutation().parseLoginSuccess(responseBody)
-                            val newUser = saveUserData(
-                                successLoginInfo.data.account_multistep.id,
-                                temp_device_id,
-                                temp_rsi_token,
-                                email!!,
-                                password!!
-                            )
-                            isLogin.postValue(newUser)
-                        }
-                    } else if (payload?.contains("mutation signup") == true) {
-                        val payloadObject = JSONObject(payload)
-                        try {
-                            val code = payloadObject.getJSONObject("variables").getString("referralCode")
-                        } catch (e: Exception) {
-                            payloadObject.getJSONObject("variables").put("referralCode", "STAR-QSCF-FXKT")
-                        }
-                        val signUpEmail = payloadObject.getJSONObject("variables").getString("email")
-                        val signUpPassword = payloadObject.getJSONObject("variables").getString("password")
-                        val webviewCookies = CookieManager.getInstance().getCookie("https://robertsspaceindustries.com")
-                        var rsiToken: String? = null
-                        webviewCookies.split(";").forEach {
-                            if (it.contains("Rsi-Token")) {
-                                rsiToken = it.split("=")[1]
-                            }
-                        }
-                        val builder = Request.Builder()
-                        val req = builder.url("https://robertsspaceindustries.com/graphql")
-                            .addHeader("user-agent", DEFAULT_USER_AGENT)
-                            .addHeader("content-type", "application/json")
-                            .addHeader("x-csrf-token", recorder.getCsrfToken()!!)
-                            .addHeader("cookie", "${RSI_COOKIE_CONSTENT}; Rsi-Token=${rsiToken}")
-                            .post(RequestBody.create("application/json".toMediaTypeOrNull(), payloadObject.toString()))
-                            .build()
-                        val response = OkHttpClient().newCall(req).execute()
-
-                        val headers = response.headers.toMap()
-                        try {
-                            val rsiDevice = headers["set-cookie"]?.split(";")!!.get(0).split("=").get(1)
-                            if (rsiToken != null && rsiDevice.isNotEmpty()) {
-//                            val newUser = saveUserData((1..60000).random(), rsiDevice, rsiToken!!, signUpEmail, signUpPassword)
-//                            isLogin.postValue(newUser)
-                                isRegistered.postValue(true)
-                            }
-                        } catch (e: Exception) {
-                            runOnUiThread {
-                                Alerter.create(this@WebLoginActivity)
-                                    .setTitle("注册失败")
-                                    .setText("用户名或邮箱已被注册")
-                                    .setBackgroundColorRes(R.color.alert_dialog_background_failure)
-                                    .setIcon(R.drawable.ic_warning)
-                                    .show()
-                            }
-                        }
-
-
-                    }
-
-                    return super.shouldInterceptRequest(view, request)
                 }
                 return super.shouldInterceptRequest(view, request)
             }
@@ -282,6 +193,8 @@ class WebLoginActivity : RefugeBaseActivity() {
         loginWebView.setInitialScale(230)
 
         loginWebView.loadUrl("https://robertsspaceindustries.com/connect")
+
+
 
     }
 
@@ -307,28 +220,37 @@ class WebLoginActivity : RefugeBaseActivity() {
     }
 
     class PayloadRecorder {
-        private val payloadMap: MutableMap<String, String> =
-            mutableMapOf()
         private var csrfToken: String? = null
+        private var email: String? = null
+        private var password: String? = null
+        private var deviceId: String? = null
+        private var rsiToken: String? = null
+        private var isSuccess = false
 
         @JavascriptInterface
-        fun recordPayload(
-            method: String,
-            url: String,
-            payload: String,
-            csrf: String
-        ) {
-            payloadMap["$method-$url"] = payload
-            Log.d("PayloadRecorder", "$method-$payload")
-            csrfToken = csrf
+        fun saveEmailPassword(email: String, password: String) {
+            this.email = email
+            this.password = password
         }
 
-        fun getPayload(
-            method: String,
-            url: String
-        ): String? =
-            payloadMap["$method-$url"]
+        @JavascriptInterface
+        fun saveCsrfToken(csrfToken: String) {
+            this.csrfToken = csrfToken
+        }
 
-        fun getCsrfToken(): String? = csrfToken
+        @JavascriptInterface
+        fun saveDeviceId(deviceId: String) {
+            this.deviceId = deviceId
+        }
+
+        @JavascriptInterface
+        fun saveRsiToken(rsiToken: String) {
+            this.rsiToken = rsiToken
+        }
+
+        @JavascriptInterface
+        fun saveIsSuccess(isSuccess: Boolean) {
+            this.isSuccess = isSuccess
+        }
     }
 }

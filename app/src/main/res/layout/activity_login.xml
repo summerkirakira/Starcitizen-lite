@@ -78,6 +78,7 @@
         </LinearLayout>
         <TextView android:layout_width="match_parent"
                   android:layout_height="wrap_content"
+                  android:visibility="gone"
                   android:gravity="center"
                   android:text="@string/login_by_web"
                   android:textColor="@color/qmui_config_color_blue"

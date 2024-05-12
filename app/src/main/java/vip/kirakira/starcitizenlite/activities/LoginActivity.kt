@@ -33,6 +33,7 @@ import vip.kirakira.starcitizenlite.database.getDatabase
 import vip.kirakira.starcitizenlite.network.*
 import vip.kirakira.starcitizenlite.network.CirnoProperty.RecaptchaList
 import vip.kirakira.starcitizenlite.network.shop.LoginProperty
+import vip.kirakira.starcitizenlite.network.shop.RsiLauncherSignInResponse
 import vip.kirakira.starcitizenlite.repositories.UserRepository
 import vip.kirakira.starcitizenlite.ui.widgets.RefugeVip
 import vip.kirakira.viewpagertest.network.graphql.*
@@ -120,14 +121,23 @@ class LoginActivity : RefugeBaseActivity() {
 //                    val loginDetail: LoginProperty
 //                    val response: retrofit2.Response<LoginProperty>
                     val captcha = if (captchaEditText.text.isNotEmpty()) captchaEditText.text.toString() else null
-                    val firstLoginAttempt = RSIApi.retrofitService.rsiLauncherSignIn(
-                        RsiLauncherSignInBody(
-                            username = email,
-                            password = password,
-                            remember = true,
-                            captcha = captcha
+                    val firstLoginAttempt: RsiLauncherSignInResponse
+                    try {
+                        firstLoginAttempt = RSIApi.retrofitService.rsiLauncherSignIn(
+                            RsiLauncherSignInBody(
+                                username = email,
+                                password = password,
+                                remember = true,
+                                captcha = captcha
+                            )
                         )
-                    )
+                    } catch (e: Exception) {
+                        stopLoading()
+                        createWarningAlerter(this@LoginActivity, getString(R.string.error), getString(R.string.network_error)).show()
+                        Log.d("LoginActivity", e.toString())
+                        return@launchWhenCreated
+                    }
+
                     Log.d("LoginActivity", firstLoginAttempt.toString())
                     if (firstLoginAttempt.success == 1) {
                         setRSICookie(firstLoginAttempt.data!!.session_id, rsi_device)
@@ -159,6 +169,30 @@ class LoginActivity : RefugeBaseActivity() {
                             }
                         }.start()
                     } else {
+
+                        if (firstLoginAttempt.code == "ErrInvalidChallengeCode") {
+                            createWarningAlerter(this@LoginActivity, "登录失败", "图形验证码错误，请重新输入").show()
+                            val captchaResponse = RSIApi.retrofitService.rsiLauncherSignInCaptcha(
+                                    RsiLauncherRecaptchaPostbody()
+                                    )
+                            val captchaBase64 = Base64.encodeToString(captchaResponse.bytes(), Base64.DEFAULT)
+                            val captchaUrl = "data:image/png;base64,$captchaBase64"
+                            captchaLayout.visibility = View.VISIBLE
+                            Glide.with(this@LoginActivity).load(captchaUrl).into(captchaImageView)
+                            stopLoading()
+                            return@launchWhenCreated
+                        }
+
+                        if (firstLoginAttempt.code == "ErrWrongPassword_email") {
+                            stopLoading()
+                            createWarningAlerter(this@LoginActivity, "登录失败", "请确认邮箱和密码是否正确哦").show()
+                            return@launchWhenCreated
+                        }
+                        if (firstLoginAttempt.data == null) {
+                            stopLoading()
+                            createWarningAlerter(this@LoginActivity, "登录失败", firstLoginAttempt.msg).show()
+                            return@launchWhenCreated
+                        }
                         rsi_token = firstLoginAttempt.data!!.session_id
                         if (firstLoginAttempt.data.device_id != null) {
                             rsi_device = firstLoginAttempt.data.device_id

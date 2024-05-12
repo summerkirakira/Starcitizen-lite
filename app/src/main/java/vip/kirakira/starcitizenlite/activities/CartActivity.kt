@@ -74,11 +74,6 @@ class CartActivity : RefugeBaseActivity() {
 
                     return WebResourceResponse("text/html", "utf-8", null)
                 }
-                if (url == "https://robertsspaceindustries.com/graphql") {
-                    // go back to last activity
-                    val payload = recorder.getPayload(request.method, "/graphql")
-                    Log.d("payload", "$payload")
-                }
 
 
                 // Get AliPay URL
