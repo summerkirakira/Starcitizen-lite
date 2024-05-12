@@ -81,7 +81,7 @@ data class CartValidationProperty(val errors: List<Error>?, val data: Data?) {
     data class Data(val store: Store) {
         data class Store(val cart: Cart) {
             data class Cart(val mutations: Mutations) {
-                data class Mutations(val validate: String)
+                data class Mutations(val validate: String?)
             }
         }
     }

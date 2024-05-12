@@ -31,9 +31,11 @@ import vip.kirakira.starcitizenlite.activities.WebLoginActivity
 import vip.kirakira.starcitizenlite.createSuccessAlerter
 import vip.kirakira.starcitizenlite.createWarningAlerter
 import vip.kirakira.starcitizenlite.databinding.HomeFragmentBinding
+import vip.kirakira.starcitizenlite.network.CirnoApi
 import vip.kirakira.starcitizenlite.network.RSIApi
 import vip.kirakira.starcitizenlite.network.hanger.HangerService
-import vip.kirakira.starcitizenlite.network.shop.clearCart
+import vip.kirakira.starcitizenlite.network.performAliPay
+import vip.kirakira.starcitizenlite.network.shop.*
 import vip.kirakira.starcitizenlite.ui.loadImage
 import vip.kirakira.starcitizenlite.ui.widgets.RefugeVip
 import vip.kirakira.viewpagertest.network.graphql.ApplyTokenBody
@@ -372,6 +374,31 @@ class HomeFragment : Fragment() {
                                             clearCart()
                                             if (!item.isUpgrade) {
                                                 val message = RSIApi.retrofitService.buyBackPledge(BuyBackPledgeBody(item.id))
+                                                val recaptcha =CirnoApi.getReCaptchaV3(1)[0]
+                                                nextStep()
+                                                val address = cartAddressQuery()
+                                                val assignAddress = cartAddressAssign(address.data.store.addressBook.first().id)
+                                                val validateData = cartValidation(recaptcha)
+                                                if (validateData.errors != null) {
+                                                    createWarningAlerter(
+                                                        requireActivity(),
+                                                        "购买失败",
+                                                        validateData.errors[0].message
+                                                    ).show()
+                                                    return@launch
+                                                }
+                                                val cartStatus = getCartSummary()
+                                                if (cartStatus.data.store.cart.totals.total == 0 && cartStatus.data.store.cart.totals.subTotal == 0) {
+                                                    createSuccessAlerter(
+                                                        requireActivity(),
+                                                        "购买成功",
+                                                        "请在机库中查看"
+                                                    ).show()
+                                                } else {
+                                                    performAliPay(requireContext(), validateData.data!!.store.cart.mutations.validate!!)
+                                                    viewModel.refresh()
+                                                    return@launch
+                                                }
                                                 if (message.success == 1) {
                                                     createSuccessAlerter(requireActivity(), getString(R.string.buy_back_success), "已添加回购${item.name}")
                                                     jumpToCartActivity(requireContext())
@@ -379,8 +406,8 @@ class HomeFragment : Fragment() {
                                                     createWarningAlerter(requireActivity(), getString(R.string.buy_back_failed), message.msg).show()
                                                 }
                                             } else {
-                                                val jwt = RSIApi.setBuybackAuthToken()
-                                                val contextToken = RSIApi.getBuybackContextToken(
+                                                RSIApi.setBuybackAuthToken()
+                                                RSIApi.getBuybackContextToken(
                                                     fromShipId = item.formShipId,
                                                     pledgeId = item.id,
                                                     toShipId = item.toShipId,
@@ -393,26 +420,45 @@ class HomeFragment : Fragment() {
                                                 val token = RSIApi.retrofitService.addUpgradeToCart(
                                                     addToCartPostBody
                                                 )
-
-                                                RSIApi.retrofitService.applyToken(ApplyTokenBody(token.data.addToCart!!.jwt))
-                                                val bundle = Bundle()
-                                                bundle.putString(
-                                                    "url",
-                                                    "https://robertsspaceindustries.com/store/pledge/cart"
-                                                )
-                                                val intent = Intent(context, CartActivity::class.java)
-                                                intent.putExtras(bundle)
-                                                // wait activity result
-                                                // if result is ok, then do next step
-                                                // else do nothing
-                                                startActivity(intent)
+                                                if (token.data.addToCart == null) {
+                                                    createWarningAlerter(activity!!, getString(R.string.buy_back_failed), "Token error").show()
+                                                    return@launch
+                                                }
+                                                RSIApi.retrofitService.applyToken(ApplyTokenBody(token.data.addToCart.jwt))
+                                                val recaptcha =CirnoApi.getReCaptchaV3(1)[0]
+                                                nextStep()
+                                                val address = cartAddressQuery()
+                                                val assignAddress = cartAddressAssign(address.data.store.addressBook.first().id)
+                                                val validateData = cartValidation(recaptcha)
+                                                if (validateData.errors != null) {
+                                                    createWarningAlerter(
+                                                        requireActivity(),
+                                                        "购买失败",
+                                                        validateData.errors[0].message
+                                                    ).show()
+                                                    return@launch
+                                                }
+                                                val cartStatus = getCartSummary()
+                                                if (cartStatus.data.store.cart.totals.total == 0 && cartStatus.data.store.cart.totals.subTotal == 0) {
+                                                    createSuccessAlerter(
+                                                        requireActivity(),
+                                                        "购买成功",
+                                                        "请在机库中查看"
+                                                    ).show()
+                                                } else {
+                                                    performAliPay(requireContext(), validateData.data!!.store.cart.mutations.validate!!)
+                                                    viewModel.refresh()
+                                                    return@launch
+                                                }
                                             }
                                         } catch (e: Exception) {
-                                            createWarningAlerter(activity!!, getString(R.string.buy_back_failed), getString(R.string.network_error)).show()
+                                            createWarningAlerter(activity!!, getString(R.string.buy_back_failed), e.toString()).show()
+                                            Log.d("buyback", e.toString())
                                         }
                                     }
                                 } catch (e: Exception) {
                                     createWarningAlerter(activity!!, getString(R.string.buy_back_failed), getString(R.string.network_error)).show()
+                                    Log.d("buyback", e.toString())
                                 }
                             }.show()
 

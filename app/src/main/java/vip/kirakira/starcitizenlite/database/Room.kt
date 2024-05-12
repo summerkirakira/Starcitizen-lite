@@ -68,6 +68,9 @@ interface BuybackItemDao {
 
     @Query("Delete FROM buyback where insert_time < :time")
     fun deleteAllOldItems(time: Long)
+
+    @Query("Delete FROM buyback")
+    fun deleteAll()
 }
 
 @Dao

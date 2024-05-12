@@ -23,8 +23,8 @@ android {
         applicationId "vip.kirakira.starcitizenlite"
         minSdk 26
         targetSdk 33
-        versionCode 13
-        versionName "2.4.6"
+        versionCode 14
+        versionName "2.4.7"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 

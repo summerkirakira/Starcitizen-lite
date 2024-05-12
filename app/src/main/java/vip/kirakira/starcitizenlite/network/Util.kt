@@ -1,20 +1,30 @@
 package vip.kirakira.starcitizenlite.network
 
-import android.app.Application
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
+import androidx.core.content.ContextCompat.startActivity
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
 import vip.kirakira.starcitizenlite.activities.CartActivity
+import vip.kirakira.starcitizenlite.createWarningAlerter
 import vip.kirakira.starcitizenlite.database.User
 import vip.kirakira.starcitizenlite.network.search.getPlayerSearchResult
 import vip.kirakira.starcitizenlite.network.shop.GetStripePaymentMethodProperty
 import vip.kirakira.starcitizenlite.network.shop.StripDataProperty
-import vip.kirakira.starcitizenlite.repositories.UserRepository
+import vip.kirakira.starcitizenlite.network.shop.getStripePaymentMethod
+import vip.kirakira.starcitizenlite.network.shop.setPaymentMethodMutation
 import java.text.SimpleDateFormat
 
 val DEFAULT_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36"
@@ -207,6 +217,65 @@ fun saveUserData(uid: Int, rsi_device: String, rsi_token: String, email: String,
     )
 }
 
+
+suspend fun performAliPay(context: Context, validateId: String) {
+    setPaymentMethodMutation(validateId)
+    Toast.makeText(
+        context,
+        "无法使用信用点购买~转为现金购买",
+        Toast.LENGTH_LONG
+    ).show()
+    try {
+        val paymentData = getStripePaymentMethod(validateId)
+        Toast.makeText(
+            context,
+            "支付信息已确认，尝试拉起支付宝",
+            Toast.LENGTH_LONG
+        ).show()
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                val urlData = getAlipayUrl(paymentData)
+                val qrcodeUrl = getAliPayQrCodeUrl(urlData.next_action.alipay_handle_redirect.url)
+
+
+                val topic = "alipays://platformapi/startapp?saId=10000007&qrcode="
+// 字符串拼接
+                val jumpUrl = topic + qrcodeUrl
+// jumpUrl 为先前示例拼接出来的 url
+                val contentUrl: Uri = Uri.parse(jumpUrl)
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = contentUrl
+                context.startActivity(intent)
+            } catch (e: Exception) {
+
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        context,
+                        "无法拉起支付宝, 请在浏览器窗口中继续",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                val bundle = Bundle()
+                bundle.putString(
+                    "url",
+                    "https://robertsspaceindustries.com/store/pledge/cart"
+                )
+                val intent = Intent(context, CartActivity::class.java)
+                intent.putExtras(bundle)
+
+                context.startActivity(intent)
+            }
+
+
+            Log.d("PaymentData", paymentData.toString())
+        }
+    } catch (e: Exception) {
+//        createWarningAlerter(context., "获取支付信息失败", e.toString()).show()
+        Log.d("PaymentData", e.toString())
+    }
+}
+
 fun getAlipayUrl(data: GetStripePaymentMethodProperty): StripDataProperty {
     val okHttpClient = OkHttpClient()
 
@@ -238,3 +307,4 @@ fun getAliPayQrCodeUrl(url: String): String {
     val result = matchResult?.groups?.get(1)!!.value
     return result
 }
+

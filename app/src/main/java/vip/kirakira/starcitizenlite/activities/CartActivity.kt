@@ -48,9 +48,12 @@ class CartActivity : RefugeBaseActivity() {
             WindowManager.LayoutParams.FLAG_FULLSCREEN
         );
         loginWebView = findViewById(R.id.webView)
-        loginWebView.settings.userAgentString = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:99.0) Gecko/20100101 Firefox/99.0"
+//        loginWebView.settings.userAgentString = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:99.0) Gecko/20100101 Firefox/99.0"
         loginWebView.settings.domStorageEnabled = true
         loginWebView.settings.javaScriptCanOpenWindowsAutomatically = true
+        loginWebView.settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW;
+        loginWebView.settings.safeBrowsingEnabled = false
+
 
         val cookieManager = CookieManager.getInstance()
         cookieManager.removeAllCookies(null)
@@ -58,7 +61,7 @@ class CartActivity : RefugeBaseActivity() {
         rsi_cookie.split(";").forEach {
             cookieManager.setCookie(RSI_URL, it)
         }
-        loginWebView.evaluateJavascript(INTERCEPT_JS, null)
+//        loginWebView.evaluateJavascript(INTERCEPT_JS, null)
         loginWebView.webViewClient = object : WebLoginActivity.LoginWebViewClient() {
 
             override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest): WebResourceResponse? {
@@ -68,10 +71,6 @@ class CartActivity : RefugeBaseActivity() {
                         isWarned = true
                         createWarningAlerter(this@CartActivity,"暂不支持PayPal支付", "出于账户安全考量，请使用信用点或者信用卡支付哦").show()
                     }
-
-
-
-
                     return WebResourceResponse("text/html", "utf-8", null)
                 }
 

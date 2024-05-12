@@ -84,7 +84,7 @@ class HangerProcess {
                 isUpgrade = true
                 fromShipId = pledge.select(".holosmallbtn").attr("data-fromshipid").toInt()
                 toShipId = pledge.select(".holosmallbtn").attr("data-toshipid").toInt()
-//                toSkuId = pledge.select(".holosmallbtn").attr("data-toskuid").toInt()
+                toSkuId = pledge.select(".holosmallbtn").attr("data-toskuid").toInt()
             }
             buybackItems.add(BuybackItem(
                 pledgeId,
