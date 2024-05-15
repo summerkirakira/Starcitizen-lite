@@ -264,6 +264,7 @@ object RSIApi {
 
     fun getPlayerInfoPage(name: String): String {
         val request = Request.Builder().url(URL("https://robertsspaceindustries.com/citizens/$name"))
+            .addHeader("cookie", rsi_cookie)
             .get()
             .build()
         val response = client.newCall(request).execute()
